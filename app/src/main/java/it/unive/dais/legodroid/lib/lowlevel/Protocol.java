@@ -25,7 +25,7 @@ public class Protocol {
 
         final Promise<float[]> returnPromise = new Promise<>();
 
-        Promise<DirectCommandReply> replyPromise = manager.sendPacketAsync(byteCode.getBytes(), 0, 4 * nvalue);
+        Promise<DirectCommandReply> replyPromise = manager.sendPacketAsyncReply(byteCode.getBytes(), 0, 4 * nvalue);
         replyPromise.then(new Handler<DirectCommandReply>() {
             @Override
             public void call(DirectCommandReply data) {
@@ -58,7 +58,7 @@ public class Protocol {
 
         final Promise<short[]> returnPromise = new Promise<>();
 
-        Promise<DirectCommandReply> replyPromise = manager.sendPacketAsync(byteCode.getBytes(), 0, nvalue);
+        Promise<DirectCommandReply> replyPromise = manager.sendPacketAsyncReply(byteCode.getBytes(), 0, nvalue);
         replyPromise.then(new Handler<DirectCommandReply>() {
             @Override
             public void call(DirectCommandReply data) {
@@ -84,12 +84,10 @@ public class Protocol {
         }
     }
 
-    public void setOutputState(int port, int speed) {
+    public void setOutputState(PacketManager manager, int port, int speed) throws IOException {
         ByteCodeGen byteCode = new ByteCodeGen();
 
         byte byteCodePort = toByteCodePort(port);
-
-        byteCode.addOpCode(Constants.DIRECT_COMMAND_NOREPLY);
 
         byteCode.addOpCode(Constants.OUTPUT_POWER);
         byteCode.addParameter(Constants.LAYER_MASTER);
@@ -99,17 +97,19 @@ public class Protocol {
         byteCode.addOpCode(Constants.OUTPUT_START);
         byteCode.addParameter(Constants.LAYER_MASTER);
         byteCode.addParameter(byteCodePort);
+
+        manager.sendPacketAsyncNoReply(byteCode.getBytes(), 0, 0);
     }
 
-    public static void soundTone(PacketManager manager, int volume, int freq, int duration) {
+    public static void soundTone(PacketManager manager, int volume, int freq, int duration) throws IOException {
         ByteCodeGen byteCode = new ByteCodeGen();
-
-        byteCode.addOpCode(Constants.DIRECT_COMMAND_NOREPLY);
 
         byteCode.addOpCode(Constants.SOUND_CONTROL);
         byteCode.addOpCode(Constants.SOUND_TONE);
         byteCode.addParameter((byte) volume);
         byteCode.addParameter((short) freq);
         byteCode.addParameter((short) duration);
+
+        manager.sendPacketAsyncNoReply(byteCode.getBytes(), 0, 0);
     }
 }

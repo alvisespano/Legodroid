@@ -15,9 +15,16 @@ public class PacketManager {
         this.sequenceCounter = 0;
     }
 
-    public Promise<DirectCommandReply> sendPacketAsync(final byte[] bytecode, final int localReservation,
-            final int globalReservation) throws IOException {
-        DirectCommandPacket packet = new DirectCommandPacket(sequenceCounter, localReservation, globalReservation,
+    void sendPacketAsyncNoReply(final byte[] bytecode, final int localReservation,
+                                final int globalReservation) throws IOException {
+        DirectCommandPacket packet = new DirectCommandPacket(sequenceCounter, false, localReservation, globalReservation,
+                bytecode);
+        connector.write(packet.getBytes());
+    }
+
+    Promise<DirectCommandReply> sendPacketAsyncReply(final byte[] bytecode, final int localReservation,
+                                                     final int globalReservation) throws IOException {
+        DirectCommandPacket packet = new DirectCommandPacket(sequenceCounter, true, localReservation, globalReservation,
                 bytecode);
         connector.write(packet.getBytes());
 

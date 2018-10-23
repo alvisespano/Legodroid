@@ -3,6 +3,10 @@ package it.unive.dais.legodroid.lib;
 import it.unive.dais.legodroid.lib.lowlevel.Connector;
 import it.unive.dais.legodroid.lib.lowlevel.PacketManager;
 import it.unive.dais.legodroid.lib.lowlevel.Protocol;
+import it.unive.dais.legodroid.lib.sensors.BaseSensor;
+import it.unive.dais.legodroid.lib.sensors.touch.TouchSensor;
+
+import java.io.IOException;
 
 public class EV3 {
     private PacketManager packetManager;
@@ -11,11 +15,15 @@ public class EV3 {
         this.packetManager = new PacketManager(connector);
     }
 
-    public void soundTone(int volume, int freq, int duration) {
+    public PacketManager getPacketManager() {
+        return packetManager;
+    }
+
+    public void soundTone(int volume, int freq, int duration) throws IOException {
         Protocol.soundTone(packetManager, volume, freq, duration);
     }
 
-    public PacketManager getPacketManager() {
-        return packetManager;
+    public TouchSensor createTouchSensor(int port) {
+        return new TouchSensor(this, port);
     }
 }

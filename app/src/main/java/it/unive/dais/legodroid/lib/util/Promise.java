@@ -19,6 +19,14 @@ public class Promise<T> {
         }
     }
 
+    public void thenError(Handler<T> handler) {
+        this.rejectHandler = handler;
+
+        if (data != null) {
+            handler.call(data);
+        }
+    }
+
     public void resolve(T data) {
         this.data = data;
 

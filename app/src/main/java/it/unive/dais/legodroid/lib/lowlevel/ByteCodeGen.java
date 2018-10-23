@@ -5,6 +5,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class ByteCodeGen {
+    private static final byte SHORT_SIZE = (byte) 0x82;
+    private static final byte INT_SIZE = (byte) 0x83;
     private ByteArrayOutputStream mStream;
 
     private DataOutputStream mWriter;
@@ -32,6 +34,7 @@ public class ByteCodeGen {
 
     public void addParameter(short param) {
         try {
+            mWriter.writeByte(SHORT_SIZE);
             mWriter.writeByte(param);
             mWriter.writeByte(param >> 8);
         } catch (IOException e) {
@@ -41,6 +44,7 @@ public class ByteCodeGen {
 
     public void addParameter(int param) {
         try {
+            mWriter.writeByte(INT_SIZE);
             mWriter.writeByte(param);
             mWriter.writeByte(param >> 8);
             mWriter.writeByte(param >> 16);

@@ -33,16 +33,21 @@ public class MainActivity extends AppCompatActivity {
             final Button button = findViewById(R.id.pollButton);
             button.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    final TouchSensor touchSensor = new TouchSensor(ev3, 0);
-                    final TextView label = findViewById(R.id.textView);
+//                    final TouchSensor touchSensor = new TouchSensor(ev3, 0);
+//                    final TextView label = findViewById(R.id.textView);
+//                    try {
+//                        touchSensor.getPressed().then(new Handler<Boolean>() {
+//                            @Override
+//                            public void call(Boolean data) {
+//                                Log.i("ev3", data.toString());
+//                                label.setText(data.toString());
+//                            }
+//                        });
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
                     try {
-                        touchSensor.getPressed().then(new Handler<Boolean>() {
-                            @Override
-                            public void call(Boolean data) {
-                                Log.i("ev3", data.toString());
-                                label.setText(data.toString());
-                            }
-                        });
+                        ev3.soundTone(2, 1000, 1000);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
