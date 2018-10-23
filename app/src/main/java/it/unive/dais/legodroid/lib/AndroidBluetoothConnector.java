@@ -1,4 +1,4 @@
-package it.unive.dais.legodroid.lib.android;
+package it.unive.dais.legodroid.lib;
 
 import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;

@@ -1,8 +1,7 @@
-package it.unive.dais.legodroid.lib.sensors.touch;
+package it.unive.dais.legodroid.lib.sensors;
 
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.lowlevel.Protocol;
-import it.unive.dais.legodroid.lib.sensors.BaseSensor;
 import it.unive.dais.legodroid.lib.util.Handler;
 import it.unive.dais.legodroid.lib.util.Promise;
 
@@ -11,8 +10,9 @@ import java.io.IOException;
 import static it.unive.dais.legodroid.lib.lowlevel.Constants.EV3_TOUCH;
 import static it.unive.dais.legodroid.lib.lowlevel.Constants.TOUCH_TOUCH;
 
-public class TouchSensor extends BaseSensor<Object> {
-    TouchSensor(EV3 ev3, int port) {
+
+public class TouchSensor extends AbstractSensor<Object> {
+    public TouchSensor(EV3 ev3, int port) {
         super(ev3, port, null);
     }
 
