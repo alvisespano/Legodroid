@@ -5,12 +5,9 @@ import it.unive.dais.legodroid.lib.lowlevel.PacketManager;
 import it.unive.dais.legodroid.lib.lowlevel.Protocol;
 
 public class EV3 {
-    private Connector connector;
     private PacketManager packetManager;
 
     public EV3(Connector connector) {
-        this.connector = connector;
-
         this.packetManager = new PacketManager(connector);
     }
 

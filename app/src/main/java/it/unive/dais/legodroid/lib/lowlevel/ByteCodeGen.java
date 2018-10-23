@@ -28,7 +28,6 @@ public class ByteCodeGen {
 
     public void addParameter(byte param) {
         try {
-            mWriter.writeByte(BYTE_SIZE);
             mWriter.writeByte(param);
         } catch (IOException e) {
             e.printStackTrace();
@@ -37,7 +36,6 @@ public class ByteCodeGen {
 
     public void addParameter(short param) {
         try {
-            mWriter.writeByte(SHORT_SIZE);
             mWriter.writeByte(param);
             mWriter.writeByte(param >> 8);
         } catch (IOException e) {
@@ -47,7 +45,6 @@ public class ByteCodeGen {
 
     public void addParameter(int param) {
         try {
-            mWriter.writeByte(INT_SIZE);
             mWriter.writeByte(param);
             mWriter.writeByte(param >> 8);
             mWriter.writeByte(param >> 16);
@@ -59,8 +56,7 @@ public class ByteCodeGen {
 
     public void addGlobalIndex(byte index) {
         try {
-            mWriter.writeByte(GLOBAL_INDEX_SIZE);
-            mWriter.writeByte(index);
+            mWriter.writeByte(index + 0x60);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -76,11 +72,6 @@ public class ByteCodeGen {
 
     public byte[] getBytes() {
         byte[] byteCode = mStream.toByteArray();
-
-        int bodyLength = byteCode.length - 2;
-
-        byteCode[0] = (byte) (bodyLength & 0xff);
-        byteCode[1] = (byte) ((bodyLength >>> 8) & 0xff);
         return byteCode;
     }
 }

@@ -11,10 +11,9 @@ import java.util.Arrays;
 public class Protocol {
     private static final byte OUTPUT_PORT_OFFSET = 0x10;
 
-    public static Promise<float[]> getSiValue(PacketManager manager, int port, int type, int mode, final int nvalue) throws IOException {
+    public static Promise<float[]> getSiValue(PacketManager manager, int port, int type, int mode, final int nvalue)
+            throws IOException {
         ByteCodeGen byteCode = new ByteCodeGen();
-        byteCode.addOpCode(Constants.DIRECT_COMMAND_REPLY);
-
         byteCode.addOpCode(Constants.INPUT_DEVICE);
         byteCode.addOpCode(Constants.READY_SI);
         byteCode.addParameter(Constants.LAYER_MASTER);
@@ -26,11 +25,10 @@ public class Protocol {
 
         final Promise<float[]> returnPromise = new Promise<>();
 
-        Promise<DirectCommandReply> replyPromise =
-                manager.sendPacketAsync(byteCode.getBytes(), 0, 4 * nvalue);
-        replyPromise.setHandler(new Handler<DirectCommandReply>() {
+        Promise<DirectCommandReply> replyPromise = manager.sendPacketAsync(byteCode.getBytes(), 0, 4 * nvalue);
+        replyPromise.then(new Handler<DirectCommandReply>() {
             @Override
-            public void response(DirectCommandReply data) {
+            public void call(DirectCommandReply data) {
                 byte[] reply = data.getData();
 
                 float[] result = new float[nvalue];
@@ -46,10 +44,9 @@ public class Protocol {
         return returnPromise;
     }
 
-    public static Promise<short[]> getPercentValue(PacketManager manager, int port, int type, int mode, final int nvalue) throws IOException {
+    public static Promise<short[]> getPercentValue(PacketManager manager, int port, int type, int mode,
+            final int nvalue) throws IOException {
         ByteCodeGen byteCode = new ByteCodeGen();
-        byteCode.addOpCode(Constants.DIRECT_COMMAND_REPLY);
-
         byteCode.addOpCode(Constants.INPUT_DEVICE);
         byteCode.addOpCode(Constants.READY_PCT);
         byteCode.addParameter(Constants.LAYER_MASTER);
@@ -61,11 +58,10 @@ public class Protocol {
 
         final Promise<short[]> returnPromise = new Promise<>();
 
-        Promise<DirectCommandReply> replyPromise =
-                manager.sendPacketAsync(byteCode.getBytes(), 0, nvalue);
-        replyPromise.setHandler(new Handler<DirectCommandReply>() {
+        Promise<DirectCommandReply> replyPromise = manager.sendPacketAsync(byteCode.getBytes(), 0, nvalue);
+        replyPromise.then(new Handler<DirectCommandReply>() {
             @Override
-            public void response(DirectCommandReply data) {
+            public void call(DirectCommandReply data) {
                 byte[] reply = data.getData();
 
                 short[] result = new short[nvalue];

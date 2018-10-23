@@ -8,36 +8,43 @@ import java.util.*;
 public class PacketManager implements DataReceiveListener {
     private Connector connector;
     private int sequenceCounter;
-    private List<Promise<DirectCommandReply>> handlers;
 
     public PacketManager(Connector connector) {
         this.connector = connector;
         this.sequenceCounter = 0;
-        this.handlers = new LinkedList<>();
-
-        this.connector.addDataReceiveListener(this);
     }
 
     public Promise<DirectCommandReply> sendPacketAsync(final byte[] bytecode, final int localReservation,
-                                   final int globalReservation) throws IOException {
-        DirectCommandPacket packet =
-                new DirectCommandPacket(sequenceCounter, localReservation, globalReservation, bytecode);
+            final int globalReservation) throws IOException {
+        DirectCommandPacket packet = new DirectCommandPacket(sequenceCounter, localReservation, globalReservation,
+                bytecode);
         connector.write(packet.getBytes());
 
-        Promise<DirectCommandReply> promise = new Promise<>(sequenceCounter);
-        handlers.add(promise);
+        final Promise<DirectCommandReply> promise = new Promise<>();
+
+        connector.read(2).then(new Handler<byte[]>() {
+            @Override
+            public void call(byte[] data) {
+                final int length = data[0] << 8 & 0xFF00 | data[1] & 0xFF;
+                final byte[] lengthHeader = data;
+                try {
+                    connector.read(length).then(new Handler<byte[]>() {
+                        @Override
+                        public void call(byte[] data) {
+                            byte[] resultBytes = new byte[length + 2];
+                            System.arraycopy(lengthHeader, 0, resultBytes, 0, 2);
+                            System.arraycopy(data, 0, resultBytes, 2, length);
+                            DirectCommandReply reply = DirectCommandReply.fromBytes(resultBytes);
+                            promise.resolve(reply);
+                        }
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         sequenceCounter++;
         return promise;
-    }
-
-    @Override
-    public void onDataReceive(byte[] data) {
-        DirectCommandReply reply = DirectCommandReply.fromBytes(data);
-        for (Promise<DirectCommandReply> handler : this.handlers) {
-            if (handler.sequenceCounter == reply.getCounter()) {
-                handler.resolve(reply);
-                this.handlers.remove(handler);
-            }
-        }
     }
 }

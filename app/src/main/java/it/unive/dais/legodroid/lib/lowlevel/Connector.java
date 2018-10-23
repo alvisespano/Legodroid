@@ -9,7 +9,5 @@ public interface Connector {
 
     void write(byte[] data) throws IOException;
 
-    void addDataReceiveListener(DataReceiveListener listener);
-
-    void removeDataReceiveListener(DataReceiveListener listener);
+    Promise<byte[]> read(int size) throws IOException;
 }

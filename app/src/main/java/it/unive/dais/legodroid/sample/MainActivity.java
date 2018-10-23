@@ -18,13 +18,33 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ev3 = new EV3(new AndroidBluetoothConnector());
+        try {
+            Connector connector = new AndroidBluetoothConnector();
+            connector.connect();
+            ev3 = new EV3(connector);
 
-        final Button button = findViewById(R.id.pollButton);
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                ev3.soundTone(2, 440, 100);
-            }
-        });
+            final Button button = findViewById(R.id.pollButton);
+            button.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    final TouchSensor touchSensor = new TouchSensor(ev3, 0);
+                    final TextView label = findViewById(R.id.textView);
+                    try {
+                        touchSensor.getPressed().then(new Handler<Boolean>() {
+                            @Override
+                            public void call(Boolean data) {
+                                Log.i("ev3", data.toString());
+                                label.setText(data.toString());
+                            }
+                        });
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            // connector.disconnect();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

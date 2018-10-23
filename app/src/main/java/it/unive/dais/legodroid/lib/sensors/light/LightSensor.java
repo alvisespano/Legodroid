@@ -3,8 +3,8 @@ package it.unive.dais.legodroid.lib.sensors.light;
 import it.unive.dais.legodroid.lib.sensors.BaseSensor;
 
 public class LightSensor extends BaseSensor<LightSensorModes> {
-    public LightSensor(int port) {
-        super(port, LightSensorModes.REFLECTIVE);
+    public LightSensor(EV3 ev3, int port) {
+        super(ev3, port, LightSensorModes.REFLECTIVE);
     }
 
     public int getReflected() {

@@ -4,39 +4,63 @@ import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.os.AsyncTask;
 import android.os.Build;
-
-import it.unive.dais.legodroid.lib.lowlevel.Connector;
-import it.unive.dais.legodroid.lib.lowlevel.DataReceiveListener;
+import com.giuliozausa.ev3droid.lowlevel.Connector;
+import com.giuliozausa.ev3droid.util.Promise;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
 
 public class AndroidBluetoothConnector implements Connector {
-    private LinkedList<DataReceiveListener> onDataReceive = new LinkedList<>();
     private final String deviceName;
-    private BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+    private final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
     private BluetoothDevice device;
     private BluetoothSocket socket;
     private InputStream in;
     private OutputStream out;
 
     public AndroidBluetoothConnector() {
-        this("EV3");
+        this.deviceName = "EV3";
     }
 
     public AndroidBluetoothConnector(String deviceName) {
         this.deviceName = deviceName;
     }
 
+    static class ReadTask extends AsyncTask<Integer, Void, byte[]> {
+        private BluetoothSocket socket;
+        private InputStream in;
+
+        public ReadTask(BluetoothSocket socket, InputStream in) {
+            this.socket = socket;
+            this.in = in;
+        }
+
+        @Override
+        protected byte[] doInBackground(Integer... integers) {
+            try {
+                if (socket.isConnected()) {
+                    while (in.available() == 0) ;
+                    byte[] data = new byte[integers[0]];
+                    int sizeRead = in.read(data, 0, integers[0]);
+                    return Arrays.copyOf(data, sizeRead);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
+
     @Override
     public void connect() throws Exception {
         if (!adapter.isEnabled())
-            throw new Exception("Bluetooth is not unable.");
+            throw new Exception("Bluetooth is not usable.");
         Set<BluetoothDevice> bind = adapter.getBondedDevices();
         boolean s = false;
         for (BluetoothDevice dev : bind) {
@@ -63,26 +87,12 @@ public class AndroidBluetoothConnector implements Connector {
         out.write(data);
     }
 
+    @Override
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    private void pollInput() throws IOException {
-        while (socket.isConnected()) {
-            if (in.available() != 0) {
-                int len = in.read() + in.read() << 8;
-                byte[] bytes = new byte[len];
-                in.read(bytes);
-                for (DataReceiveListener listener : onDataReceive) {
-                    listener.onDataReceive(bytes);
-                }
-            }
-        }
-    }
-
-    public void addDataReceiveListener(DataReceiveListener listener) {
-        if (!onDataReceive.contains(listener))
-            onDataReceive.add(listener);
-    }
-
-    public void removeDataReceiveListener(DataReceiveListener listener) {
-        onDataReceive.remove(listener);
+    public Promise<byte[]> read(int size) {
+        Promise<byte[]> promise = new Promise<>();
+        ReadTask task = new ReadTask(socket, in);
+        task.doInBackground(size);
+        return promise;
     }
 }
