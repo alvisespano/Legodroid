@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
         final Button button = findViewById(R.id.pollButton);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                ev3.soundTone(1, 440, 100);
+                ev3.soundTone(2, 440, 100);
             }
         });
     }
