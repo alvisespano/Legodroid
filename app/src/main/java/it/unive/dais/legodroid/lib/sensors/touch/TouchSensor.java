@@ -12,7 +12,7 @@ import static it.unive.dais.legodroid.lib.lowlevel.Constants.EV3_TOUCH;
 import static it.unive.dais.legodroid.lib.lowlevel.Constants.TOUCH_TOUCH;
 
 public class TouchSensor extends BaseSensor<Object> {
-    public TouchSensor(EV3 ev3, int port) {
+    TouchSensor(EV3 ev3, int port) {
         super(ev3, port, null);
     }
 
