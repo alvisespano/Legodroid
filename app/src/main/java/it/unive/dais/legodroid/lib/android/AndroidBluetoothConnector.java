@@ -6,8 +6,8 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.os.AsyncTask;
 import android.os.Build;
-import com.giuliozausa.ev3droid.lowlevel.Connector;
-import com.giuliozausa.ev3droid.util.Promise;
+import it.unive.dais.legodroid.lib.lowlevel.Connector;
+import it.unive.dais.legodroid.lib.util.Promise;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -83,8 +83,9 @@ public class AndroidBluetoothConnector implements Connector {
     }
 
     @Override
-    public void write(byte[] data) throws IOException {
+    public Promise<Void> write(byte[] data) throws IOException {
         out.write(data);
+        return new Promise<>(); // TODO
     }
 
     @Override

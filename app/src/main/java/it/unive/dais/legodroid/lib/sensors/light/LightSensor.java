@@ -1,5 +1,6 @@
 package it.unive.dais.legodroid.lib.sensors.light;
 
+import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.sensors.BaseSensor;
 
 public class LightSensor extends BaseSensor<LightSensorModes> {

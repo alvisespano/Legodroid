@@ -1,5 +1,7 @@
 package it.unive.dais.legodroid.lib.sensors;
 
+import it.unive.dais.legodroid.lib.EV3;
+
 public abstract class BaseSensor<TMode> {
     protected int port;
     protected TMode currentMode;

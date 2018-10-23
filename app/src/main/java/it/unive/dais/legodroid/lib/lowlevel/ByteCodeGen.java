@@ -5,10 +5,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class ByteCodeGen {
-    private static final byte BYTE_SIZE = (byte) 0x81;
-    private static final byte SHORT_SIZE = (byte) 0x82;
-    private static final byte INT_SIZE = (byte) 0x83;
-    private static final byte GLOBAL_INDEX_SIZE = (byte) 0xe1;
     private ByteArrayOutputStream mStream;
 
     private DataOutputStream mWriter;

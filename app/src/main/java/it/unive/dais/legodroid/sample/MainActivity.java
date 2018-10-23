@@ -2,12 +2,19 @@ package it.unive.dais.legodroid.sample;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import it.unive.dais.legodroid.R;
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.android.AndroidBluetoothConnector;
+import it.unive.dais.legodroid.lib.lowlevel.Connector;
+import it.unive.dais.legodroid.lib.sensors.touch.TouchSensor;
+import it.unive.dais.legodroid.lib.util.Handler;
+
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 

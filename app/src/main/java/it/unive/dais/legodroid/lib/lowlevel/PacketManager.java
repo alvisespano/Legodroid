@@ -1,11 +1,12 @@
 package it.unive.dais.legodroid.lib.lowlevel;
 
+import it.unive.dais.legodroid.lib.util.Handler;
 import it.unive.dais.legodroid.lib.util.Promise;
 
 import java.io.IOException;
 import java.util.*;
 
-public class PacketManager implements DataReceiveListener {
+public class PacketManager {
     private Connector connector;
     private int sequenceCounter;
 
