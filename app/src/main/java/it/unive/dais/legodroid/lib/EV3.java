@@ -3,8 +3,7 @@ package it.unive.dais.legodroid.lib;
 import it.unive.dais.legodroid.lib.lowlevel.Connector;
 import it.unive.dais.legodroid.lib.lowlevel.PacketManager;
 import it.unive.dais.legodroid.lib.lowlevel.Protocol;
-import it.unive.dais.legodroid.lib.sensors.BaseSensor;
-import it.unive.dais.legodroid.lib.sensors.touch.TouchSensor;
+import it.unive.dais.legodroid.lib.sensors.TouchSensor;
 
 import java.io.IOException;
 
