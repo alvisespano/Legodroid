@@ -4,6 +4,7 @@ import it.unive.dais.legodroid.lib.lowlevel.Connector;
 import it.unive.dais.legodroid.lib.lowlevel.PacketManager;
 import it.unive.dais.legodroid.lib.lowlevel.Protocol;
 import it.unive.dais.legodroid.lib.sensors.TouchSensor;
+import it.unive.dais.legodroid.lib.util.Consumer;
 
 import java.io.IOException;
 
@@ -22,7 +23,7 @@ public class EV3 {
         Protocol.soundTone(packetManager, volume, freq, duration);
     }
 
-    public TouchSensor createTouchSensor(int port) {
-        return new TouchSensor(this, port);
+    public void run(Consumer<Api> c) {
+        
     }
 }

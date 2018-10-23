@@ -25,7 +25,7 @@ class DirectCommandPacket {
     }
 
     byte[] getBytes() {
-        byte[] bytes = new byte[this.length + 2];
+        byte[] bytes = new byte[this.length];
 
         bytes[0] = (byte) (this.length & 0xFF);
         bytes[1] = (byte) ((this.length >> 8) & 0xFF);

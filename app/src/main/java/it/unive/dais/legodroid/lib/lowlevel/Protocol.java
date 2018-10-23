@@ -1,6 +1,6 @@
 package it.unive.dais.legodroid.lib.lowlevel;
 
-import it.unive.dais.legodroid.lib.util.Handler;
+import it.unive.dais.legodroid.lib.util.Consumer;
 import it.unive.dais.legodroid.lib.util.Promise;
 
 import java.io.IOException;
@@ -26,7 +26,7 @@ public class Protocol {
         final Promise<float[]> returnPromise = new Promise<>();
 
         Promise<DirectCommandReply> replyPromise = manager.sendPacketAsyncReply(byteCode.getBytes(), 0, 4 * nvalue);
-        replyPromise.then(new Handler<DirectCommandReply>() {
+        replyPromise.then(new Consumer<DirectCommandReply>() {
             @Override
             public void call(DirectCommandReply data) {
                 byte[] reply = data.getData();
@@ -59,7 +59,7 @@ public class Protocol {
         final Promise<short[]> returnPromise = new Promise<>();
 
         Promise<DirectCommandReply> replyPromise = manager.sendPacketAsyncReply(byteCode.getBytes(), 0, nvalue);
-        replyPromise.then(new Handler<DirectCommandReply>() {
+        replyPromise.then(new Consumer<DirectCommandReply>() {
             @Override
             public void call(DirectCommandReply data) {
                 byte[] reply = data.getData();

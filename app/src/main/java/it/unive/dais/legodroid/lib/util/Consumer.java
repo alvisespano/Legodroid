@@ -1,5 +1,5 @@
 package it.unive.dais.legodroid.lib.util;
 
-public interface Handler<T> {
+public interface Consumer<T> {
     void call(T data);
 }

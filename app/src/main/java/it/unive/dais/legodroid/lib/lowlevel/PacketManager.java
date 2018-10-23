@@ -1,10 +1,9 @@
 package it.unive.dais.legodroid.lib.lowlevel;
 
-import it.unive.dais.legodroid.lib.util.Handler;
+import it.unive.dais.legodroid.lib.util.Consumer;
 import it.unive.dais.legodroid.lib.util.Promise;
 
 import java.io.IOException;
-import java.util.*;
 
 public class PacketManager {
     private Connector connector;
@@ -30,13 +29,13 @@ public class PacketManager {
 
         final Promise<DirectCommandReply> promise = new Promise<>();
 
-        connector.read(2).then(new Handler<byte[]>() {
+        connector.read(2).then(new Consumer<byte[]>() {
             @Override
             public void call(byte[] data) {
                 final int length = data[0] << 8 & 0xFF00 | data[1] & 0xFF;
                 final byte[] lengthHeader = data;
                 try {
-                    connector.read(length).then(new Handler<byte[]>() {
+                    connector.read(length).then(new Consumer<byte[]>() {
                         @Override
                         public void call(byte[] data) {
                             byte[] resultBytes = new byte[length + 2];

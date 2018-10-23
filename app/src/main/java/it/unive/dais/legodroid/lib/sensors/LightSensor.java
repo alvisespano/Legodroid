@@ -2,9 +2,9 @@ package it.unive.dais.legodroid.lib.sensors;
 
 import it.unive.dais.legodroid.lib.EV3;
 
-public class LightSensor extends AbstractSensor<LightSensor.Mode> {
+public class LightSensor extends AbstractSensor {
     public LightSensor(EV3 ev3, int port) {
-        super(ev3, port, Mode.REFLECTIVE);
+        super(ev3, port);
     }
 
     public int getReflected() {
@@ -42,12 +42,4 @@ public class LightSensor extends AbstractSensor<LightSensor.Mode> {
         BROWN
     }
 
-    public enum Mode {
-        REFLECTIVE,
-        AMBIENT,
-        COLOR,
-        REFLECTIVE_RAW,
-        REFLECTIVE_RGB,
-        CALIBRATION
-    }
 }

@@ -1,8 +1,8 @@
 package it.unive.dais.legodroid.lib.util;
 
 public class Promise<T> {
-    private Handler<T> resolveHandler;
-    private Handler<T> rejectHandler;
+    private Consumer<T> resolveHandler;
+    private Consumer<T> rejectHandler;
     private T data;
 
     public Promise() {
@@ -11,7 +11,7 @@ public class Promise<T> {
         this.data = null;
     }
 
-    public void then(Handler<T> handler) {
+    public void then(Consumer<T> handler) {
         this.resolveHandler = handler;
 
         if (data != null) {
@@ -19,7 +19,7 @@ public class Promise<T> {
         }
     }
 
-    public void thenError(Handler<T> handler) {
+    public void thenError(Consumer<T> handler) {
         this.rejectHandler = handler;
 
         if (data != null) {

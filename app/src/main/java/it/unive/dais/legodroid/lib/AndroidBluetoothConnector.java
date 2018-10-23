@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.os.AsyncTask;
 import android.os.Build;
+
 import it.unive.dais.legodroid.lib.lowlevel.Connector;
 import it.unive.dais.legodroid.lib.util.Promise;
 
@@ -15,8 +16,10 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeoutException;
 
 public class AndroidBluetoothConnector implements Connector {
+    private static final long READ_TIMEOUT_MS = 1000;
     private final String deviceName;
     private final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
     private BluetoothDevice device;
@@ -25,7 +28,7 @@ public class AndroidBluetoothConnector implements Connector {
     private OutputStream out;
 
     public AndroidBluetoothConnector() {
-        this.deviceName = "EV3";
+        this("EV3");
     }
 
     public AndroidBluetoothConnector(String deviceName) {
@@ -58,9 +61,9 @@ public class AndroidBluetoothConnector implements Connector {
     }
 
     @Override
-    public void connect() throws Exception {
+    public void connect() throws IOException {
         if (!adapter.isEnabled())
-            throw new Exception("Bluetooth is not usable.");
+            throw new IOException("Bluetooth is not usable.");
         Set<BluetoothDevice> bind = adapter.getBondedDevices();
         boolean s = false;
         for (BluetoothDevice dev : bind) {
@@ -70,7 +73,7 @@ public class AndroidBluetoothConnector implements Connector {
             }
         }
         if (!s)
-            throw new Exception("Brick not found.");
+            throw new IOException("Brick not found.");
         socket = device.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
         socket.connect();
         in = socket.getInputStream();
@@ -96,4 +99,27 @@ public class AndroidBluetoothConnector implements Connector {
         task.doInBackground(size);
         return promise;
     }
+
+    public byte[] readSized(int size) throws IOException, TimeoutException {
+        byte[] r = new byte[size];
+        int off = 0;
+        long now = System.currentTimeMillis();
+        while (off < size) {
+            off += in.read(r, off, size - off);
+            if (System.currentTimeMillis() - now > READ_TIMEOUT_MS) throw new TimeoutException();
+        }
+        return r;
+    }
+
+    public byte[] readPacket() throws IOException, TimeoutException {
+        byte[] lb = readSized(2);
+        return readSized(((lb[0] & 0xff) << 8) | (lb[1] & 0xff));
+    }
+
+    public void writePacket(byte[] a) throws IOException {
+        byte[] l = new byte[] { (byte) (a.length & 0xFF), (byte) ((a.length >> 8) & 0xFF) };
+        out.write(l);
+        out.write(a);
+    }
+
 }
