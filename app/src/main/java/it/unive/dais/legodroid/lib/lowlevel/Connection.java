@@ -4,8 +4,8 @@ import it.unive.dais.legodroid.lib.util.Promise;
 
 import java.io.IOException;
 
-public interface Connector {
-    void connect() throws Exception;
+public interface Connection {
+    void connect() throws IOException;
 
     void disconnect() throws IOException;
 

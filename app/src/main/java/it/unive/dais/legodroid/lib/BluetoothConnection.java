@@ -7,7 +7,7 @@ import android.bluetooth.BluetoothSocket;
 import android.os.AsyncTask;
 import android.os.Build;
 
-import it.unive.dais.legodroid.lib.lowlevel.Connector;
+import it.unive.dais.legodroid.lib.lowlevel.Connection;
 import it.unive.dais.legodroid.lib.util.Promise;
 
 import java.io.IOException;
@@ -18,8 +18,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
-public class AndroidBluetoothConnector implements Connector {
+public class BluetoothConnection implements Connection {
     private static final long READ_TIMEOUT_MS = 1000;
+
     private final String deviceName;
     private final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
     private BluetoothDevice device;
@@ -27,15 +28,15 @@ public class AndroidBluetoothConnector implements Connector {
     private InputStream in;
     private OutputStream out;
 
-    public AndroidBluetoothConnector() {
+    public BluetoothConnection() {
         this("EV3");
     }
 
-    public AndroidBluetoothConnector(String deviceName) {
+    public BluetoothConnection(String deviceName) {
         this.deviceName = deviceName;
     }
 
-    static class ReadTask extends AsyncTask<Integer, Void, byte[]> {
+    private static class ReadTask extends AsyncTask<Integer, Void, byte[]> {
         private BluetoothSocket socket;
         private InputStream in;
 
@@ -50,8 +51,8 @@ public class AndroidBluetoothConnector implements Connector {
                 if (socket.isConnected()) {
                     while (in.available() == 0) ;
                     byte[] data = new byte[integers[0]];
-                    int sizeRead = in.read(data, 0, integers[0]);
-                    return Arrays.copyOf(data, sizeRead);
+                    int l = in.read(data, 0, integers[0]);
+                    return Arrays.copyOf(data, l);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -63,7 +64,7 @@ public class AndroidBluetoothConnector implements Connector {
     @Override
     public void connect() throws IOException {
         if (!adapter.isEnabled())
-            throw new IOException("Bluetooth is not usable.");
+            throw new IOException("Bluetooth adapter is not enabled or unavailable.");
         Set<BluetoothDevice> bind = adapter.getBondedDevices();
         boolean s = false;
         for (BluetoothDevice dev : bind) {
@@ -100,7 +101,7 @@ public class AndroidBluetoothConnector implements Connector {
         return promise;
     }
 
-    public byte[] readSized(int size) throws IOException, TimeoutException {
+    private byte[] readSized(int size) throws IOException, TimeoutException {
         byte[] r = new byte[size];
         int off = 0;
         long now = System.currentTimeMillis();

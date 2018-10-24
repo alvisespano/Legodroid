@@ -8,7 +8,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import it.unive.dais.legodroid.R;
-import it.unive.dais.legodroid.lib.AndroidBluetoothConnector;
+import it.unive.dais.legodroid.lib.BluetoothConnection;
 import it.unive.dais.legodroid.lib.Api;
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.sensors.TouchSensor;
@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        AndroidBluetoothConnector connector = new AndroidBluetoothConnector();
+        BluetoothConnection connector = new BluetoothConnection();
         try {
             connector.connect();
         } catch (IOException e) {

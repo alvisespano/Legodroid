@@ -1,6 +1,6 @@
 package it.unive.dais.legodroid.lib.lowlevel;
 
-class DirectCommandPacket {
+public class DirectCommandPacket {
     private int length;
     private int counter;
     private boolean reply;
@@ -8,8 +8,8 @@ class DirectCommandPacket {
     private int reservation2;
     private byte[] data;
 
-    DirectCommandPacket(int counter, boolean reply, int localReservation,
-                        int globalReservation, byte[] bytecode) {
+    public DirectCommandPacket(int counter, boolean reply, int localReservation,
+                               int globalReservation, byte[] bytecode) {
         if (globalReservation > 1024)
             throw new IllegalArgumentException("Global buffer must be less than 1024 bytes");
         if (localReservation > 64)
@@ -24,7 +24,7 @@ class DirectCommandPacket {
         this.data = bytecode;
     }
 
-    byte[] getBytes() {
+    public byte[] getBytes() {
         byte[] bytes = new byte[this.length];
 
         bytes[0] = (byte) (this.length & 0xFF);
