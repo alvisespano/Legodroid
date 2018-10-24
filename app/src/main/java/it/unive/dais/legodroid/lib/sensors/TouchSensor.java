@@ -5,8 +5,8 @@ import it.unive.dais.legodroid.lib.util.Consumer;
 import it.unive.dais.legodroid.lib.util.Promise;
 
 import java.io.IOException;
-import static it.unive.dais.legodroid.lib.lowlevel.Constants.EV3_TOUCH;
-import static it.unive.dais.legodroid.lib.lowlevel.Constants.TOUCH_TOUCH;
+import static it.unive.dais.legodroid.lib.comm.Constants.EV3_TOUCH;
+import static it.unive.dais.legodroid.lib.comm.Constants.TOUCH_TOUCH;
 
 
 public class TouchSensor extends AbstractSensor {

@@ -5,11 +5,11 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
-import it.unive.dais.legodroid.lib.lowlevel.Bytecode;
-import it.unive.dais.legodroid.lib.lowlevel.Connection;
-import it.unive.dais.legodroid.lib.lowlevel.Constants;
-import it.unive.dais.legodroid.lib.lowlevel.DirectCommandPacket;
-import it.unive.dais.legodroid.lib.lowlevel.DirectCommandReply;
+import it.unive.dais.legodroid.lib.comm.Bytecode;
+import it.unive.dais.legodroid.lib.comm.Connection;
+import it.unive.dais.legodroid.lib.comm.Constants;
+import it.unive.dais.legodroid.lib.comm.DirectCommandPacket;
+import it.unive.dais.legodroid.lib.comm.DirectCommandReply;
 import it.unive.dais.legodroid.lib.util.Consumer;
 import it.unive.dais.legodroid.lib.util.Promise;
 

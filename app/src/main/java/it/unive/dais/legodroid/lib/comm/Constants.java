@@ -1,4 +1,4 @@
-package it.unive.dais.legodroid.lib.lowlevel;
+package it.unive.dais.legodroid.lib.comm;
 
 public class Constants {
     // Command Types

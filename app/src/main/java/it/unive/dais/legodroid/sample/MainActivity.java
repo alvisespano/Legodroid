@@ -8,7 +8,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import it.unive.dais.legodroid.R;
-import it.unive.dais.legodroid.lib.BluetoothConnection;
+import it.unive.dais.legodroid.lib.comm.BluetoothConnection;
 import it.unive.dais.legodroid.lib.Api;
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.sensors.TouchSensor;
@@ -24,14 +24,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BluetoothConnection connector = new BluetoothConnection();
+        BluetoothConnection conn = new BluetoothConnection();
         try {
-            connector.connect();
+            conn.connect();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        final EV3 ev3 = new EV3(connector);
+        final EV3 ev3 = new EV3(conn);
         ev3.run((Api api) -> {
             ColorSensor s = api.getColorSensor(0);
             Color[][] bitmap = ...

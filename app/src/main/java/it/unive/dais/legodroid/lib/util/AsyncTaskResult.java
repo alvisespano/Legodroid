@@ -79,9 +79,9 @@ public class AsyncTaskResult<R> {
             protected AsyncTaskResult.Result<R> doInBackground(T... xs) {
                 try {
                     final T x = xs[0];
-                    Log.v(TAG, String.format("computing function application: %s(%s)", f, x));
+                    Log.d(TAG, String.format("computing function application: %s(%s)", f, x));
                     final R r = f.apply(x);
-                    Log.v(TAG, String.format("computation finished: %s(%s)", f, x));
+                    Log.d(TAG, String.format("computation finished: %s(%s)", f, x));
                     return new AsyncTaskResult.Result<>(r);
                 } catch (Exception e) {
                     return new AsyncTaskResult.Result<>(e);
