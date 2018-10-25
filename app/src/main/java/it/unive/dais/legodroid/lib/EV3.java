@@ -76,13 +76,8 @@ public class EV3 {
     }
 
     public class Api {
-        private EV3 ev3;
-        private Queue<Event> incomingEvents;
-
-        Api(EV3 ev3) {
-            this.ev3 = ev3;
-            this.incomingEvents = new ConcurrentLinkedQueue<>();
-        }
+        private final EV3 ev3 = EV3.this;
+        private final Queue<Event> incomingEvents = new ConcurrentLinkedQueue<>();
 
         public LightSensor getLightSensor(int port) {
             return new LightSensor(ev3, port);
@@ -105,7 +100,7 @@ public class EV3 {
         }
 
 //        public void playSoundTone(int volume, int freq, int duration) throws IOException {
-//            ev3.soundTone(volume, freq, duration);
+//            Comm.soundTone(volume, freq, duration);
 //        }
 
         public Event pollEvents() {

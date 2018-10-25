@@ -2,6 +2,7 @@ package it.unive.dais.legodroid.lib.comm;
 
 import android.support.annotation.NonNull;
 
+// TODO: fare classe astratta che fornisce length, counter, data e ciò che accomuna un DirectCommandPacket con un DirectCommandReply
 public class DirectCommandReply implements Packet {
     private int length;
     private int counter;
@@ -9,7 +10,7 @@ public class DirectCommandReply implements Packet {
     @NonNull
     private byte[] data;
 
-    DirectCommandReply(byte[] bytes) {
+    public DirectCommandReply(byte[] bytes) {
         length = ((bytes[0] & 0xff) << 8) | (bytes[1] & 0xff);
         counter = ((bytes[2] & 0xff) << 8) | (bytes[3] & 0xff);
         error = bytes[4] == Constants.DIRECT_COMMAND_SUCCESS;

@@ -10,11 +10,11 @@ import java.util.concurrent.FutureTask;
 
 public class SpooledAsyncChannel implements AsyncChannel {
     @NonNull
-    private final Channel<Packet, Packet> channel;
+    private final Channel channel;
     @NonNull
     private final Executor exec = Executors.newSingleThreadExecutor();
 
-    public SpooledAsyncChannel(@NonNull Channel<Packet, Packet> channel) {
+    public SpooledAsyncChannel(@NonNull Channel channel) {
         this.channel = channel;
     }
 

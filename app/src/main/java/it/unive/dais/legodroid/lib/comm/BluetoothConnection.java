@@ -30,9 +30,9 @@ public class BluetoothConnection implements Connection {
     }
 
     @Override
-    public MyChannel connect() throws IOException {
+    public BluetoothChannel connect() throws IOException {
         if (!adapter.isEnabled())
-            throw new IOException("Bluetooth adapter is not enabled or unavailable.");
+            throw new IOException("bluetooth adapter is not enabled or unavailable");
         Set<BluetoothDevice> devs = adapter.getBondedDevices();
         boolean s = false;
         for (BluetoothDevice dev : devs) {
@@ -42,10 +42,10 @@ public class BluetoothConnection implements Connection {
             }
         }
         if (!s)
-            throw new IOException("Brick not found.");
+            throw new IOException("brick not found");
         socket = device.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
         socket.connect();
-        return new MyChannel(socket);
+        return new BluetoothChannel(socket);
     }
 
     @Override
@@ -59,13 +59,13 @@ public class BluetoothConnection implements Connection {
         disconnect();
     }
 
-    public static class MyChannel implements Channel<Packet, Packet> {
+    public static class BluetoothChannel implements Channel {
         @NonNull
         private InputStream in;
         @NonNull
         private OutputStream out;
 
-        private MyChannel(@NonNull BluetoothSocket socket) throws IOException {
+        private BluetoothChannel(@NonNull BluetoothSocket socket) throws IOException {
             in = socket.getInputStream();
             out = socket.getOutputStream();
         }

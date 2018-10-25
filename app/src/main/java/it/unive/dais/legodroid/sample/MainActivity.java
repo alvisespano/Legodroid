@@ -8,7 +8,6 @@ import it.unive.dais.legodroid.R;
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.comm.BluetoothConnection;
 import it.unive.dais.legodroid.lib.comm.Channel;
-import it.unive.dais.legodroid.lib.comm.Packet;
 import it.unive.dais.legodroid.lib.comm.SpooledAsyncChannel;
 import it.unive.dais.legodroid.lib.motors.TachoMotor;
 import it.unive.dais.legodroid.lib.sensors.LightSensor;
@@ -24,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             BluetoothConnection conn = new BluetoothConnection("EV3");
-            Channel<Packet, Packet> channel = conn.connect();
+            Channel channel = conn.connect();
             EV3 ev3 = new EV3(new SpooledAsyncChannel(channel));
 
 //            ev3.run((Api api) -> {
@@ -70,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-            final Button button = findViewById(R.id.pollButton);
+            Button button = findViewById(R.id.pollButton);
             button.setOnClickListener(v -> {
 //                ev3.sendEvent(new ScannerEvent(ScannerEventType.SCANNER_STOP));
             });
