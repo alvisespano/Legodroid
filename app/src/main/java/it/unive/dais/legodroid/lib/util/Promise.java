@@ -2,6 +2,8 @@ package it.unive.dais.legodroid.lib.util;
 
 import android.support.annotation.NonNull;
 
+// TODO: usare i Future dell'SDK di Android SE POSSIBILE; se non è possibile ovunque ci ripensiamo
+@Deprecated
 public class Promise<T> {
     @NonNull
     private Consumer<T> onSuccess;

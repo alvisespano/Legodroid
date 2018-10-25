@@ -26,22 +26,6 @@ public class MainActivity extends AppCompatActivity {
             Channel channel = conn.connect();
             EV3 ev3 = new EV3(new SpooledAsyncChannel(channel));
 
-//            ev3.run((Api api) -> {
-//                ColorSensor s = api.getColorSensor(0);
-//                Color[][] bitmap = ...
-//                for (int x = 0; x < w; x++) {
-//                    for (int y = 0; y < h; y++) {
-//                        api.moveTo(x, y);
-//                        Color c = s.get();
-//                        bitmap[x][y] = c;
-//                    }
-//
-//                    ev3.setEventListener(event -> {
-//                        if (event.getEventType() == ScannerEventType.SCANNER_FINISHED) {
-//                            displayScannedData(event.scanned);
-//                        }
-//                    });
-
             ev3.run(api -> {
                 LightSensor lightSensor = api.getLightSensor(0);
                 TachoMotor motorX = api.getTachoMotor(0);

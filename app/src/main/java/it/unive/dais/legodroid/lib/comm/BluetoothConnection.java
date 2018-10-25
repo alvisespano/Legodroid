@@ -71,18 +71,18 @@ public class BluetoothConnection implements Connection {
         }
 
         @Override
-        public void write(Packet p) throws IOException {
-            byte[] a = p.getBytes();
+        public void write(Command p) throws IOException {
+            byte[] a = p.marshal();
             byte[] l = new byte[]{(byte) (a.length & 0xFF), (byte) ((a.length >> 8) & 0xFF)};
             out.write(l);
             out.write(a);
         }
 
         @Override
-        public Packet read() throws IOException, TimeoutException {
+        public Reply read() throws IOException, TimeoutException {
             byte[] lb = readSized(2);
             int len = ((lb[0] & 0xff) << 8) | (lb[1] & 0xff);
-            return new DirectCommandReply(readSized(len));
+            return new Reply(readSized(len));
         }
 
         private byte[] readSized(int size) throws IOException, TimeoutException {

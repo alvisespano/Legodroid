@@ -5,6 +5,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 
 public interface AsyncChannel {
-    void write(Packet data) throws IOException;
-    Future<Packet> read() throws IOException, TimeoutException;
+    void write(Command data) throws IOException;
+    Future<Reply> read() throws IOException, TimeoutException;
 }

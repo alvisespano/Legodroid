@@ -2,16 +2,12 @@ package it.unive.dais.legodroid.lib.comm;
 
 import android.support.annotation.NonNull;
 
-public class DirectCommandPacket implements Packet {
-    private int length;
-    private int counter;
+public class Command extends Packet {
     private boolean reply;
     private int reservation1;
     private int reservation2;
-    @NonNull
-    private byte[] data;
 
-    public DirectCommandPacket(int counter, boolean reply, int localReservation, int globalReservation, @NonNull byte[] bytecode) {
+    public Command(int counter, boolean reply, int localReservation, int globalReservation, @NonNull byte[] bytecode) {
         if (globalReservation > 1024)
             throw new IllegalArgumentException("Global buffer must be less than 1024 bytes");
         if (localReservation > 64)
@@ -26,8 +22,7 @@ public class DirectCommandPacket implements Packet {
         this.data = bytecode;
     }
 
-    @Override
-    public byte[] getBytes() {
+    public byte[] marshal() {
         byte[] bytes = new byte[this.length];
         bytes[0] = (byte) (this.length & 0xFF);
         bytes[1] = (byte) ((this.length >> 8) & 0xFF);

@@ -19,13 +19,13 @@ public class SpooledAsyncChannel implements AsyncChannel {
     }
 
     @Override
-    public void write(Packet p) throws IOException {
+    public void write(Command p) throws IOException {
         channel.write(p);
     }
 
     @Override
-    public Future<Packet> read() {
-        FutureTask<Packet> r = new FutureTask<>(channel::read);
+    public Future<Reply> read() {
+        FutureTask<Reply> r = new FutureTask<>(channel::read);
         exec.execute(r);
         return r;
     }
