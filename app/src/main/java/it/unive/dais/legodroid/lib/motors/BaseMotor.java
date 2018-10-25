@@ -1,9 +1,13 @@
 package it.unive.dais.legodroid.lib.motors;
 
-public class BaseMotor implements Motor {
-    private int port;
+import it.unive.dais.legodroid.lib.EV3;
 
-    public BaseMotor(int port) {
+public class BaseMotor implements Motor {
+    protected EV3 ev3;
+    protected int port;
+
+    BaseMotor(EV3 ev3, int port) {
+        this.ev3 = ev3;
         this.port = port;
     }
 
