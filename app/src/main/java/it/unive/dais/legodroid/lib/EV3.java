@@ -5,20 +5,23 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
+import it.unive.dais.legodroid.lib.comm.AsyncChannel;
 import it.unive.dais.legodroid.lib.comm.Bytecode;
+import it.unive.dais.legodroid.lib.comm.Channel;
 import it.unive.dais.legodroid.lib.comm.Connection;
 import it.unive.dais.legodroid.lib.comm.Constants;
 import it.unive.dais.legodroid.lib.comm.DirectCommandPacket;
 import it.unive.dais.legodroid.lib.comm.DirectCommandReply;
+import it.unive.dais.legodroid.lib.comm.Packet;
 import it.unive.dais.legodroid.lib.util.Consumer;
 import it.unive.dais.legodroid.lib.util.Promise;
 
 public class EV3 {
-    private Connection conn;
+    private AsyncChannel channel;
     private int sequenceCounter = 0;
 
-    public EV3(Connection conn) {
-        this.conn = conn;
+    public EV3(AsyncChannel channel) {
+        this.channel = channel;
     }
 
 //    @Deprecated
@@ -29,12 +32,12 @@ public class EV3 {
 
     public void sendPacketAsyncNoReply(byte[] bytecode, int localReservation, int globalReservation) throws IOException {
         DirectCommandPacket packet = new DirectCommandPacket(sequenceCounter, false, localReservation, globalReservation, bytecode);
-        conn.write(packet.getBytes());
+        channel.write(packet);
     }
 
     public Promise<DirectCommandReply> sendPacketAsyncReply(byte[] bytecode, int localReservation, int globalReservation) throws IOException {
         DirectCommandPacket packet = new DirectCommandPacket(sequenceCounter, true, localReservation, globalReservation, bytecode);
-        conn.write(packet.getBytes());
+        channel.write(packet);
 
         Promise<DirectCommandReply> promise = new Promise<>();
 
@@ -65,7 +68,7 @@ public class EV3 {
     public class Comm {
         private static final byte OUTPUT_PORT_OFFSET = 0x10;
 
-        private Bytecode preface(byte ready, int port, int type, int mode, int nvalue) {
+        private Bytecode preface(byte ready, int port, int type, int mode, int nvalue) throws IOException {
             Bytecode r = new Bytecode();
             r.addOpCode(Constants.INPUT_DEVICE);
             r.addOpCode(ready);

@@ -1,11 +1,10 @@
 package it.unive.dais.legodroid.lib.comm;
 
 import java.io.IOException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 
-import it.unive.dais.legodroid.lib.util.Promise;
-
-public interface AsyncChannel {
+public interface AsyncChannel extends Channel<Packet, Future<Packet>> {
     void write(Packet data) throws IOException;
-    Promise<Packet> read() throws IOException, TimeoutException;
+    Future<Packet> read() throws IOException, TimeoutException;
 }

@@ -3,19 +3,15 @@ package it.unive.dais.legodroid.lib.comm;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
-
-import it.unive.dais.legodroid.lib.util.Promise;
 
 public class BluetoothConnection implements Connection {
     private static final long READ_TIMEOUT_MS = 1000;
@@ -34,7 +30,7 @@ public class BluetoothConnection implements Connection {
     }
 
     @Override
-    public Channel connect() throws IOException {
+    public MyChannel connect() throws IOException {
         if (!adapter.isEnabled())
             throw new IOException("Bluetooth adapter is not enabled or unavailable.");
         Set<BluetoothDevice> devs = adapter.getBondedDevices();
@@ -63,42 +59,7 @@ public class BluetoothConnection implements Connection {
         disconnect();
     }
 
-    public static class AsyncChannelizer implements AsyncChannel {
-
-        private class ReadTask extends AsyncTask<Void, Void, Packet> {
-            @Override
-            protected Packet doInBackground(Void... args) {
-                Promise<Packet> r = new Promise<>();
-                try {
-                    r.resolve(read());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (TimeoutException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        private Channel channel;
-
-        public AsyncChannelizer(Channel ch) {
-            this.channel = ch;
-        }
-
-        @Override
-        public void write(Packet data) throws IOException {
-
-        }
-
-        @Override
-        public Promise<Packet> read() throws IOException, TimeoutException {
-            return null;
-        }
-    }
-
-
-
-    public static class MyChannel implements Channel {
+    public static class MyChannel implements Channel<Packet, Packet> {
         @NonNull
         private InputStream in;
         @NonNull

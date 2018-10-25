@@ -17,6 +17,10 @@ public class AsyncTaskResult<R> {
         this.task = t;
     }
 
+    public static <R> AsyncTaskResult<R> create(AsyncTask<?, ?, Result<R>> t) {
+        return new AsyncTaskResult<>(t);
+    }
+
     public Result<R> get() throws ExecutionException, InterruptedException {
         return task.get();
     }
@@ -35,7 +39,7 @@ public class AsyncTaskResult<R> {
         return get().getException();
     }
 
-    static class Result<R> {
+    public static class Result<R> {
 
         @Nullable
         private R result;

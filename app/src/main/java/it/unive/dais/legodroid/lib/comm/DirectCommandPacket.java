@@ -11,7 +11,7 @@ public class DirectCommandPacket implements Packet {
     @NonNull
     private byte[] data;
 
-    DirectCommandPacket(int counter, boolean reply, int localReservation, int globalReservation, @NonNull byte[] bytecode) {
+    public DirectCommandPacket(int counter, boolean reply, int localReservation, int globalReservation, @NonNull byte[] bytecode) {
         if (globalReservation > 1024)
             throw new IllegalArgumentException("Global buffer must be less than 1024 bytes");
         if (localReservation > 64)

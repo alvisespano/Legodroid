@@ -11,6 +11,7 @@ import it.unive.dais.legodroid.R;
 import it.unive.dais.legodroid.lib.comm.BluetoothConnection;
 import it.unive.dais.legodroid.lib.Api;
 import it.unive.dais.legodroid.lib.EV3;
+import it.unive.dais.legodroid.lib.comm.Channel;
 import it.unive.dais.legodroid.lib.sensors.TouchSensor;
 
 import java.io.IOException;
@@ -24,14 +25,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BluetoothConnection conn = new BluetoothConnection();
-        try {
-            conn.connect();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        BluetoothConnection conn = new BluetoothConnection("EV3");
+        Channel<?, ?> ch = conn.connect();
 
-        final EV3 ev3 = new EV3(conn);
+        EV3 ev3 = new EV3(conn);
         ev3.run((Api api) -> {
             ColorSensor s = api.getColorSensor(0);
             Color[][] bitmap = ...
@@ -63,14 +60,4 @@ public class MainActivity extends AppCompatActivity {
                 }));
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        try {
-            connector.disconnect();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }

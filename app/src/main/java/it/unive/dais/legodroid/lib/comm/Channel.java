@@ -3,10 +3,7 @@ package it.unive.dais.legodroid.lib.comm;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-import it.unive.dais.legodroid.lib.util.Promise;
-
-public interface Channel {
-    void write(Packet data) throws IOException;
-    Packet read() throws IOException, TimeoutException;
-
+public interface Channel<Input, Output> {
+    void write(Input data) throws IOException;
+    Output read() throws IOException, TimeoutException;
 }
