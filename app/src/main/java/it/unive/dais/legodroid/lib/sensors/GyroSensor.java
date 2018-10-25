@@ -10,8 +10,8 @@ import static it.unive.dais.legodroid.lib.comm.Constants.EV3_TOUCH;
 import static it.unive.dais.legodroid.lib.comm.Constants.TOUCH_TOUCH;
 
 
-public class TouchSensor extends AbstractSensor {
-    public TouchSensor(EV3 ev3, int port) {
+public class GyroSensor extends AbstractSensor {
+    public GyroSensor(EV3 ev3, int port) {
         super(ev3, port);
     }
 

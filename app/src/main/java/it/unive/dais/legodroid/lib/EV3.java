@@ -4,28 +4,31 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import it.unive.dais.legodroid.lib.comm.Bytecode;
 import it.unive.dais.legodroid.lib.comm.Connection;
 import it.unive.dais.legodroid.lib.comm.Constants;
 import it.unive.dais.legodroid.lib.comm.DirectCommandPacket;
 import it.unive.dais.legodroid.lib.comm.DirectCommandReply;
+import it.unive.dais.legodroid.lib.motors.TachoMotor;
+import it.unive.dais.legodroid.lib.sensors.GyroSensor;
+import it.unive.dais.legodroid.lib.sensors.LightSensor;
+import it.unive.dais.legodroid.lib.sensors.TouchSensor;
+import it.unive.dais.legodroid.lib.sensors.UltrasonicSensor;
 import it.unive.dais.legodroid.lib.util.Consumer;
 import it.unive.dais.legodroid.lib.util.Promise;
 
-public class EV3 {
+public class EV3<TEvent> {
     private Connection conn;
     private int sequenceCounter = 0;
+    private Consumer<TEvent> eventListener;
+    private Api api;
 
     public EV3(Connection conn) {
         this.conn = conn;
     }
-
-//    @Deprecated
-//    public void soundTone(int volume, int freq, int duration) throws IOException {
-//        Comm.soundTone(packetManager, volume, freq, duration);
-//    }
-
 
     public void sendPacketAsyncNoReply(byte[] bytecode, int localReservation, int globalReservation) throws IOException {
         DirectCommandPacket packet = new DirectCommandPacket(sequenceCounter, false, localReservation, globalReservation, bytecode);
@@ -59,7 +62,57 @@ public class EV3 {
     }
 
     public void run(Consumer<Api> c) {
-        // TODO
+        c.call(api);
+    }
+
+    public void sendEvent(TEvent e) {
+        api.incomingEvents.add(e);
+    }
+
+    public void setEventListener(Consumer<TEvent> eventListener) {
+        this.eventListener = eventListener;
+    }
+
+    public class Api {
+        private EV3 ev3;
+        private Queue<TEvent> incomingEvents;
+
+        Api(EV3 ev3) {
+            this.ev3 = ev3;
+            this.incomingEvents = new ConcurrentLinkedQueue<>();
+        }
+
+        public LightSensor getLightSensor(int port) {
+            return new LightSensor(ev3, port);
+        }
+
+        public TouchSensor getTouchSensor(int port) {
+            return new TouchSensor(ev3, port);
+        }
+
+        public UltrasonicSensor getUltrasonicSensor(int port) {
+            return new UltrasonicSensor(ev3, port);
+        }
+
+        public GyroSensor getGyroSensor(int port) {
+            return new GyroSensor(ev3, port);
+        }
+
+        public TachoMotor getTachoMotor(int port) {
+            return new TachoMotor(ev3, port);
+        }
+
+        public void playSoundTone(int volume, int freq, int duration) throws IOException {
+            ev3.soundTone(volume, freq, duration);
+        }
+
+        public TEvent pollEvents() {
+            return incomingEvents.poll();
+        }
+
+        public void sendEvent(TEvent e) {
+            eventListener.call(e);
+        }
     }
 
     public class Comm {
@@ -79,15 +132,15 @@ public class EV3 {
         }
 
         public Promise<float[]> getSiValue(int port, int type, int mode, int nvalue) throws IOException {
-    //        Bytecode byteCode = new Bytecode();
-    //        byteCode.addOpCode(Constants.INPUT_DEVICE);
-    //        byteCode.addOpCode(Constants.READY_SI);
-    //        byteCode.addParameter(Constants.LAYER_MASTER);
-    //        byteCode.addParameter((byte) port);
-    //        byteCode.addParameter((byte) type);
-    //        byteCode.addParameter((byte) mode);
-    //        byteCode.addParameter((byte) nvalue);
-    //        byteCode.addGlobalIndex((byte) 0x00);
+            //        Bytecode byteCode = new Bytecode();
+            //        byteCode.addOpCode(Constants.INPUT_DEVICE);
+            //        byteCode.addOpCode(Constants.READY_SI);
+            //        byteCode.addParameter(Constants.LAYER_MASTER);
+            //        byteCode.addParameter((byte) port);
+            //        byteCode.addParameter((byte) type);
+            //        byteCode.addParameter((byte) mode);
+            //        byteCode.addParameter((byte) nvalue);
+            //        byteCode.addGlobalIndex((byte) 0x00);
             Bytecode byteCode = preface(Constants.READY_SI, port, type, mode, nvalue);
 
             final Promise<float[]> returnPromise = new Promise<>();
@@ -109,15 +162,15 @@ public class EV3 {
         }
 
         public Promise<short[]> getPercentValue(int port, int type, int mode, int nvalue) throws IOException {
-    //        Bytecode byteCode = new Bytecode();
-    //        byteCode.addOpCode(Constants.INPUT_DEVICE);
-    //        byteCode.addOpCode(Constants.READY_PCT);
-    //        byteCode.addParameter(Constants.LAYER_MASTER);
-    //        byteCode.addParameter((byte) port);
-    //        byteCode.addParameter((byte) type);
-    //        byteCode.addParameter((byte) mode);
-    //        byteCode.addParameter((byte) nvalue);
-    //        byteCode.addGlobalIndex((byte) 0x00);
+            //        Bytecode byteCode = new Bytecode();
+            //        byteCode.addOpCode(Constants.INPUT_DEVICE);
+            //        byteCode.addOpCode(Constants.READY_PCT);
+            //        byteCode.addParameter(Constants.LAYER_MASTER);
+            //        byteCode.addParameter((byte) port);
+            //        byteCode.addParameter((byte) type);
+            //        byteCode.addParameter((byte) mode);
+            //        byteCode.addParameter((byte) nvalue);
+            //        byteCode.addGlobalIndex((byte) 0x00);
             Bytecode byteCode = preface(Constants.READY_PCT, port, type, mode, nvalue);
 
             final Promise<short[]> returnPromise = new Promise<>();
@@ -148,9 +201,8 @@ public class EV3 {
         }
 
 
-
         // TODO: queste forse non servono; o comunque vanno risistemate prima o poi
-        public void setOutputState( int port, int speed) throws IOException {
+        public void setOutputState(int port, int speed) throws IOException {
             Bytecode byteCode = new Bytecode();
 
             byte byteCodePort = toByteCodePort(port);

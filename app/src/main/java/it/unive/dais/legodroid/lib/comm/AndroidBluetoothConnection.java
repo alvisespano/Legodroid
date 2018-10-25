@@ -17,7 +17,7 @@ import java.util.concurrent.TimeoutException;
 
 import it.unive.dais.legodroid.lib.util.Promise;
 
-public class BluetoothConnection implements Connection {
+public class AndroidBluetoothConnection implements Connection {
     private static final long READ_TIMEOUT_MS = 1000;
 
     @NonNull
@@ -29,7 +29,7 @@ public class BluetoothConnection implements Connection {
     @Nullable
     private BluetoothSocket socket;
 
-    public BluetoothConnection(@NonNull String name) {
+    public AndroidBluetoothConnection(@NonNull String name) {
         this.name = name;
     }
 
