@@ -8,7 +8,6 @@ import it.unive.dais.legodroid.R;
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.comm.BluetoothConnection;
 import it.unive.dais.legodroid.lib.comm.Channel;
-import it.unive.dais.legodroid.lib.comm.Packet;
 import it.unive.dais.legodroid.lib.comm.SpooledAsyncChannel;
 import it.unive.dais.legodroid.lib.motors.TachoMotor;
 import it.unive.dais.legodroid.lib.sensors.LightSensor;
@@ -24,24 +23,8 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             BluetoothConnection conn = new BluetoothConnection("EV3");
-            Channel<Packet, Packet> channel = conn.connect();
+            Channel channel = conn.connect();
             EV3 ev3 = new EV3(new SpooledAsyncChannel(channel));
-
-//            ev3.run((Api api) -> {
-//                ColorSensor s = api.getColorSensor(0);
-//                Color[][] bitmap = ...
-//                for (int x = 0; x < w; x++) {
-//                    for (int y = 0; y < h; y++) {
-//                        api.moveTo(x, y);
-//                        Color c = s.get();
-//                        bitmap[x][y] = c;
-//                    }
-//
-//                    ev3.setEventListener(event -> {
-//                        if (event.getEventType() == ScannerEventType.SCANNER_FINISHED) {
-//                            displayScannedData(event.scanned);
-//                        }
-//                    });
 
             ev3.run(api -> {
                 LightSensor lightSensor = api.getLightSensor(0);
@@ -70,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-            final Button button = findViewById(R.id.pollButton);
+            Button button = findViewById(R.id.pollButton);
             button.setOnClickListener(v -> {
 //                ev3.sendEvent(new ScannerEvent(ScannerEventType.SCANNER_STOP));
             });

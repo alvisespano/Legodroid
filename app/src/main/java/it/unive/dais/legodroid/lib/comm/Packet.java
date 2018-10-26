@@ -1,5 +1,18 @@
 package it.unive.dais.legodroid.lib.comm;
 
-public interface Packet {
-    byte[] getBytes();
+import android.support.annotation.NonNull;
+
+public abstract class Packet {
+    protected int length;
+    protected int counter;
+    protected byte[] data;
+
+    public int getLength() {
+        return length;
+    }
+
+    public int getCounter() {
+        return counter;
+    }
+
 }
