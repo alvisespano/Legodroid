@@ -15,4 +15,6 @@ public abstract class Packet {
         return counter;
     }
 
+    public byte[] getData() { return data; }
+
 }

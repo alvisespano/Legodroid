@@ -1,6 +1,6 @@
 package it.unive.dais.legodroid.lib.comm;
 
-public class Constants {
+public class Const {
     // Command Types
     public static final byte DIRECT_COMMAND_REPLY = (byte) 0x00;
     public static final byte DIRECT_COMMAND_NOREPLY = (byte) 0x80;
