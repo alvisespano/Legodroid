@@ -16,7 +16,7 @@ public class Command extends Packet {
         if (localReservation > 64)
             throw new IllegalArgumentException("local buffer must be less than 64 bytes");
 
-        this.length = bytecode.length + 5;
+//        this.length = bytecode.length + 5;
         this.counter = Command.sequenceCounter++;
         this.reply = reply;
         this.reservation1 = ((localReservation << 2) & 0b11111100) | ((globalReservation >> 8) & 0x03);
@@ -25,15 +25,13 @@ public class Command extends Packet {
     }
 
     public byte[] marshal() {
-        byte[] bytes = new byte[this.length];
-        bytes[0] = (byte) (this.length & 0xFF);
-        bytes[1] = (byte) ((this.length >> 8) & 0xFF);
-        bytes[2] = (byte) (this.counter & 0xFF);
-        bytes[3] = (byte) ((this.counter >> 8) & 0xFF);
-        bytes[4] = reply ? Const.DIRECT_COMMAND_REPLY : Const.DIRECT_COMMAND_NOREPLY;
-        bytes[5] = (byte) (this.reservation1 & 0xFF);
-        bytes[6] = (byte) (this.reservation2 & 0xFF);
-        System.arraycopy(this.data, 0, bytes, 7, data.length);
+        byte[] bytes = new byte[5 + data.length];
+        bytes[0] = (byte) (this.counter & 0xFF);
+        bytes[1] = (byte) ((this.counter >> 8) & 0xFF);
+        bytes[2] = reply ? Const.DIRECT_COMMAND_REPLY : Const.DIRECT_COMMAND_NOREPLY;
+        bytes[3] = (byte) (this.reservation1 & 0xFF);
+        bytes[4] = (byte) (this.reservation2 & 0xFF);
+        System.arraycopy(this.data, 0, bytes, 5, data.length);
         return bytes;
     }
 }

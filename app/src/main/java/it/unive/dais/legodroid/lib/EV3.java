@@ -1,7 +1,10 @@
 package it.unive.dais.legodroid.lib;
 
+import android.annotation.SuppressLint;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -14,7 +17,6 @@ import java.util.concurrent.FutureTask;
 
 import it.unive.dais.legodroid.lib.comm.AsyncChannel;
 import it.unive.dais.legodroid.lib.comm.Bytecode;
-import it.unive.dais.legodroid.lib.comm.Command;
 import it.unive.dais.legodroid.lib.comm.Const;
 import it.unive.dais.legodroid.lib.comm.Reply;
 import it.unive.dais.legodroid.lib.motors.TachoMotor;
@@ -23,8 +25,10 @@ import it.unive.dais.legodroid.lib.sensors.LightSensor;
 import it.unive.dais.legodroid.lib.sensors.TouchSensor;
 import it.unive.dais.legodroid.lib.sensors.UltrasonicSensor;
 import it.unive.dais.legodroid.lib.util.Consumer;
+import it.unive.dais.legodroid.lib.util.UnexpectedException;
 
 public class EV3 {
+    private static final String TAG = "EV3";
     @NonNull
     private final AsyncChannel channel;
     @Nullable
@@ -39,8 +43,24 @@ public class EV3 {
         this.channel = channel;
     }
 
-    public void run(Consumer<Api> c) {
-        c.call(new Api());
+    @SuppressLint("StaticFieldLeak")
+    public void run(@NonNull Consumer<Api> c) {
+        new AsyncTask<Void, Void, Void>() {
+            private static final String TAG = "EV3Worker";
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                Thread.currentThread().setName(TAG);
+                try {
+                    c.call(new Api());
+                }
+                catch (Exception e) {
+                    Log.e(TAG, String.format("uncaught exception: %s. Aborting EV3 job.", e.getMessage()));
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void sendEvent(Event e) {
@@ -51,27 +71,54 @@ public class EV3 {
         this.eventListener = eventListener;
     }
 
+    public enum InputPort {
+        _1, _2, _3, _4;
+
+        public byte toByte() {
+            switch (this) {
+                case _1: return 0;
+                case _2: return 1;
+                case _3: return 2;
+                case _4: return 3;
+            }
+            throw new UnexpectedException("invalid input port");
+        }
+    }
+
+    public enum OutputPort {
+        A, B, C, D;
+
+        public byte toByte() {
+            switch (this) {
+                case A: return 0;
+                case B: return 1;
+                case C: return 2;
+                case D: return 3;
+            }
+            throw new UnexpectedException("invalid output port");
+        }
+    }
+
     public class Api {
-        private final EV3 ev3 = EV3.this;
 
-        public LightSensor getLightSensor(int port) {
-            return new LightSensor(ev3, port);
+        public LightSensor getLightSensor(InputPort port) {
+            return new LightSensor(this, port);
         }
 
-        public TouchSensor getTouchSensor(int port) {
-            return new TouchSensor(ev3, port);
+        public TouchSensor getTouchSensor(InputPort port) {
+            return new TouchSensor(this, port);
         }
 
-        public UltrasonicSensor getUltrasonicSensor(int port) {
-            return new UltrasonicSensor(ev3, port);
+        public UltrasonicSensor getUltrasonicSensor(InputPort port) {
+            return new UltrasonicSensor(this, port);
         }
 
-        public GyroSensor getGyroSensor(int port) {
-            return new GyroSensor(ev3, port);
+        public GyroSensor getGyroSensor(InputPort port) {
+            return new GyroSensor(this, port);
         }
 
-        public TachoMotor getTachoMotor(int port) {
-            return new TachoMotor(ev3, port);
+        public TachoMotor getTachoMotor(OutputPort port) {
+            return new TachoMotor(this, port);
         }
 
         public Event pollEvents() {
@@ -87,12 +134,12 @@ public class EV3 {
         // low level API
         //
 
-        private Bytecode preface(byte ready, int port, int type, int mode, int nvalue) throws IOException {
+        private Bytecode preface(byte ready, InputPort port, int type, int mode, int nvalue) throws IOException {
             Bytecode r = new Bytecode();
             r.addOpCode(Const.INPUT_DEVICE);
             r.addOpCode(ready);
             r.addParameter(Const.LAYER_MASTER);
-            r.addParameter((byte) port);
+            r.addParameter(port.toByte());
             r.addParameter((byte) type);
             r.addParameter((byte) mode);
             r.addParameter((byte) nvalue);
@@ -102,10 +149,9 @@ public class EV3 {
 
         // TODO: controllare che la manipolazione byte a byte sia corretta per tutti questi metodi che operano a basso livello
 
-        public Future<float[]> getSiValue(int port, int type, int mode, int nvalue) throws IOException {
+        public Future<float[]> getSiValue(InputPort port, int type, int mode, int nvalue) throws IOException {
             Bytecode bc = preface(Const.READY_SI, port, type, mode, nvalue);
-            Command cmd = new Command(true, 0, 4 * nvalue, bc.getBytes());
-            Future<Reply> r = channel.send(cmd);
+            Future<Reply> r = channel.send(4 * nvalue, bc);
             return new FutureTask<>(() -> {
                 Reply reply = r.get();
                 float[] result = new float[nvalue];
@@ -117,15 +163,14 @@ public class EV3 {
             });
         }
 
-        public Future<short[]> getPercentValue(int port, int type, int mode, int nvalue) throws IOException {
+        public Future<short[]> getPercentValue(InputPort port, int type, int mode, int nvalue) throws IOException {
             Bytecode bc = preface(Const.READY_PCT, port, type, mode, nvalue);
-            Command cmd = new Command(true, 0, 4 * nvalue, bc.getBytes());  // TODO: questo 4 * nvalue è giusto anche se sono short?
-            Future<Reply> r = channel.send(cmd);
+            Future<Reply> r = channel.send(2 * nvalue, bc);
             return new FutureTask<>(() -> {
                 byte[] reply = r.get().getData();
                 short[] result = new short[nvalue];
                 for (int i = 0; i < nvalue; i++) {
-                    result[i] = (short) reply[3 + i];
+                    result[i] = (short) reply[i];
                 }
                 return result;
             });

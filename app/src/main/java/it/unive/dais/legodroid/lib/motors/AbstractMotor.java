@@ -1,18 +1,20 @@
 package it.unive.dais.legodroid.lib.motors;
 
+import android.support.annotation.NonNull;
+
 import it.unive.dais.legodroid.lib.EV3;
 
 public abstract class AbstractMotor implements Motor {
-    protected EV3 ev3;
-    protected int port;
+    protected EV3.Api api;
+    protected EV3.OutputPort port;
 
-    AbstractMotor(EV3 ev3, int port) {
-        this.ev3 = ev3;
+    AbstractMotor(@NonNull EV3.Api api, EV3.OutputPort port) {
+        this.api = api;
         this.port = port;
     }
 
     @Override
-    public int getPort() {
+    public EV3.OutputPort getPort() {
         return port;
     }
 }

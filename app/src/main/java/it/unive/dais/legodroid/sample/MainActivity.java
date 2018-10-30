@@ -4,6 +4,10 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
 import it.unive.dais.legodroid.R;
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.comm.BluetoothConnection;
@@ -23,25 +27,30 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             BluetoothConnection conn = new BluetoothConnection("EV3");
-            Channel channel = conn.connect();
+            Channel channel = null;
+            channel = conn.connect();
             EV3 ev3 = new EV3(new SpooledAsyncChannel(channel));
 
             ev3.run(api -> {
-                LightSensor lightSensor = api.getLightSensor(0);
-                TachoMotor motorX = api.getTachoMotor(0);
-                TachoMotor motorY = api.getTachoMotor(1);
+                LightSensor sen = api.getLightSensor(EV3.InputPort._3);
+                TachoMotor motorX = api.getTachoMotor(EV3.OutputPort.A);
+                TachoMotor motorY = api.getTachoMotor(EV3.OutputPort.B);
 
                 int scanWidth = 10;
                 int scanHeight = 10;
-                int[][] scanBuffer = new int[scanWidth][scanHeight];
+                int[][] buff = new int[scanWidth][scanHeight];
 
                 for (int x = 0; x < scanWidth; x++) {
                     motorX.goToPositionAbs(x);
 
                     for (int y = 0; y < scanHeight; y++) {
-                        motorY.goToPositionAbs(y);
-                        int color = lightSensor.getReflected();
-                        scanBuffer[x][y] = color;
+                        try {
+                            motorY.goToPositionAbs(y);
+                            Future<Integer> pct = sen.getReflected();
+                            buff[x][y] = pct.get();
+                        } catch (IOException | InterruptedException | ExecutionException e) {
+                            e.printStackTrace();
+                        }
 
 //                        ScannerEvent evt = null;
 //                        while ((evt = api.pollEvents()) != null) {
@@ -55,11 +64,10 @@ public class MainActivity extends AppCompatActivity {
 
             Button button = findViewById(R.id.pollButton);
             button.setOnClickListener(v -> {
-//                ev3.sendEvent(new ScannerEvent(ScannerEventType.SCANNER_STOP));
+//                api.sendEvent(new ScannerEvent(ScannerEventType.SCANNER_STOP));
             });
 
-
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 

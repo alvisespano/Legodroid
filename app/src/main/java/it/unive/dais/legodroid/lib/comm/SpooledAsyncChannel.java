@@ -41,6 +41,7 @@ public class SpooledAsyncChannel implements AsyncChannel {
         @Override
         protected Void doInBackground(Void... voids) {
             Log.v(TAG, "starting spooler task");
+            Thread.currentThread().setName(TAG);
             while (!isCancelled()) {
                 try {
                     Reply r = channel.read();
@@ -113,6 +114,12 @@ public class SpooledAsyncChannel implements AsyncChannel {
         MyFuture r = new MyFuture(cmd.getCounter());
         q.add(r);
         return r;
+    }
+
+    @NonNull
+    @Override
+    public Future<Reply> send(int reservation, @NonNull Bytecode bc) throws IOException {
+        return send(new Command(true, 0, reservation, bc.getBytes()));
     }
 
     @Override
