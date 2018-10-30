@@ -62,7 +62,7 @@ public class SpooledAsyncChannel implements AsyncChannel {
     }
 
     public class MyFuture implements Future<Reply> {
-        private static final long GET_MAX_TIMEOUT = 5000;
+        private static final long GET_MAX_TIMEOUT_MS = 5000;
         private final int id;
         @Nullable
         private Reply reply = null;
@@ -94,7 +94,7 @@ public class SpooledAsyncChannel implements AsyncChannel {
         @Override
         @NonNull
         public Reply get() throws InterruptedException {
-            return get(GET_MAX_TIMEOUT, TimeUnit.MILLISECONDS);
+            return get(GET_MAX_TIMEOUT_MS, TimeUnit.MILLISECONDS);
         }
 
         @NonNull

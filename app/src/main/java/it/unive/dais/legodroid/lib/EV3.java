@@ -1,6 +1,7 @@
 package it.unive.dais.legodroid.lib;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -38,12 +39,14 @@ public class EV3 {
     private Consumer<Event> eventListener;
     @NonNull
     private final Queue<Event> incomingEvents = new ConcurrentLinkedQueue<>();
+    @NonNull
+    private final Activity activity;
 
-    public interface Event {
-    }
+    public interface Event {}
 
-    public EV3(@NonNull AsyncChannel channel) {
+    public EV3(@NonNull AsyncChannel channel, @NonNull Activity activity) {
         this.channel = channel;
+        this.activity = activity;
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -130,7 +133,7 @@ public class EV3 {
 
         public void sendEvent(Event e) {
             if (eventListener != null) {
-                eventListener.call(e);
+                activity.runOnUiThread(() -> eventListener.call(e));
             }
         }
 
