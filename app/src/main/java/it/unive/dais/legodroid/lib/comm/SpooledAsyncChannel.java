@@ -61,7 +61,7 @@ public class SpooledAsyncChannel implements AsyncChannel {
         }
     }
 
-    private class MyFuture implements Future<Reply> {
+    public class MyFuture implements Future<Reply> {
         private static final long GET_MAX_TIMEOUT = 5000;
         private final int id;
         @Nullable
@@ -73,7 +73,7 @@ public class SpooledAsyncChannel implements AsyncChannel {
 
         public synchronized void setReply(Reply r) {
             reply = r;
-            notify();
+            notifyAll();
         }
 
         @Override
@@ -109,7 +109,7 @@ public class SpooledAsyncChannel implements AsyncChannel {
 
     @Override
     @NonNull
-    public Future<Reply> send(@NonNull Command cmd) throws IOException {
+    public MyFuture send(@NonNull Command cmd) throws IOException {
         channel.write(cmd);
         MyFuture r = new MyFuture(cmd.getCounter());
         q.add(r);
@@ -118,7 +118,7 @@ public class SpooledAsyncChannel implements AsyncChannel {
 
     @NonNull
     @Override
-    public Future<Reply> send(int reservation, @NonNull Bytecode bc) throws IOException {
+    public MyFuture send(int reservation, @NonNull Bytecode bc) throws IOException {
         return send(new Command(true, 0, reservation, bc.getBytes()));
     }
 

@@ -12,8 +12,8 @@ public class LightSensor extends AbstractSensor {
         super(api, port);
     }
 
-    public Future<Integer> getReflected() throws IOException {
-        Future<short[]> f = api.getPercentValue(port, Const.EV3_COLOR, Const.COL_REFLECT, 1);
+    public FutureTask<Integer> getReflected() throws IOException {
+        FutureTask<short[]> f = api.getPercentValue(port, Const.EV3_COLOR, Const.COL_REFLECT, 1);
         return new FutureTask<>(() -> (int) f.get()[0]);
     }
 

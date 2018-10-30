@@ -7,8 +7,8 @@ public class Command extends Packet {
     private static int sequenceCounter = 0;
 
     private boolean reply;
-    private int reservation1;
-    private int reservation2;
+    private int reservationH;
+    private int reservationL;
 
     public Command(boolean reply, int localReservation, int globalReservation, @NonNull byte[] bytecode) {
         if (globalReservation > 1024)
@@ -19,8 +19,8 @@ public class Command extends Packet {
 //        this.length = bytecode.length + 5;
         this.counter = Command.sequenceCounter++;
         this.reply = reply;
-        this.reservation1 = ((localReservation << 2) & 0b11111100) | ((globalReservation >> 8) & 0x03);
-        this.reservation2 = globalReservation & 0xFF;
+        this.reservationH = ((localReservation << 2) & ~0x3) | ((globalReservation >> 8) & 0x03);
+        this.reservationL = globalReservation & 0xFF;
         this.data = bytecode;
     }
 
@@ -29,8 +29,8 @@ public class Command extends Packet {
         bytes[0] = (byte) (this.counter & 0xFF);
         bytes[1] = (byte) ((this.counter >> 8) & 0xFF);
         bytes[2] = reply ? Const.DIRECT_COMMAND_REPLY : Const.DIRECT_COMMAND_NOREPLY;
-        bytes[3] = (byte) (this.reservation1 & 0xFF);
-        bytes[4] = (byte) (this.reservation2 & 0xFF);
+        bytes[3] = (byte) (this.reservationL & 0xFF);
+        bytes[4] = (byte) (this.reservationH & 0xFF);
         System.arraycopy(this.data, 0, bytes, 5, data.length);
         return bytes;
     }

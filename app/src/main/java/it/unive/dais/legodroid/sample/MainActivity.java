@@ -2,11 +2,13 @@ package it.unive.dais.legodroid.sample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Button;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 import it.unive.dais.legodroid.R;
 import it.unive.dais.legodroid.lib.EV3;
@@ -46,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
                     for (int y = 0; y < scanHeight; y++) {
                         try {
                             motorY.goToPositionAbs(y);
-                            Future<Integer> pct = sen.getReflected();
+                            FutureTask<Integer> pct = sen.getReflected();
+                            Log.d(TAG, String.format("reflected: %d", pct.get()));
                             buff[x][y] = pct.get();
                         } catch (IOException | InterruptedException | ExecutionException e) {
                             e.printStackTrace();

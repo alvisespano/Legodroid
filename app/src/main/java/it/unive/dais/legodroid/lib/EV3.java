@@ -19,6 +19,7 @@ import it.unive.dais.legodroid.lib.comm.AsyncChannel;
 import it.unive.dais.legodroid.lib.comm.Bytecode;
 import it.unive.dais.legodroid.lib.comm.Const;
 import it.unive.dais.legodroid.lib.comm.Reply;
+import it.unive.dais.legodroid.lib.comm.SpooledAsyncChannel;
 import it.unive.dais.legodroid.lib.motors.TachoMotor;
 import it.unive.dais.legodroid.lib.sensors.GyroSensor;
 import it.unive.dais.legodroid.lib.sensors.LightSensor;
@@ -163,9 +164,9 @@ public class EV3 {
             });
         }
 
-        public Future<short[]> getPercentValue(InputPort port, int type, int mode, int nvalue) throws IOException {
+        public FutureTask<short[]> getPercentValue(InputPort port, int type, int mode, int nvalue) throws IOException {
             Bytecode bc = preface(Const.READY_PCT, port, type, mode, nvalue);
-            Future<Reply> r = channel.send(2 * nvalue, bc);
+            SpooledAsyncChannel.MyFuture r = channel.send(2 * nvalue, bc);
             return new FutureTask<>(() -> {
                 byte[] reply = r.get().getData();
                 short[] result = new short[nvalue];
