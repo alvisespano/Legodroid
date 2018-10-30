@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
                     for (int y = 0; y < scanHeight; y++) {
                         try {
                             motorY.goToPositionAbs(y);
-                            FutureTask<Integer> pct = sen.getReflected();
+                            Future<Integer> pct = sen.getReflected();
                             Log.d(TAG, String.format("reflected: %d", pct.get()));
                             buff[x][y] = pct.get();
                         } catch (IOException | InterruptedException | ExecutionException e) {

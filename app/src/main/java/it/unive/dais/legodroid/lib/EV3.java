@@ -11,7 +11,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Queue;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
@@ -19,7 +22,6 @@ import it.unive.dais.legodroid.lib.comm.AsyncChannel;
 import it.unive.dais.legodroid.lib.comm.Bytecode;
 import it.unive.dais.legodroid.lib.comm.Const;
 import it.unive.dais.legodroid.lib.comm.Reply;
-import it.unive.dais.legodroid.lib.comm.SpooledAsyncChannel;
 import it.unive.dais.legodroid.lib.motors.TachoMotor;
 import it.unive.dais.legodroid.lib.sensors.GyroSensor;
 import it.unive.dais.legodroid.lib.sensors.LightSensor;
@@ -153,7 +155,7 @@ public class EV3 {
         public Future<float[]> getSiValue(InputPort port, int type, int mode, int nvalue) throws IOException {
             Bytecode bc = preface(Const.READY_SI, port, type, mode, nvalue);
             Future<Reply> r = channel.send(4 * nvalue, bc);
-            return new FutureTask<>(() -> {
+            return execAsync(() -> {
                 Reply reply = r.get();
                 float[] result = new float[nvalue];
                 for (int i = 0; i < nvalue; i++) {
@@ -164,10 +166,18 @@ public class EV3 {
             });
         }
 
-        public FutureTask<short[]> getPercentValue(InputPort port, int type, int mode, int nvalue) throws IOException {
+        private Executor executor = Executors.newSingleThreadExecutor();
+
+        public <T> Future<T> execAsync(Callable<T> c) {
+            FutureTask<T> t = new FutureTask<>(c);
+            executor.execute(t);
+            return t;
+        }
+
+        public Future<short[]> getPercentValue(InputPort port, int type, int mode, int nvalue) throws IOException {
             Bytecode bc = preface(Const.READY_PCT, port, type, mode, nvalue);
-            SpooledAsyncChannel.MyFuture r = channel.send(2 * nvalue, bc);
-            return new FutureTask<>(() -> {
+            Future<Reply> r = channel.send(2 * nvalue, bc);
+            return execAsync(() -> {
                 byte[] reply = r.get().getData();
                 short[] result = new short[nvalue];
                 for (int i = 0; i < nvalue; i++) {

@@ -2,7 +2,6 @@ package it.unive.dais.legodroid.lib.sensors;
 
 import java.io.IOException;
 import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.comm.Const;
@@ -12,9 +11,9 @@ public class LightSensor extends AbstractSensor {
         super(api, port);
     }
 
-    public FutureTask<Integer> getReflected() throws IOException {
-        FutureTask<short[]> f = api.getPercentValue(port, Const.EV3_COLOR, Const.COL_REFLECT, 1);
-        return new FutureTask<>(() -> (int) f.get()[0]);
+    public Future<Integer> getReflected() throws IOException {
+        Future<short[]> f = api.getPercentValue(port, Const.EV3_COLOR, Const.COL_REFLECT, 1);
+        return api.execAsync(() -> (int) f.get()[0]);
     }
 
     public int getAmbient() {
