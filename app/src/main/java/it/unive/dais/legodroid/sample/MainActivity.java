@@ -5,11 +5,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.TextView;
-
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-
 import it.unive.dais.legodroid.R;
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.comm.BluetoothConnection;
@@ -38,8 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             BluetoothConnection conn = new BluetoothConnection("EV3");
-            Channel channel = null;
-            channel = conn.connect();
+            Channel channel = conn.connect();
             EV3 ev3 = new EV3(new SpooledAsyncChannel(channel), this);
 
             ev3.setEventListener(event -> {
