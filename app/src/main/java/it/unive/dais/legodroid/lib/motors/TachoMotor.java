@@ -33,12 +33,8 @@ public class TachoMotor {
 
     }
 
-    public void forward(int speed) throws IOException {
+    public void setSpeed(int speed) throws IOException {
         api.setOutputState(port.toByte(), speed);
-    }
-
-    public void backward(int speed) {
-
     }
 
     public void brake() {
