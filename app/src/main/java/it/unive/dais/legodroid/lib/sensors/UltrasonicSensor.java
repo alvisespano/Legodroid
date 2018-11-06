@@ -1,6 +1,10 @@
 package it.unive.dais.legodroid.lib.sensors;
 
 import it.unive.dais.legodroid.lib.EV3;
+import it.unive.dais.legodroid.lib.comm.Const;
+
+import java.io.IOException;
+import java.util.concurrent.Future;
 
 
 public class UltrasonicSensor extends AbstractSensor {
@@ -8,9 +12,8 @@ public class UltrasonicSensor extends AbstractSensor {
         super(api, port);
     }
 
-//    public Promise<Boolean> getPressed() throws IOException {
-//        final Promise<Boolean> promise = new Promise<>();  // TODO: da rifare
-////        api.getSiValue(port, EV3_TOUCH, TOUCH_TOUCH, 1).then((Consumer<float[]>) values -> promise.resolve((int) values[0] == 1));
-//        return promise;
-//    }
+    public Future<Float> getDistance() throws IOException {
+        Future<float[]> f = api.getSiValue(port, Const.EV3_ULTRASONIC, Const.US_CM, 1);
+        return api.execAsync(() -> f.get()[0]);
+    }
 }

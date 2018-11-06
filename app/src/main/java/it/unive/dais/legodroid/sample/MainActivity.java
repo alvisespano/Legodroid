@@ -57,11 +57,13 @@ public class MainActivity extends AppCompatActivity {
 
             ev3.run(api -> {
                 LightSensor lightSensor = api.getLightSensor(EV3.InputPort._3);
-                TouchSensor touchSensor = api.getTouchSensor(EV3.InputPort._1);
+//                TouchSensor touchSensor = api.getTouchSensor(EV3.InputPort._1);
                 boolean running = true;
 
                 while (running) {
                     try {
+                        Future<Integer> ambient = lightSensor.getAmbient();
+                        api.sendEvent(new DataReady(ambient.get()));
 //                        Future<Integer> reflected = lightSensor.getReflected();
 //                        api.sendEvent(new DataReady(reflected.get()));
 //                        Log.d(TAG, String.format("reflected: %d", reflected.get()));    // TODO: verificare che chiamare 2 volte get() non ricomputi la future (secondo la doc non dovrebbe farlo)
@@ -69,8 +71,8 @@ public class MainActivity extends AppCompatActivity {
 //                        int rgbv = rgb.get().R << 16 | rgb.get().G << 8 | rgb.get().B;
 //                        api.sendEvent(new DataReady(rgbv));
 //                        Log.d(TAG, String.format("rgb: %d", rgbv));
-                        Future<Boolean> touched = touchSensor.getPressed();
-                        api.sendEvent(new DataReady(touched.get() ? 1 : 0));
+//                        Future<Boolean> touched = touchSensor.getPressed();
+//                        api.sendEvent(new DataReady(touched.get() ? 1 : 0));
                     } catch (IOException | InterruptedException | ExecutionException e) {
                         e.printStackTrace();
                     }
