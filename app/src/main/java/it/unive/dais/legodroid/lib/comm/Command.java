@@ -16,7 +16,6 @@ public class Command extends Packet {
         if (localReservation > 64)
             throw new IllegalArgumentException("local buffer must be less than 64 bytes");
 
-//        this.length = bytecode.length + 5;
         this.counter = Command.sequenceCounter++;
         this.reply = reply;
         this.reservationH = ((localReservation << 2) & ~0x3) | ((globalReservation >> 8) & 0x03);

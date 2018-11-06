@@ -28,7 +28,6 @@ import it.unive.dais.legodroid.lib.sensors.LightSensor;
 import it.unive.dais.legodroid.lib.sensors.TouchSensor;
 import it.unive.dais.legodroid.lib.sensors.UltrasonicSensor;
 import it.unive.dais.legodroid.lib.util.Consumer;
-import it.unive.dais.legodroid.lib.util.UnexpectedException;
 
 public class EV3 {
     private static final String TAG = "EV3";
@@ -46,6 +45,7 @@ public class EV3 {
         this.channel = channel;
     }
 
+    // TODO: Fix StaticFieldLeak
     @SuppressLint("StaticFieldLeak")
     public void run(@NonNull Consumer<Api> c) {
         new AsyncTask<Void, Void, Void>() {
@@ -71,42 +71,6 @@ public class EV3 {
 
     public void setEventListener(@NonNull Consumer<Event> eventListener) {
         this.eventListener = eventListener;
-    }
-
-    public enum InputPort {
-        _1, _2, _3, _4;
-
-        public byte toByte() {
-            switch (this) {
-                case _1:
-                    return 0;
-                case _2:
-                    return 1;
-                case _3:
-                    return 2;
-                case _4:
-                    return 3;
-            }
-            throw new UnexpectedException("invalid input port");
-        }
-    }
-
-    public enum OutputPort {
-        A, B, C, D;
-
-        public byte toByte() {
-            switch (this) {
-                case A:
-                    return 0;
-                case B:
-                    return 1;
-                case C:
-                    return 2;
-                case D:
-                    return 3;
-            }
-            throw new UnexpectedException("invalid output port");
-        }
     }
 
     public class Api {
@@ -141,10 +105,22 @@ public class EV3 {
             }
         }
 
+        public void soundTone(int volume, int freq, int duration) throws IOException {
+            Bytecode bc = new Bytecode();
+            bc.addOpCode(Const.SOUND_CONTROL);
+            bc.addOpCode(Const.SOUND_TONE);
+            bc.addParameter((byte) volume);
+            bc.addParameter((short) freq);
+            bc.addParameter((short) duration);
+            channel.sendNoReply(bc);
+        }
+
         // low level API
         //
 
-        private Bytecode preface(byte ready, InputPort port, int type, int mode, int nvalue) throws IOException {
+        private Executor executor = Executors.newSingleThreadExecutor();
+
+        private Bytecode prefaceGetValue(byte ready, InputPort port, int type, int mode, int nvalue) throws IOException {
             Bytecode r = new Bytecode();
             r.addOpCode(Const.INPUT_DEVICE);
             r.addOpCode(ready);
@@ -160,7 +136,7 @@ public class EV3 {
         // TODO: controllare che la manipolazione byte a byte sia corretta per tutti questi metodi che operano a basso livello
 
         public Future<float[]> getSiValue(InputPort port, int type, int mode, int nvalue) throws IOException {
-            Bytecode bc = preface(Const.READY_SI, port, type, mode, nvalue);
+            Bytecode bc = prefaceGetValue(Const.READY_SI, port, type, mode, nvalue);
             Future<Reply> r = channel.send(4 * nvalue, bc);
             return execAsync(() -> {
                 Reply reply = r.get();
@@ -173,8 +149,6 @@ public class EV3 {
             });
         }
 
-        private Executor executor = Executors.newSingleThreadExecutor();
-
         public <T> Future<T> execAsync(Callable<T> c) {
             FutureTask<T> t = new FutureTask<>(c);
             executor.execute(t);
@@ -182,7 +156,7 @@ public class EV3 {
         }
 
         public Future<short[]> getPercentValue(InputPort port, int type, int mode, int nvalue) throws IOException {
-            Bytecode bc = preface(Const.READY_PCT, port, type, mode, nvalue);
+            Bytecode bc = prefaceGetValue(Const.READY_PCT, port, type, mode, nvalue);
             Future<Reply> fr = channel.send(2 * nvalue, bc);
             return execAsync(() -> {
                 Reply r = fr.get();
@@ -195,27 +169,9 @@ public class EV3 {
             });
         }
 
-        public void soundTone(int volume, int freq, int duration) throws IOException {
+        public void setOutputSpeed(OutputPort port, int speed) throws IOException {
             Bytecode bc = new Bytecode();
-            bc.addOpCode(Const.SOUND_CONTROL);
-            bc.addOpCode(Const.SOUND_TONE);
-            bc.addParameter((byte) volume);
-            bc.addParameter((short) freq);
-            bc.addParameter((short) duration);
-            channel.sendNoReply(bc);
-        }
-
-        private byte toByteCodePort(int port) {
-            if (port >= 0x00 && port <= 0x03) {
-                return (byte) (0x01 << port);
-            } else {
-                return 0x00;
-            }
-        }
-
-        public void setOutputState(int port, int speed) throws IOException {
-            Bytecode bc = new Bytecode();
-            byte p = toByteCodePort(port);
+            byte p = (byte)(0x01 << port.toByte());
             bc.addOpCode(Const.OUTPUT_POWER);
             bc.addParameter(Const.LAYER_MASTER);
             bc.addParameter(p);
@@ -225,7 +181,5 @@ public class EV3 {
             bc.addParameter(p);
             channel.sendNoReply(bc);
         }
-
     }
-
 }

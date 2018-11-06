@@ -13,6 +13,8 @@ import java.util.concurrent.Future;
 
 import it.unive.dais.legodroid.R;
 import it.unive.dais.legodroid.lib.EV3;
+import it.unive.dais.legodroid.lib.InputPort;
+import it.unive.dais.legodroid.lib.OutputPort;
 import it.unive.dais.legodroid.lib.comm.BluetoothConnection;
 import it.unive.dais.legodroid.lib.comm.Channel;
 import it.unive.dais.legodroid.lib.comm.SpooledAsyncChannel;
@@ -56,13 +58,13 @@ public class MainActivity extends AppCompatActivity {
             });
 
             ev3.run(api -> {
-                LightSensor lightSensor = api.getLightSensor(EV3.InputPort._3);
+                LightSensor lightSensor = api.getLightSensor(InputPort._3);
 //                TouchSensor touchSensor = api.getTouchSensor(EV3.InputPort._1);
                 boolean running = true;
 
                 while (running) {
                     try {
-                        api.getTachoMotor(EV3.OutputPort.A).setSpeed(10);
+                        api.getTachoMotor(OutputPort.A).setSpeed(10);
                         Future<Integer> ambient = lightSensor.getAmbient();
                         api.sendEvent(new DataReady(ambient.get()));
 //                        Future<Integer> reflected = lightSensor.getReflected();
@@ -96,8 +98,5 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
-
-
 }
