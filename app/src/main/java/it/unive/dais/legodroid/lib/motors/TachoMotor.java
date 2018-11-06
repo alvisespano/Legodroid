@@ -2,9 +2,11 @@ package it.unive.dais.legodroid.lib.motors;
 
 import it.unive.dais.legodroid.lib.EV3;
 
+import java.io.IOException;
+
 public class TachoMotor {
-    EV3.Api api;
-    EV3.OutputPort port;
+    private EV3.Api api;
+    private EV3.OutputPort port;
 
     public TachoMotor(EV3.Api api, EV3.OutputPort port) {
         this.api = api;
@@ -31,8 +33,8 @@ public class TachoMotor {
 
     }
 
-    public void forward(int speed) {
-
+    public void forward(int speed) throws IOException {
+        api.setOutputState(port.toByte(), speed);
     }
 
     public void backward(int speed) {

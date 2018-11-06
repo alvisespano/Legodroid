@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
                 while (running) {
                     try {
+                        api.getTachoMotor(EV3.OutputPort.A).forward(10);
                         Future<Integer> ambient = lightSensor.getAmbient();
                         api.sendEvent(new DataReady(ambient.get()));
 //                        Future<Integer> reflected = lightSensor.getReflected();
