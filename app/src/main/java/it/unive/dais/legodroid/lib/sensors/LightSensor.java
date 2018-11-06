@@ -1,7 +1,6 @@
 package it.unive.dais.legodroid.lib.sensors;
 
 import java.io.IOException;
-import java.util.EnumSet;
 import java.util.concurrent.Future;
 
 import it.unive.dais.legodroid.lib.EV3;
@@ -46,20 +45,14 @@ public class LightSensor extends AbstractSensor {
     }
 
     public enum Color {
-        TRANSPARENT (0),
-        BLACK (1),
-        BLUE (2),
-        GREEN (3),
-        YELLOW (4),
-        RED (5),
-        WHITE (6),
-        BROWN (7);
-
-        private final int val;
-
-        Color(int n) {
-            val = n;
-        }
+        TRANSPARENT,
+        BLACK,
+        BLUE,
+        GREEN,
+        YELLOW,
+        RED,
+        WHITE,
+        BROWN
     }
 
 }
