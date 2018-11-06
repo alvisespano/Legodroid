@@ -1,6 +1,7 @@
 package it.unive.dais.legodroid.lib.sensors;
 
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.concurrent.Future;
 
 import it.unive.dais.legodroid.lib.EV3;
@@ -16,35 +17,49 @@ public class LightSensor extends AbstractSensor {
         return api.execAsync(() -> (int) f.get()[0]);
     }
 
-    public int getAmbient() {
-        return 0;
+    public Future<Integer> getAmbient() throws IOException {
+        Future<short[]> f = api.getPercentValue(port, Const.EV3_COLOR, Const.COL_AMBIENT, 1);
+        return api.execAsync(() -> (int) f.get()[0]);
     }
 
-    public Color getColor() {
-        return Color.BLACK;
+    public Future<Color> getColor() throws IOException {
+        Future<short[]> f = api.getPercentValue(port, Const.EV3_COLOR, Const.COL_COLOR, 1);
+        return api.execAsync(() -> Color.values()[f.get()[0]]);
     }
 
-    public int getRawR() {
-        return 0;
+    public static class Rgb {
+        public final int R, G, B;
+
+        public Rgb(int R, int G, int B) {
+            this.R = R;
+            this.G = G;
+            this.B = B;
+        }
     }
 
-    public int getRawG() {
-        return 0;
-    }
-
-    public int getRawB() {
-        return 0;
+    public Future<Rgb> getRgb() throws IOException {
+        Future<short[]> f = api.getPercentValue(port, Const.EV3_COLOR, Const.COL_RGB, 3);
+        return api.execAsync(() -> {
+                short[] rgb = f.get();
+                return new Rgb(rgb[0], rgb[1], rgb[2]);
+        });
     }
 
     public enum Color {
-        TRANSPARENT,
-        BLACK,
-        BLUE,
-        GREEN,
-        YELLOW,
-        RED,
-        WHITE,
-        BROWN
+        TRANSPARENT (0),
+        BLACK (1),
+        BLUE (2),
+        GREEN (3),
+        YELLOW (4),
+        RED (5),
+        WHITE (6),
+        BROWN (7);
+
+        private final int val;
+
+        Color(int n) {
+            val = n;
+        }
     }
 
 }

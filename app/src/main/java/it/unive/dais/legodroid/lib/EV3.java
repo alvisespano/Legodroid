@@ -1,7 +1,6 @@
 package it.unive.dais.legodroid.lib;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -39,14 +38,12 @@ public class EV3 {
     private Consumer<Event> eventListener;
     @NonNull
     private final Queue<Event> incomingEvents = new ConcurrentLinkedQueue<>();
-    @NonNull
-    private final Activity activity;
 
-    public interface Event {}
+    public interface Event {
+    }
 
-    public EV3(@NonNull AsyncChannel channel, @NonNull Activity activity) {
+    public EV3(@NonNull AsyncChannel channel) {
         this.channel = channel;
-        this.activity = activity;
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -59,8 +56,7 @@ public class EV3 {
                 Thread.currentThread().setName(TAG);
                 try {
                     c.call(new Api());
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     Log.e(TAG, String.format("uncaught exception: %s. Aborting EV3 job.", e.getMessage()));
                     e.printStackTrace();
                 }
@@ -82,10 +78,14 @@ public class EV3 {
 
         public byte toByte() {
             switch (this) {
-                case _1: return 0;
-                case _2: return 1;
-                case _3: return 2;
-                case _4: return 3;
+                case _1:
+                    return 0;
+                case _2:
+                    return 1;
+                case _3:
+                    return 2;
+                case _4:
+                    return 3;
             }
             throw new UnexpectedException("invalid input port");
         }
@@ -96,10 +96,14 @@ public class EV3 {
 
         public byte toByte() {
             switch (this) {
-                case A: return 0;
-                case B: return 1;
-                case C: return 2;
-                case D: return 3;
+                case A:
+                    return 0;
+                case B:
+                    return 1;
+                case C:
+                    return 2;
+                case D:
+                    return 3;
             }
             throw new UnexpectedException("invalid output port");
         }
@@ -127,13 +131,13 @@ public class EV3 {
             return new TachoMotor(this, port);
         }
 
-        public Event pollEvents() {
+        public synchronized Event pollEvents() {
             return incomingEvents.poll();
         }
 
-        public void sendEvent(Event e) {
+        public synchronized void sendEvent(Event e) {
             if (eventListener != null) {
-                activity.runOnUiThread(() -> eventListener.call(e));
+                eventListener.call(e);
             }
         }
 
@@ -179,9 +183,10 @@ public class EV3 {
 
         public Future<short[]> getPercentValue(InputPort port, int type, int mode, int nvalue) throws IOException {
             Bytecode bc = preface(Const.READY_PCT, port, type, mode, nvalue);
-            Future<Reply> r = channel.send(2 * nvalue, bc);
+            Future<Reply> fr = channel.send(2 * nvalue, bc);
             return execAsync(() -> {
-                byte[] reply = r.get().getData();
+                Reply r = fr.get();
+                byte[] reply = r.getData();
                 short[] result = new short[nvalue];
                 for (int i = 0; i < nvalue; i++) {
                     result[i] = (short) reply[i];

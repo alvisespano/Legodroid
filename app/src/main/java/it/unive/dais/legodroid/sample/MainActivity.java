@@ -5,9 +5,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.TextView;
+
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+
 import it.unive.dais.legodroid.R;
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.comm.BluetoothConnection;
@@ -23,10 +25,12 @@ public class MainActivity extends AppCompatActivity {
 
     private static class DataReady implements EV3.Event {
         public final int value;
+
         public DataReady(int value) {
             this.value = value;
         }
     }
+
 
     @SuppressLint("DefaultLocale")
     @Override
@@ -37,14 +41,16 @@ public class MainActivity extends AppCompatActivity {
         try {
             BluetoothConnection conn = new BluetoothConnection("EV3");
             Channel channel = conn.connect();
-            EV3 ev3 = new EV3(new SpooledAsyncChannel(channel), this);
+            EV3 ev3 = new EV3(new SpooledAsyncChannel(channel));
 
             ev3.setEventListener(event -> {
-                if (event instanceof DataReady) {
-                    DataReady e = (DataReady) event;
-                    TextView view = findViewById(R.id.textView);
-                    view.setText(String.format("%d", e.value));
-                }
+                runOnUiThread(() -> {
+                    if (event instanceof DataReady) {
+                        DataReady e = (DataReady) event;
+                        TextView view = findViewById(R.id.textView);
+                        view.setText(String.format("%d", e.value));
+                    }
+                });
             });
 
             ev3.run(api -> {
@@ -53,8 +59,10 @@ public class MainActivity extends AppCompatActivity {
 
                 while (running) {
                     try {
-                        Future<Integer> pct = sen.getReflected();
-                        api.sendEvent(new DataReady(pct.get()));
+                        Future<Integer> reflected = sen.getReflected();
+                        api.sendEvent(new DataReady(reflected.get()));
+//                        Future<LightSensor.Rgb> rgb = sen.getRgb();
+//                        api.sendEvent(new DataReady(rgb.get().R << 16 | rgb.get().G << 8 | rgb.get().B));
                     } catch (IOException | InterruptedException | ExecutionException e) {
                         e.printStackTrace();
                     }

@@ -12,14 +12,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class SpooledAsyncChannel implements AsyncChannel {
 
     @NonNull
     private final Channel channel;
     @NonNull
-    private final List<MyFuture> q = Collections.synchronizedList(new ArrayList<>());
+    private final List<FutureReply> q = Collections.synchronizedList(new ArrayList<>());
     @NonNull
     private final SpoolerTask task;
 
@@ -45,14 +47,16 @@ public class SpooledAsyncChannel implements AsyncChannel {
             while (!isCancelled()) {
                 try {
                     Reply r = channel.read();
-                    for (MyFuture t : q) {
-                        if (t.id == r.counter) {
-                            t.setReply(r);
-                            break;
+                    synchronized (q) {
+                        for (FutureReply t : q) {
+                            if (t.id == r.counter) {
+                                t.setReply(r);
+                                break;
+                            }
                         }
                     }
-                } catch (IOException | TimeoutException e) {
-                    Log.e(TAG, "recoverable exception caught");
+                } catch (Throwable e) {
+                    Log.e(TAG, "recoverable exception caught: %s");
                     e.printStackTrace();
                 }
             }
@@ -61,19 +65,28 @@ public class SpooledAsyncChannel implements AsyncChannel {
         }
     }
 
-    public class MyFuture implements Future<Reply> {
+    public class FutureReply implements Future<Reply> {
         private static final long GET_MAX_TIMEOUT_MS = 5000;
         private final int id;
+        @NonNull
+        private final Lock lock = new ReentrantLock();
+        @NonNull
+        private final Condition cond = lock.newCondition();
         @Nullable
         private Reply reply = null;
 
-        public MyFuture(int id) {
+        public FutureReply(int id) {
             this.id = id;
         }
 
-        public synchronized void setReply(Reply r) {
-            reply = r;
-            notifyAll();
+        private void setReply(Reply r) {
+            lock.lock();
+            try {
+                reply = r;
+                cond.signalAll();
+            } finally {
+                lock.unlock();
+            }
         }
 
         @Override
@@ -87,8 +100,13 @@ public class SpooledAsyncChannel implements AsyncChannel {
         }
 
         @Override
-        public synchronized boolean isDone() {
-            return reply != null;
+        public boolean isDone() {
+            lock.lock();
+            try {
+                return reply != null;
+            } finally {
+                lock.unlock();
+            }
         }
 
         @Override
@@ -99,26 +117,31 @@ public class SpooledAsyncChannel implements AsyncChannel {
 
         @NonNull
         @Override
-        public synchronized Reply get(long l, @NonNull TimeUnit timeUnit) throws InterruptedException {
-            if (reply == null)
-                wait(timeUnit.toMillis(l));
-            assert reply != null;
-            return reply;
+        public Reply get(long l, @NonNull TimeUnit timeUnit) throws InterruptedException {
+            lock.lock();
+            try {
+                if (reply == null)
+                    cond.await(); //(l, timeUnit);
+                assert reply != null;
+                return reply;
+            } finally {
+                lock.unlock();
+            }
         }
     }
 
     @Override
     @NonNull
-    public MyFuture send(@NonNull Command cmd) throws IOException {
+    public FutureReply send(@NonNull Command cmd) throws IOException {
         channel.write(cmd);
-        MyFuture r = new MyFuture(cmd.getCounter());
+        FutureReply r = new FutureReply(cmd.getCounter());
         q.add(r);
         return r;
     }
 
     @NonNull
     @Override
-    public MyFuture send(int reservation, @NonNull Bytecode bc) throws IOException {
+    public FutureReply send(int reservation, @NonNull Bytecode bc) throws IOException {
         return send(new Command(true, 0, reservation, bc.getBytes()));
     }
 

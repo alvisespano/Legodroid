@@ -1,10 +1,11 @@
 package it.unive.dais.legodroid.lib.comm;
 
-import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 public abstract class Packet {
     protected int counter;
-    protected byte[] data;
+    @Nullable
+    protected byte[] data = null;
 
     public int getCounter() {
         return counter;

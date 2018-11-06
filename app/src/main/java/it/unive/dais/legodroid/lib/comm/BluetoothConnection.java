@@ -17,7 +17,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 public class BluetoothConnection implements Connection {
-    private static final long READ_TIMEOUT_MS = 1000;
+    private static final long READ_TIMEOUT_MS = 10000;
 
     @NonNull
     private final String name;
@@ -81,6 +81,7 @@ public class BluetoothConnection implements Connection {
         }
 
         private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
+
         private static String bytesToHex(byte[] bytes) {
             char[] hexChars = new char[bytes.length * 2];
             for (int j = 0; j < bytes.length; j++) {
@@ -102,28 +103,27 @@ public class BluetoothConnection implements Connection {
 
         @Override
         public Reply read() throws IOException, TimeoutException {
-//            Log.d(TAG, "read loop");
-//            while (true) {
-//                int b = in.read();
-//                Log.d(TAG, String.format("read: %d", b));
-//            }
-
             byte[] lb = readSized(2);
             int len = ((lb[1] & 0xff) << 8) | (lb[0] & 0xff);
             Log.d(TAG, String.format("read len = %d", len));
             return new Reply(readSized(len));
         }
 
+        public int count = 0;
+
         private byte[] readSized(int size) throws IOException, TimeoutException {
             byte[] r = new byte[size];
             int off = 0;
             long now = System.currentTimeMillis();
             while (off < size) {
+                Log.d(TAG, "reading...");
                 off += in.read(r, off, size - off);
                 Log.d(TAG, String.format("read: %s", bytesToHex(r)));
-                if (System.currentTimeMillis() - now > READ_TIMEOUT_MS) throw new TimeoutException();
+                if (System.currentTimeMillis() - now > READ_TIMEOUT_MS)
+                    throw new TimeoutException();
             }
-            Log.d(TAG, String.format("read: full: %s", bytesToHex(r)));
+            count += size;
+            Log.d(TAG, String.format("total read: %d", count));
             return r;
         }
     }
