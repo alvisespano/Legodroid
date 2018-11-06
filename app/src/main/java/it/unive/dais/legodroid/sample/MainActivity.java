@@ -3,6 +3,7 @@ package it.unive.dais.legodroid.sample;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -61,8 +62,11 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         Future<Integer> reflected = sen.getReflected();
                         api.sendEvent(new DataReady(reflected.get()));
+                        Log.d(TAG, String.format("reflected: %d", reflected.get()));    // TODO: verificare che chiamare 2 volte get() non ricomputi la future (secondo la doc non dovrebbe farlo)
 //                        Future<LightSensor.Rgb> rgb = sen.getRgb();
-//                        api.sendEvent(new DataReady(rgb.get().R << 16 | rgb.get().G << 8 | rgb.get().B));
+//                        int rgbv = rgb.get().R << 16 | rgb.get().G << 8 | rgb.get().B;
+//                        api.sendEvent(new DataReady(rgbv));
+//                        Log.d(TAG, String.format("rgb: %d", rgbv));
                     } catch (IOException | InterruptedException | ExecutionException e) {
                         e.printStackTrace();
                     }

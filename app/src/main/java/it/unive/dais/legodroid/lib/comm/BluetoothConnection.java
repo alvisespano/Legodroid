@@ -97,7 +97,7 @@ public class BluetoothConnection implements Connection {
             byte[] a = p.marshal();
             byte[] l = new byte[]{(byte) (a.length & 0xFF), (byte) ((a.length >> 8) & 0xFF)};
             byte[] w = concat(l, a);
-            Log.d(TAG, String.format("write: { %s }", bytesToHex(w)));
+//            Log.d(TAG, String.format("write: { %s }", bytesToHex(w)));
             out.write(w);
         }
 
@@ -105,7 +105,7 @@ public class BluetoothConnection implements Connection {
         public Reply read() throws IOException, TimeoutException {
             byte[] lb = readSized(2);
             int len = ((lb[1] & 0xff) << 8) | (lb[0] & 0xff);
-            Log.d(TAG, String.format("read len = %d", len));
+//            Log.d(TAG, String.format("read len = %d", len));
             return new Reply(readSized(len));
         }
 
@@ -116,14 +116,13 @@ public class BluetoothConnection implements Connection {
             int off = 0;
             long now = System.currentTimeMillis();
             while (off < size) {
-                Log.d(TAG, "reading...");
                 off += in.read(r, off, size - off);
-                Log.d(TAG, String.format("read: %s", bytesToHex(r)));
+//                Log.d(TAG, String.format("read: %s", bytesToHex(r)));
                 if (System.currentTimeMillis() - now > READ_TIMEOUT_MS)
                     throw new TimeoutException();
             }
             count += size;
-            Log.d(TAG, String.format("total read: %d", count));
+//            Log.d(TAG, String.format("total read: %d bytes", count));
             return r;
         }
     }

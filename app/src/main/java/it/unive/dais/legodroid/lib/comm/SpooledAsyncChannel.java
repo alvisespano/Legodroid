@@ -1,6 +1,5 @@
 package it.unive.dais.legodroid.lib.comm;
 
-import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,7 +26,7 @@ public class SpooledAsyncChannel implements AsyncChannel {
 
     public SpooledAsyncChannel(@NonNull Channel channel) {
         this.channel = channel;
-        this.task = new SpoolerTask();
+        this.task = new SpoolerTask(channel, q);
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -36,9 +35,17 @@ public class SpooledAsyncChannel implements AsyncChannel {
         task.cancel(true);
     }
 
-    @SuppressLint("StaticFieldLeak")
-    private class SpoolerTask extends AsyncTask<Void, Void, Void> {
+    private static class SpoolerTask extends AsyncTask<Void, Void, Void> {
         private static final String TAG = "SpoolerTask";
+        @NonNull
+        private final Channel channel;
+        @NonNull
+        private final List<FutureReply> q;
+
+        public SpoolerTask(@NonNull Channel ch, @NonNull List<FutureReply> q) {
+            this.channel = ch;
+            this.q = q;
+        }
 
         @Override
         protected Void doInBackground(Void... voids) {
@@ -121,7 +128,7 @@ public class SpooledAsyncChannel implements AsyncChannel {
             lock.lock();
             try {
                 if (reply == null)
-                    cond.await(); //(l, timeUnit);
+                    cond.await(l, timeUnit);
                 assert reply != null;
                 return reply;
             } finally {
