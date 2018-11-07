@@ -157,8 +157,6 @@ public class EV3 {
             return r;
         }
 
-        // TODO: controllare che la manipolazione byte a byte sia corretta per tutti questi metodi che operano a basso livello
-
         public Future<float[]> getSiValue(InputPort port, int type, int mode, int nvalue) throws IOException {
             Bytecode bc = preface(Const.READY_SI, port, type, mode, nvalue);
             Future<Reply> r = channel.send(4 * nvalue, bc);
