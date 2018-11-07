@@ -1,10 +1,17 @@
 package it.unive.dais.legodroid.lib.motors;
 
 import it.unive.dais.legodroid.lib.EV3;
+import it.unive.dais.legodroid.lib.OutputPort;
 
-public class TachoMotor extends AbstractMotor {
-    public TachoMotor(EV3.Api api, EV3.OutputPort port) {
-        super(api, port);
+import java.io.IOException;
+
+public class TachoMotor {
+    private EV3.Api api;
+    private OutputPort port;
+
+    public TachoMotor(EV3.Api api, OutputPort port) {
+        this.api = api;
+        this.port = port;
     }
 
     public int getPosition() {
@@ -27,27 +34,18 @@ public class TachoMotor extends AbstractMotor {
 
     }
 
-    @Override
-    public void forward(int speed) {
-
+    public void setSpeed(int speed) throws IOException {
+        api.setOutputSpeed(port, speed);
     }
 
-    @Override
-    public void backward(int speed) {
-
-    }
-
-    @Override
     public void brake() {
 
     }
 
-    @Override
     public void stop() {
 
     }
 
-    @Override
     public boolean isMoving() { // TODO: questo non è un doppione con isStill()?
         return false;
     }

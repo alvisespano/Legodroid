@@ -143,4 +143,6 @@ public class Const {
     public static final byte M_MOTOR_DEGREE = (byte) 0x00;
     public static final byte M_MOTOR_ROTATE = (byte) 0x01;
     public static final byte M_MOTOR_SPEED = (byte) 0x02;
+
+    private static final byte OUTPUT_PORT_OFFSET = 0x10;
 }

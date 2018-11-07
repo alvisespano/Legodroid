@@ -1,19 +1,25 @@
 package it.unive.dais.legodroid.lib.sensors;
 
 import java.io.IOException;
+import java.util.concurrent.Future;
 
 import it.unive.dais.legodroid.lib.EV3;
-import it.unive.dais.legodroid.lib.util.Promise;
+import it.unive.dais.legodroid.lib.InputPort;
+import it.unive.dais.legodroid.lib.comm.Const;
 
 
 public class GyroSensor extends AbstractSensor {
-    public GyroSensor(EV3.Api api, EV3.InputPort port) {
+    public GyroSensor(EV3.Api api, InputPort port) {
         super(api, port);
     }
 
-//    public Promise<Boolean> getPressed() throws IOException {
-//        final Promise<Boolean> promise = new Promise<>();  // TODO: da rifare
-////        api.getSiValue(port, EV3_TOUCH, TOUCH_TOUCH, 1).then((Consumer<float[]>) values -> promise.resolve((int) values[0] == 1));
-//        return promise;
-//    }
+    public Future<Float> getAngle() throws IOException {
+        Future<float[]> f = api.getSiValue(port, Const.EV3_GYRO, Const.GYRO_ANGLE, 1);
+        return api.execAsync(() -> f.get()[0]);
+    }
+
+    public Future<Float> geRate() throws IOException {
+        Future<float[]> f = api.getSiValue(port, Const.EV3_GYRO, Const.GYRO_RATE, 1);
+        return api.execAsync(() -> f.get()[0]);
+    }
 }
