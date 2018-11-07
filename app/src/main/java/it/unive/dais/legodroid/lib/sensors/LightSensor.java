@@ -4,27 +4,23 @@ import java.io.IOException;
 import java.util.concurrent.Future;
 
 import it.unive.dais.legodroid.lib.EV3;
-import it.unive.dais.legodroid.lib.InputPort;
 import it.unive.dais.legodroid.lib.comm.Const;
 
 public class LightSensor extends AbstractSensor {
-    public LightSensor(EV3.Api api, InputPort port) {
-        super(api, port);
+    public LightSensor(EV3.Api api, EV3.InputPort port) {
+        super(api, port, Const.EV3_COLOR);
     }
 
-    public Future<Integer> getReflected() throws IOException {
-        Future<short[]> f = api.getPercentValue(port, Const.EV3_COLOR, Const.COL_REFLECT, 1);
-        return api.execAsync(() -> (int) f.get()[0]);
+    public Future<Short> getReflected() throws IOException {
+        return getPercent1(Const.COL_REFLECT);
     }
 
-    public Future<Integer> getAmbient() throws IOException {
-        Future<short[]> f = api.getPercentValue(port, Const.EV3_COLOR, Const.COL_AMBIENT, 1);
-        return api.execAsync(() -> (int) f.get()[0]);
+    public Future<Short> getAmbient() throws IOException {
+        return getPercent1(Const.COL_AMBIENT);
     }
 
     public Future<Color> getColor() throws IOException {
-        Future<short[]> f = api.getPercentValue(port, Const.EV3_COLOR, Const.COL_COLOR, 1);
-        return api.execAsync(() -> Color.values()[f.get()[0]]);
+        return getPercent1(Const.COL_COLOR, (x) -> Color.values()[x]);
     }
 
     public static class Rgb {
@@ -38,11 +34,7 @@ public class LightSensor extends AbstractSensor {
     }
 
     public Future<Rgb> getRgb() throws IOException {
-        Future<short[]> f = api.getPercentValue(port, Const.EV3_COLOR, Const.COL_RGB, 3);
-        return api.execAsync(() -> {
-                short[] rgb = f.get();
-                return new Rgb(rgb[0], rgb[1], rgb[2]);
-        });
+        return getPercent(Const.COL_COLOR, 3, (rgb) -> new Rgb(rgb[0], rgb[1], rgb[2]));
     }
 
     public enum Color {

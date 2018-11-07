@@ -1,15 +1,14 @@
 package it.unive.dais.legodroid.lib.motors;
 
 import it.unive.dais.legodroid.lib.EV3;
-import it.unive.dais.legodroid.lib.OutputPort;
 
 import java.io.IOException;
 
 public class TachoMotor {
     private EV3.Api api;
-    private OutputPort port;
+    private EV3.OutputPort port;
 
-    public TachoMotor(EV3.Api api, OutputPort port) {
+    public TachoMotor(EV3.Api api, EV3.OutputPort port) {
         this.api = api;
         this.port = port;
     }

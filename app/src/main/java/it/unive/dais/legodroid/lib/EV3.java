@@ -28,18 +28,22 @@ import it.unive.dais.legodroid.lib.sensors.LightSensor;
 import it.unive.dais.legodroid.lib.sensors.TouchSensor;
 import it.unive.dais.legodroid.lib.sensors.UltrasonicSensor;
 import it.unive.dais.legodroid.lib.util.Consumer;
+import it.unive.dais.legodroid.lib.util.UnexpectedException;
 
 public class EV3 {
     private static final String TAG = "EV3";
+
+    // base type for events: inherit this to define your own event types
+    public interface Event {}
+
     @NonNull
     private final AsyncChannel channel;
     @Nullable
     private Consumer<Event> eventListener;
     @NonNull
     private final Queue<Event> incomingEvents = new ConcurrentLinkedQueue<>();
-
-    public interface Event {
-    }
+    @Nullable
+    private AsyncTask<Void, Void, Void> task;
 
     public EV3(@NonNull AsyncChannel channel) {
         this.channel = channel;
@@ -48,7 +52,7 @@ public class EV3 {
     // TODO: Fix StaticFieldLeak
     @SuppressLint("StaticFieldLeak")
     public void run(@NonNull Consumer<Api> c) {
-        new AsyncTask<Void, Void, Void>() {
+        task = new AsyncTask<Void, Void, Void>() {
             private static final String TAG = "EV3Worker";
 
             @Override
@@ -62,7 +66,13 @@ public class EV3 {
                 }
                 return null;
             }
-        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+            @Override
+            protected void onPostExecute(Void v) {
+                task = null;
+            }
+        };
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void sendEvent(Event e) {
@@ -71,6 +81,11 @@ public class EV3 {
 
     public void setEventListener(@NonNull Consumer<Event> eventListener) {
         this.eventListener = eventListener;
+    }
+
+    public void stop() {
+        if (task != null)
+            task.cancel(true);
     }
 
     public class Api {
@@ -169,7 +184,7 @@ public class EV3 {
 
         public void setOutputSpeed(OutputPort port, int speed) throws IOException {
             Bytecode bc = new Bytecode();
-            byte p = (byte)(0x01 << port.toByte());
+            byte p = (byte) (0x01 << port.toByte());
             bc.addOpCode(Const.OUTPUT_POWER);
             bc.addParameter(Const.LAYER_MASTER);
             bc.addParameter(p);
@@ -178,6 +193,46 @@ public class EV3 {
             bc.addParameter(Const.LAYER_MASTER);
             bc.addParameter(p);
             channel.sendNoReply(bc);
+        }
+
+        public boolean isRunning() {
+            return false;
+        }
+    }
+
+    public enum InputPort {
+        _1, _2, _3, _4;
+
+        public byte toByte() {
+            switch (this) {
+                case _1:
+                    return 0;
+                case _2:
+                    return 1;
+                case _3:
+                    return 2;
+                case _4:
+                    return 3;
+            }
+            throw new UnexpectedException("invalid input port");
+        }
+    }
+
+    public enum OutputPort {
+        A, B, C, D;
+
+        public byte toByte() {
+            switch (this) {
+                case A:
+                    return 0;
+                case B:
+                    return 1;
+                case C:
+                    return 2;
+                case D:
+                    return 3;
+            }
+            throw new UnexpectedException("invalid output port");
         }
     }
 }

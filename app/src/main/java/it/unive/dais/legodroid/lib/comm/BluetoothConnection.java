@@ -5,18 +5,19 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.res.TypedArrayUtils;
 import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 public class BluetoothConnection implements Connection {
+    private static final String TAG = "BluetoothConnection";
     private static final long READ_TIMEOUT_MS = 10000;
 
     @NonNull
@@ -24,7 +25,7 @@ public class BluetoothConnection implements Connection {
     @NonNull
     private final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
     @Nullable
-    private BluetoothDevice device;
+    private BluetoothDevice device = null;
     @Nullable
     private BluetoothSocket socket;
 
@@ -33,28 +34,30 @@ public class BluetoothConnection implements Connection {
     }
 
     @Override
-    public BluetoothChannel connect() throws IOException {
+    public Channel connect() throws IOException {
         if (!adapter.isEnabled())
             throw new IOException("bluetooth adapter is not enabled or unavailable");
         Set<BluetoothDevice> devs = adapter.getBondedDevices();
-        boolean s = false;
         for (BluetoothDevice dev : devs) {
             if (dev.getName().equals(name)) {
                 device = dev;
-                s = true;
+                break;
             }
         }
-        if (!s)
+        if (device == null)
             throw new IOException("brick not found");
         socket = device.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
         socket.connect();
-        return new BluetoothChannel(socket);
+        Log.v(TAG, String.format("bluetooth connected successfully to device '%s'", device.getName()));
+        return new Channel(socket);
     }
 
     @Override
     public void disconnect() throws IOException {
-        if (socket != null)
+        if (socket != null) {
+            Log.v(TAG, String.format("bluetooth disconnected from device '%s'", Objects.requireNonNull(device).getName()));
             socket.close();
+        }
     }
 
     @Override
@@ -62,27 +65,27 @@ public class BluetoothConnection implements Connection {
         disconnect();
     }
 
-    public static class BluetoothChannel implements Channel {
-        private static final String TAG = "BluetoothChannel";
+    public class Channel implements it.unive.dais.legodroid.lib.comm.Channel {
+        private static final String TAG = BluetoothConnection.TAG + ".Channel";
         @NonNull
         private InputStream in;
         @NonNull
         private OutputStream out;
 
-        private BluetoothChannel(@NonNull BluetoothSocket socket) throws IOException {
+        private Channel(@NonNull BluetoothSocket socket) throws IOException {
             in = socket.getInputStream();
             out = socket.getOutputStream();
         }
 
-        private static byte[] concat(byte[] first, byte[] second) {
+        private byte[] concat(byte[] first, byte[] second) {
             byte[] result = Arrays.copyOf(first, first.length + second.length);
             System.arraycopy(second, 0, result, first.length, second.length);
             return result;
         }
 
-        private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
+        private final char[] hexArray = "0123456789ABCDEF".toCharArray();
 
-        private static String bytesToHex(byte[] bytes) {
+        private String bytesToHex(byte[] bytes) {
             char[] hexChars = new char[bytes.length * 2];
             for (int j = 0; j < bytes.length; j++) {
                 int v = bytes[j] & 0xFF;
@@ -122,8 +125,12 @@ public class BluetoothConnection implements Connection {
                     throw new TimeoutException();
             }
             count += size;
-//            Log.d(TAG, String.format("total read: %d bytes", count));
             return r;
+        }
+
+        @Override
+        public void close() throws Exception {
+            disconnect();
         }
     }
 
