@@ -49,8 +49,10 @@ public class SpooledAsyncChannel implements AsyncChannel {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            Log.v(TAG, "starting spooler task");
+            Log.v(TAG, "spooler task started");
             Thread.currentThread().setName(TAG);
+            int retries = 5;
+            String cause = "cancellation";
             while (!isCancelled()) {
                 try {
                     Reply r = channel.read();
@@ -63,11 +65,17 @@ public class SpooledAsyncChannel implements AsyncChannel {
                         }
                     }
                 } catch (Throwable e) {
-                    Log.e(TAG, "recoverable exception caught: %s");
+                    Log.e(TAG, String.format("recoverable exception caught: %s", e.getMessage()));
                     e.printStackTrace();
+                    if (retries-- > 0)
+                        Log.e(TAG, String.format("retries left: %d", retries));
+                    else {
+                        cause = "max retries reached";
+                        break;
+                    }
                 }
             }
-            Log.v(TAG, "quitting spooler task");
+            Log.v(TAG, String.format("spooler task quitting due to %s", cause));
             return null;
         }
     }

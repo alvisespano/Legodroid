@@ -49,11 +49,10 @@ public class EV3 {
         this.channel = channel;
     }
 
-    // TODO: Fix StaticFieldLeak
     @SuppressLint("StaticFieldLeak")
     public void run(@NonNull Consumer<Api> c) {
         task = new AsyncTask<Void, Void, Void>() {
-            private static final String TAG = "EV3Worker";
+            private static final String TAG = "EV3-Task";
 
             @Override
             protected Void doInBackground(Void... voids) {
@@ -61,7 +60,7 @@ public class EV3 {
                 try {
                     c.call(new Api());
                 } catch (Exception e) {
-                    Log.e(TAG, String.format("uncaught exception: %s. Aborting EV3 job.", e.getMessage()));
+                    Log.e(TAG, String.format("uncaught exception: %s. Aborting EV3 task.", e.getMessage()));
                     e.printStackTrace();
                 }
                 return null;
@@ -83,12 +82,23 @@ public class EV3 {
         this.eventListener = eventListener;
     }
 
-    public void stop() {
-        if (task != null)
+    public void cancel() {
+        if (task != null) {
+            Log.d(TAG, "cancelling task");
             task.cancel(true);
+        }
+    }
+
+    public boolean isCancelled() {
+        if (task != null) {
+            return task.isCancelled();
+        }
+        else return true;
     }
 
     public class Api {
+
+        public EV3 getEV3() { return EV3.this; }
 
         public LightSensor getLightSensor(InputPort port) {
             return new LightSensor(this, port);
@@ -162,7 +172,7 @@ public class EV3 {
             });
         }
 
-        public <T> Future<T> execAsync(Callable<T> c) {
+        public <T> FutureTask<T> execAsync(Callable<T> c) {
             FutureTask<T> t = new FutureTask<>(c);
             executor.execute(t);
             return t;
@@ -193,10 +203,6 @@ public class EV3 {
             bc.addParameter(Const.LAYER_MASTER);
             bc.addParameter(p);
             channel.sendNoReply(bc);
-        }
-
-        public boolean isRunning() {
-            return false;
         }
     }
 
