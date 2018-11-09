@@ -67,7 +67,7 @@ public class SpooledAsyncChannel implements AsyncChannel {
                         }
                     }
                 } catch (Throwable e) {
-                    Log.e(TAG, String.format("recoverable exception caught: %s", e.getMessage()));
+                    Log.e(TAG, String.format("recoverable exception caught: %s", e));
                     e.printStackTrace();
                     if (retries-- > 0)
                         Log.e(TAG, String.format("retries left: %d", retries));

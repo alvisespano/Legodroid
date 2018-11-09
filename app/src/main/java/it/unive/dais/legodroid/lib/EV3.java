@@ -1,6 +1,5 @@
 package it.unive.dais.legodroid.lib;
 
-import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -10,9 +9,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
-import java.util.Queue;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -40,7 +37,7 @@ public class EV3 {
     @NonNull
     private final AsyncChannel channel;
     @Nullable
-    private AsyncTask<Void, Void, Void> task;
+    private AsyncTask<Void, Void, Void> task = null;
 
     public EV3(@NonNull AsyncChannel channel) {
         this.channel = channel;
@@ -50,29 +47,40 @@ public class EV3 {
         this(new SpooledAsyncChannel(channel));
     }
 
-    @SuppressLint("StaticFieldLeak")
-    public void run(@NonNull Consumer<Api> c) {
-        task = new AsyncTask<Void, Void, Void>() {
-            private final String TAG = ReTAG(EV3.TAG, "AsyncTask");
+    public synchronized void run(@NonNull Consumer<Api> f) {
+        if (task != null) throw new IllegalStateException("EV3 is already running a task");
+        task = new MyAsyncTask(this, f).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
 
-            @Override
-            protected Void doInBackground(Void... voids) {
-                Thread.currentThread().setName(TAG);
-                try {
-                    c.call(new Api());
-                } catch (Exception e) {
-                    Log.e(TAG, String.format("uncaught exception: %s. Aborting EV3 task.", e.getMessage()));
-                    e.printStackTrace();
-                }
-                return null;
-            }
+    private static class MyAsyncTask extends AsyncTask<Void, Void, Void> {
+        private final String TAG = ReTAG(EV3.TAG, "AsyncTask");
 
-            @Override
-            protected void onPostExecute(Void v) {
-                task = null;
+        @NonNull
+        private final EV3 ev3;
+        @NonNull
+        private final Consumer<Api> f;
+
+        private MyAsyncTask(@NonNull EV3 ev3, @NonNull Consumer<Api> f) {
+            this.ev3 = ev3;
+            this.f = f;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Thread.currentThread().setName(TAG);
+            Log.v(TAG, "starting task");
+            try {
+                f.call(new Api(ev3));
+            } catch (Exception e) {
+                Log.e(TAG, String.format("uncaught exception: %s. Aborting.", e.getMessage()));
+                e.printStackTrace();
             }
-        };
-        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            synchronized (ev3) {
+                ev3.task = null;
+            }
+            Log.v(TAG, "exiting task");
+            return null;
+        }
     }
 
     public synchronized void cancel() {
@@ -88,10 +96,13 @@ public class EV3 {
         } else return true;
     }
 
-    public class Api {
-
+    public static class Api {
         @NonNull
-        public final EV3 ev3 = EV3.this;
+        public final EV3 ev3;
+
+        private Api(@NonNull EV3 ev3) {
+            this.ev3 = ev3;
+        }
 
         @NonNull
         public LightSensor getLightSensor(InputPort port) {
@@ -125,7 +136,7 @@ public class EV3 {
             bc.addParameter((byte) volume);
             bc.addParameter((short) freq);
             bc.addParameter((short) duration);
-            channel.sendNoReply(bc);
+            ev3.channel.sendNoReply(bc);
         }
 
         // low level API
@@ -148,7 +159,7 @@ public class EV3 {
 
         public Future<float[]> getSiValue(InputPort port, int type, int mode, int nvalue) throws IOException {
             Bytecode bc = prefaceGetValue(Const.READY_SI, port, type, mode, nvalue);
-            Future<Reply> r = channel.send(4 * nvalue, bc);
+            Future<Reply> r = ev3.channel.send(4 * nvalue, bc);
             return execAsync(() -> {
                 Reply reply = r.get();
                 float[] result = new float[nvalue];
@@ -170,7 +181,7 @@ public class EV3 {
         @NonNull
         public Future<short[]> getPercentValue(InputPort port, int type, int mode, int nvalue) throws IOException {
             Bytecode bc = prefaceGetValue(Const.READY_PCT, port, type, mode, nvalue);
-            Future<Reply> fr = channel.send(2 * nvalue, bc);
+            Future<Reply> fr = ev3.channel.send(2 * nvalue, bc);
             return execAsync(() -> {
                 Reply r = fr.get();
                 byte[] reply = r.getData();
@@ -192,7 +203,7 @@ public class EV3 {
             bc.addOpCode(Const.OUTPUT_START);
             bc.addParameter(Const.LAYER_MASTER);
             bc.addParameter(p);
-            channel.sendNoReply(bc);
+            ev3.channel.sendNoReply(bc);
         }
     }
 

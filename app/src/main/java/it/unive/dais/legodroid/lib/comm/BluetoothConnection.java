@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.TimeoutException;
 
 import static it.unive.dais.legodroid.lib.comm.Const.ReTAG;
 
@@ -29,7 +28,7 @@ public class BluetoothConnection implements Connection {
     @Nullable
     private BluetoothDevice device = null;
     @Nullable
-    private BluetoothSocket socket;
+    private BluetoothSocket socket = null;
 
     public BluetoothConnection(@NonNull String name) {
         this.name = name;
@@ -38,6 +37,10 @@ public class BluetoothConnection implements Connection {
     @NonNull
     @Override
     public BluetoothChannel connect() throws IOException {
+        if (socket != null && socket.isConnected()) {
+            Log.w(TAG, "bluetooth socket is already connected");
+            return new BluetoothChannel(socket);
+        }
         if (!adapter.isEnabled())
             throw new IOException("bluetooth adapter is not enabled or unavailable");
         Set<BluetoothDevice> devs = adapter.getBondedDevices();
@@ -111,27 +114,22 @@ public class BluetoothConnection implements Connection {
 
         @NonNull
         @Override
-        public Reply read() throws IOException, TimeoutException {
+        public Reply read() throws IOException {
             byte[] lb = readSized(2);
             int len = ((lb[1] & 0xff) << 8) | (lb[0] & 0xff);
-//            Log.d(TAG, String.format("read len = %d", len));
+            Log.d(TAG, String.format("read len = %d", len));
             return new Reply(readSized(len));
         }
 
-        public int count = 0;
-
         @NonNull
-        private byte[] readSized(int size) throws IOException, TimeoutException {
+        private byte[] readSized(int size) throws IOException {
             byte[] r = new byte[size];
             int off = 0;
-            long now = System.currentTimeMillis();
             while (off < size) {
+                Log.d(TAG, "reading...");
                 off += in.read(r, off, size - off);
-//                Log.d(TAG, String.format("read: %s", bytesToHex(r)));
-                if (System.currentTimeMillis() - now > READ_TIMEOUT_MS)
-                    throw new TimeoutException();
+                Log.d(TAG, String.format("read: %s", bytesToHex(r)));
             }
-            count += size;
             return r;
         }
 

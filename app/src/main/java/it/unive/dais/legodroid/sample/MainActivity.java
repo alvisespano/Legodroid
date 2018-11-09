@@ -29,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
 
     private final Map<String, Integer> statusMap = new HashMap<>();
 
-
     private void updateStatus(EV3 ev3, String key, int value) {
         Log.d(TAG, String.format("%s: %d", key, value));
         statusMap.put(key, value);
@@ -78,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                     }
-                    Log.i(TAG, "exiting EV3 program");
 
                 });
             });

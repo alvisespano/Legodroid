@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:layout_margin="10dp"
-        android:text="Prova"
+        android:text="Premi START per partire"
         tools:ignore="HardcodedText" />
 
     <LinearLayout
