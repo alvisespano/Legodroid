@@ -16,8 +16,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
+import static it.unive.dais.legodroid.lib.comm.Const.ReTAG;
+
 public class BluetoothConnection implements Connection {
-    private static final String TAG = "BluetoothConnection";
+    private static final String TAG = ReTAG("BluetoothConnection");
     private static final long READ_TIMEOUT_MS = 10000;
 
     @NonNull
@@ -33,8 +35,9 @@ public class BluetoothConnection implements Connection {
         this.name = name;
     }
 
+    @NonNull
     @Override
-    public Channel connect() throws IOException {
+    public BluetoothChannel connect() throws IOException {
         if (!adapter.isEnabled())
             throw new IOException("bluetooth adapter is not enabled or unavailable");
         Set<BluetoothDevice> devs = adapter.getBondedDevices();
@@ -49,7 +52,7 @@ public class BluetoothConnection implements Connection {
         socket = device.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
         socket.connect();
         Log.v(TAG, String.format("bluetooth connected successfully to device '%s'", device.getName()));
-        return new Channel(socket);
+        return new BluetoothChannel(socket);
     }
 
     @Override
@@ -65,19 +68,20 @@ public class BluetoothConnection implements Connection {
         disconnect();
     }
 
-    public class Channel implements it.unive.dais.legodroid.lib.comm.Channel {
-        private static final String TAG = BluetoothConnection.TAG + ".Channel";
+    public class BluetoothChannel implements Channel {
+        private final String TAG = ReTAG(BluetoothConnection.TAG, ".BluetoothChannel");
         @NonNull
         private InputStream in;
         @NonNull
         private OutputStream out;
 
-        private Channel(@NonNull BluetoothSocket socket) throws IOException {
+        private BluetoothChannel(@NonNull BluetoothSocket socket) throws IOException {
             in = socket.getInputStream();
             out = socket.getOutputStream();
         }
 
-        private byte[] concat(byte[] first, byte[] second) {
+        @NonNull
+        private byte[] concat(@NonNull byte[] first, @NonNull byte[] second) {
             byte[] result = Arrays.copyOf(first, first.length + second.length);
             System.arraycopy(second, 0, result, first.length, second.length);
             return result;
@@ -85,6 +89,7 @@ public class BluetoothConnection implements Connection {
 
         private final char[] hexArray = "0123456789ABCDEF".toCharArray();
 
+        @NonNull
         private String bytesToHex(byte[] bytes) {
             char[] hexChars = new char[bytes.length * 2];
             for (int j = 0; j < bytes.length; j++) {
@@ -96,7 +101,7 @@ public class BluetoothConnection implements Connection {
         }
 
         @Override
-        public void write(Command p) throws IOException {
+        public void write(@NonNull Command p) throws IOException {
             byte[] a = p.marshal();
             byte[] l = new byte[]{(byte) (a.length & 0xFF), (byte) ((a.length >> 8) & 0xFF)};
             byte[] w = concat(l, a);
@@ -104,6 +109,7 @@ public class BluetoothConnection implements Connection {
             out.write(w);
         }
 
+        @NonNull
         @Override
         public Reply read() throws IOException, TimeoutException {
             byte[] lb = readSized(2);
@@ -114,6 +120,7 @@ public class BluetoothConnection implements Connection {
 
         public int count = 0;
 
+        @NonNull
         private byte[] readSized(int size) throws IOException, TimeoutException {
             byte[] r = new byte[size];
             int off = 0;

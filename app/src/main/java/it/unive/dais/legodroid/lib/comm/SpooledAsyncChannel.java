@@ -15,6 +15,8 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static it.unive.dais.legodroid.lib.comm.Const.ReTAG;
+
 public class SpooledAsyncChannel implements AsyncChannel {
 
     @NonNull
@@ -36,7 +38,7 @@ public class SpooledAsyncChannel implements AsyncChannel {
     }
 
     private static class SpoolerTask extends AsyncTask<Void, Void, Void> {
-        private static final String TAG = "SpoolerTask";
+        private static final String TAG = ReTAG("SpoolerTask");
         @NonNull
         private final Channel channel;
         @NonNull
@@ -58,7 +60,7 @@ public class SpooledAsyncChannel implements AsyncChannel {
                     Reply r = channel.read();
                     synchronized (q) {
                         for (FutureReply t : q) {
-                            if (t.id == r.counter) {
+                            if (t.id == r.getCounter()) {
                                 t.setReply(r);
                                 break;
                             }

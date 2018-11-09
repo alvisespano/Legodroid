@@ -20,8 +20,10 @@ import java.util.concurrent.FutureTask;
 
 import it.unive.dais.legodroid.lib.comm.AsyncChannel;
 import it.unive.dais.legodroid.lib.comm.Bytecode;
+import it.unive.dais.legodroid.lib.comm.Channel;
 import it.unive.dais.legodroid.lib.comm.Const;
 import it.unive.dais.legodroid.lib.comm.Reply;
+import it.unive.dais.legodroid.lib.comm.SpooledAsyncChannel;
 import it.unive.dais.legodroid.lib.motors.TachoMotor;
 import it.unive.dais.legodroid.lib.sensors.GyroSensor;
 import it.unive.dais.legodroid.lib.sensors.LightSensor;
@@ -30,18 +32,21 @@ import it.unive.dais.legodroid.lib.sensors.UltrasonicSensor;
 import it.unive.dais.legodroid.lib.util.Consumer;
 import it.unive.dais.legodroid.lib.util.UnexpectedException;
 
+import static it.unive.dais.legodroid.lib.comm.Const.ReTAG;
+
 public class EV3 {
-    private static final String TAG = "EV3";
+    private static final String TAG = ReTAG("EV3");
 
     // base type for events: inherit this to define your own event types
-    public interface Event {}
+    public interface Event {
+    }
 
     @NonNull
     private final AsyncChannel channel;
     @Nullable
     private Consumer<Event> eventListener;
     @NonNull
-    private final Queue<Event> incomingEvents = new ConcurrentLinkedQueue<>();
+    private final Queue<Event> eventQueue = new ConcurrentLinkedQueue<>();
     @Nullable
     private AsyncTask<Void, Void, Void> task;
 
@@ -49,10 +54,14 @@ public class EV3 {
         this.channel = channel;
     }
 
+    public EV3(@NonNull Channel channel) {
+        this(new SpooledAsyncChannel(channel));
+    }
+
     @SuppressLint("StaticFieldLeak")
     public void run(@NonNull Consumer<Api> c) {
         task = new AsyncTask<Void, Void, Void>() {
-            private static final String TAG = "EV3-Task";
+            private final String TAG = ReTAG(EV3.TAG, "AsyncTask");
 
             @Override
             protected Void doInBackground(Void... voids) {
@@ -74,60 +83,60 @@ public class EV3 {
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    public void sendEvent(Event e) {
-        incomingEvents.add(e);
+    public synchronized void sendEvent(@NonNull Event e) {
+        eventQueue.add(e);
     }
 
-    public void setEventListener(@NonNull Consumer<Event> eventListener) {
+    public synchronized void setEventListener(@NonNull Consumer<Event> eventListener) {
         this.eventListener = eventListener;
     }
 
-    public void cancel() {
+    @Nullable
+    public synchronized Event pollEvents() {
+        return eventQueue.poll();
+    }
+
+    public synchronized void cancel() {
         if (task != null) {
             Log.d(TAG, "cancelling task");
             task.cancel(true);
         }
     }
 
-    public boolean isCancelled() {
+    public synchronized boolean isCancelled() {
         if (task != null) {
             return task.isCancelled();
-        }
-        else return true;
+        } else return true;
     }
 
     public class Api {
 
-        public EV3 getEV3() { return EV3.this; }
+        @NonNull
+        public final EV3 ev3 = EV3.this;
 
+        @NonNull
         public LightSensor getLightSensor(InputPort port) {
             return new LightSensor(this, port);
         }
 
+        @NonNull
         public TouchSensor getTouchSensor(InputPort port) {
             return new TouchSensor(this, port);
         }
 
+        @NonNull
         public UltrasonicSensor getUltrasonicSensor(InputPort port) {
             return new UltrasonicSensor(this, port);
         }
 
+        @NonNull
         public GyroSensor getGyroSensor(InputPort port) {
             return new GyroSensor(this, port);
         }
 
+        @NonNull
         public TachoMotor getTachoMotor(OutputPort port) {
             return new TachoMotor(this, port);
-        }
-
-        public synchronized Event pollEvents() {
-            return incomingEvents.poll();
-        }
-
-        public synchronized void sendEvent(Event e) {
-            if (eventListener != null) {
-                eventListener.call(e);
-            }
         }
 
         public void soundTone(int volume, int freq, int duration) throws IOException {
@@ -143,7 +152,7 @@ public class EV3 {
         // low level API
         //
 
-        private Executor executor = Executors.newSingleThreadExecutor();
+        private final Executor executor = Executors.newSingleThreadExecutor();
 
         private Bytecode prefaceGetValue(byte ready, InputPort port, int type, int mode, int nvalue) throws IOException {
             Bytecode r = new Bytecode();
@@ -172,12 +181,14 @@ public class EV3 {
             });
         }
 
-        public <T> FutureTask<T> execAsync(Callable<T> c) {
+        @NonNull
+        public <T> FutureTask<T> execAsync(@NonNull Callable<T> c) {
             FutureTask<T> t = new FutureTask<>(c);
             executor.execute(t);
             return t;
         }
 
+        @NonNull
         public Future<short[]> getPercentValue(InputPort port, int type, int mode, int nvalue) throws IOException {
             Bytecode bc = prefaceGetValue(Const.READY_PCT, port, type, mode, nvalue);
             Future<Reply> fr = channel.send(2 * nvalue, bc);

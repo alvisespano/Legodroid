@@ -1,5 +1,7 @@
 package it.unive.dais.legodroid.lib.sensors;
 
+import android.support.annotation.NonNull;
+
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.comm.Const;
 
@@ -12,6 +14,7 @@ public class UltrasonicSensor extends AbstractSensor {
         super(api, port, Const.EV3_ULTRASONIC);
     }
 
+    @NonNull
     public Future<Float> getDistance() throws IOException {
         return getSi1(Const.US_CM);
     }

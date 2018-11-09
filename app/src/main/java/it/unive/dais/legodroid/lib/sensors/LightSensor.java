@@ -1,5 +1,7 @@
 package it.unive.dais.legodroid.lib.sensors;
 
+import android.support.annotation.NonNull;
+
 import java.io.IOException;
 import java.util.concurrent.Future;
 
@@ -11,16 +13,20 @@ public class LightSensor extends AbstractSensor {
         super(api, port, Const.EV3_COLOR);
     }
 
+    @NonNull
     public Future<Short> getReflected() throws IOException {
         return getPercent1(Const.COL_REFLECT);
     }
 
+    @NonNull
     public Future<Short> getAmbient() throws IOException {
         return getPercent1(Const.COL_AMBIENT);
     }
 
+    @NonNull
     public Future<Color> getColor() throws IOException {
         return getPercent1(Const.COL_COLOR, (x) -> Color.values()[x]);
+
     }
 
     public static class Rgb {
@@ -33,6 +39,7 @@ public class LightSensor extends AbstractSensor {
         }
     }
 
+    @NonNull
     public Future<Rgb> getRgb() throws IOException {
         return getPercent(Const.COL_COLOR, 3, (rgb) -> new Rgb(rgb[0], rgb[1], rgb[2]));
     }

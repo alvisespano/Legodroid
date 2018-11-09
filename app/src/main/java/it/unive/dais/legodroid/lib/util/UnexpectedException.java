@@ -1,5 +1,7 @@
 package it.unive.dais.legodroid.lib.util;
 
+import android.support.annotation.NonNull;
+
 /**
  * Eccezione di tipo inatteso, sottoclasse di RuntimeException.
  * Da usare per segnalare un errore che non è contemplato dall'applicazione, come ad esempio un caso che non dovrebbe accadere oppure scenari
@@ -11,11 +13,11 @@ public class UnexpectedException extends RuntimeException {
      * Costruttore per stringa.
      * @param s la stringa col messaggio contenuto nell'eccezione.
      */
-    public UnexpectedException(String s) {
+    public UnexpectedException(@NonNull String s) {
         super(s);
     }
 
-    public UnexpectedException(String s, Throwable cause) {
+    public UnexpectedException(@NonNull String s, @NonNull Throwable cause) {
         super(s, cause);
     }
 }

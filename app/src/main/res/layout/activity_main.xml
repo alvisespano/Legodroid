@@ -1,31 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="it.unive.dais.legodroid.sample.MainActivity">
 
-    <ScrollView
+
+    <TextView
+        android:id="@+id/textView"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:scrollbars="vertical"
-        android:fillViewport="true">
+        android:layout_height="300dp"
+        android:text="Prova"
+        tools:ignore="HardcodedText" />
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="Prova" />
-
-    </ScrollView>
 
     <Button
-        android:id="@+id/pollButton"
+        android:id="@+id/stopButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:text="Stop" />
+        android:text="Stop"
+        tools:ignore="HardcodedText" />
 
 </LinearLayout>

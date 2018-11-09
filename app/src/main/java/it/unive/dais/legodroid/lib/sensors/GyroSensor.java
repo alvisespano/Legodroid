@@ -1,5 +1,7 @@
 package it.unive.dais.legodroid.lib.sensors;
 
+import android.support.annotation.NonNull;
+
 import java.io.IOException;
 import java.util.concurrent.Future;
 
@@ -12,10 +14,12 @@ public class GyroSensor extends AbstractSensor {
         super(api, port, Const.EV3_GYRO);
     }
 
+    @NonNull
     public Future<Float> getAngle() throws IOException {
         return getSi1(Const.GYRO_ANGLE);
     }
 
+    @NonNull
     public Future<Float> getRate() throws IOException {
         return getSi1(Const.GYRO_RATE);
     }

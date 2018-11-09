@@ -1,5 +1,7 @@
 package it.unive.dais.legodroid.lib.sensors;
 
+import android.support.annotation.NonNull;
+
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.comm.Const;
 
@@ -12,6 +14,7 @@ public class TouchSensor extends AbstractSensor {
         super(api, port, Const.EV3_TOUCH);
     }
 
+    @NonNull
     public Future<Boolean> getPressed() throws IOException {
         return getPercent1(Const.TOUCH_TOUCH, (x) -> x > 0);
     }

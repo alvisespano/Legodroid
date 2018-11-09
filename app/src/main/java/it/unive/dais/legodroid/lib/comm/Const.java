@@ -145,4 +145,16 @@ public class Const {
     public static final byte M_MOTOR_SPEED = (byte) 0x02;
 
     private static final byte OUTPUT_PORT_OFFSET = 0x10;
+
+    // activity tagging facilities
+
+    public static final String TAG_BASE = "Legodroid";
+
+    public static String ReTAG(String tag) {
+        return String.format("%s/%s", TAG_BASE, tag);
+    }
+
+    public static String ReTAG(String parent, String tag) {
+        return ReTAG(String.format("%s/%s", parent, tag));
+    }
 }

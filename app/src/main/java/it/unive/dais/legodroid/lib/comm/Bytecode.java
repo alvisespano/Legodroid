@@ -11,9 +11,9 @@ public class Bytecode {
     private static final byte INT_SIZE = (byte) 0x83;
 
     @NonNull
-    private ByteArrayOutputStream underlying;
+    private final ByteArrayOutputStream underlying;
     @NonNull
-    private DataOutputStream out;
+    private final DataOutputStream out;
 
     public Bytecode() {
         underlying = new ByteArrayOutputStream();
