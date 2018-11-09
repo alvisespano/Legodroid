@@ -71,9 +71,9 @@ public class BluetoothConnection implements Connection {
     public class BluetoothChannel implements Channel {
         private final String TAG = ReTAG(BluetoothConnection.TAG, ".BluetoothChannel");
         @NonNull
-        private InputStream in;
+        private final InputStream in;
         @NonNull
-        private OutputStream out;
+        private final OutputStream out;
 
         private BluetoothChannel(@NonNull BluetoothSocket socket) throws IOException {
             in = socket.getInputStream();

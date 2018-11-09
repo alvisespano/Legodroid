@@ -13,6 +13,7 @@ public class TachoMotor {
         this.port = port;
     }
 
+    // TODO: implementare i metodi
     public int getPosition() {
         return 0;
     }

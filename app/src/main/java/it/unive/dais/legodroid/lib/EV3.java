@@ -37,16 +37,8 @@ import static it.unive.dais.legodroid.lib.comm.Const.ReTAG;
 public class EV3 {
     private static final String TAG = ReTAG("EV3");
 
-    // base type for events: inherit this to define your own event types
-    public interface Event {
-    }
-
     @NonNull
     private final AsyncChannel channel;
-    @Nullable
-    private Consumer<Event> eventListener;
-    @NonNull
-    private final Queue<Event> eventQueue = new ConcurrentLinkedQueue<>();
     @Nullable
     private AsyncTask<Void, Void, Void> task;
 
@@ -81,19 +73,6 @@ public class EV3 {
             }
         };
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-    }
-
-    public synchronized void sendEvent(@NonNull Event e) {
-        eventQueue.add(e);
-    }
-
-    public synchronized void setEventListener(@NonNull Consumer<Event> eventListener) {
-        this.eventListener = eventListener;
-    }
-
-    @Nullable
-    public synchronized Event pollEvents() {
-        return eventQueue.poll();
     }
 
     public synchronized void cancel() {
