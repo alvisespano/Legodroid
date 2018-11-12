@@ -193,17 +193,12 @@ public class EV3 {
             });
         }
 
-        public void setOutputSpeed(OutputPort port, int speed) throws IOException {
-            Bytecode bc = new Bytecode();
-            byte p = (byte) (0x01 << port.toByte());
-            bc.addOpCode(Const.OUTPUT_POWER);
-            bc.addParameter(Const.LAYER_MASTER);
-            bc.addParameter(p);
-            bc.addParameter((byte) speed);
-            bc.addOpCode(Const.OUTPUT_START);
-            bc.addParameter(Const.LAYER_MASTER);
-            bc.addParameter(p);
-            ev3.channel.sendNoReply(bc);
+        public Future<Reply> send(int reservation, @NonNull Bytecode bc) throws IOException {
+            ev3.channel.send(reservation, bc);
+        }
+
+        public void sendNoReply(Bytecode bytecode) throws IOException {
+            ev3.channel.sendNoReply(bytecode);
         }
     }
 
