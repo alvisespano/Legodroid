@@ -148,7 +148,7 @@ public class Const {
 
     // activity tagging facilities
 
-    public static final String TAG_BASE = "Legodroid";
+    public static final String TAG_BASE = "LegodroidLib";
 
     public static String ReTAG(String tag) {
         return String.format("%s/%s", TAG_BASE, tag);

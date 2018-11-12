@@ -1,5 +1,7 @@
 package it.unive.dais.legodroid.lib.motors;
 
+import android.support.annotation.NonNull;
+
 import it.unive.dais.legodroid.lib.EV3;
 
 import java.io.IOException;
@@ -8,7 +10,7 @@ public class TachoMotor {
     private final EV3.Api api;
     private final EV3.OutputPort port;
 
-    public TachoMotor(EV3.Api api, EV3.OutputPort port) {
+    public TachoMotor(@NonNull EV3.Api api, EV3.OutputPort port) {
         this.api = api;
         this.port = port;
     }

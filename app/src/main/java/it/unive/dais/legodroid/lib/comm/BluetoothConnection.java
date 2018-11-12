@@ -117,7 +117,7 @@ public class BluetoothConnection implements Connection {
         public Reply read() throws IOException {
             byte[] lb = readSized(2);
             int len = ((lb[1] & 0xff) << 8) | (lb[0] & 0xff);
-            Log.d(TAG, String.format("read len = %d", len));
+//            Log.d(TAG, String.format("read len = %d", len));
             return new Reply(readSized(len));
         }
 
@@ -126,9 +126,9 @@ public class BluetoothConnection implements Connection {
             byte[] r = new byte[size];
             int off = 0;
             while (off < size) {
-                Log.d(TAG, "reading...");
+//                Log.d(TAG, "reading...");
                 off += in.read(r, off, size - off);
-                Log.d(TAG, String.format("read: %s", bytesToHex(r)));
+//                Log.d(TAG, String.format("read: %s", bytesToHex(r)));
             }
             return r;
         }
