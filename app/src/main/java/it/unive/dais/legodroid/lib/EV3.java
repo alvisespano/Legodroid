@@ -27,9 +27,8 @@ import it.unive.dais.legodroid.lib.sensors.LightSensor;
 import it.unive.dais.legodroid.lib.sensors.TouchSensor;
 import it.unive.dais.legodroid.lib.sensors.UltrasonicSensor;
 import it.unive.dais.legodroid.lib.util.Consumer;
-import it.unive.dais.legodroid.lib.util.UnexpectedException;
 
-import static it.unive.dais.legodroid.lib.comm.Const.ReTAG;
+import static it.unive.dais.legodroid.lib.util.Prelude.ReTAG;
 
 public class EV3 {
     private static final String TAG = ReTAG("EV3");
@@ -144,12 +143,13 @@ public class EV3 {
 
         private final Executor executor = Executors.newSingleThreadExecutor();
 
-        private Bytecode prefaceGetValue(byte ready, InputPort port, int type, int mode, int nvalue) throws IOException {
+        @NonNull
+        private Bytecode prefaceGetValue(byte ready, byte port, int type, int mode, int nvalue) throws IOException {
             Bytecode r = new Bytecode();
             r.addOpCode(Const.INPUT_DEVICE);
             r.addOpCode(ready);
             r.addParameter(Const.LAYER_MASTER);
-            r.addParameter(port.toByte());
+            r.addParameter(port);
             r.addParameter((byte) type);
             r.addParameter((byte) mode);
             r.addParameter((byte) nvalue);
@@ -157,14 +157,17 @@ public class EV3 {
             return r;
         }
 
-        public Future<float[]> getSiValue(InputPort port, int type, int mode, int nvalue) throws IOException {
+        @NonNull
+        public Future<float[]> getSiValue(byte port, int type, int mode, int nvalue) throws IOException {
             Bytecode bc = prefaceGetValue(Const.READY_SI, port, type, mode, nvalue);
             Future<Reply> r = ev3.channel.send(4 * nvalue, bc);
             return execAsync(() -> {
                 Reply reply = r.get();
+                if (reply.isError())
+                    Log.e(TAG, String.format("getSiValue() Reply error"));
                 float[] result = new float[nvalue];
                 for (int i = 0; i < nvalue; i++) {
-                    byte[] bData = Arrays.copyOfRange(reply.getData(), 3 + 4 * i, 7 + 4 * i);
+                    byte[] bData = Arrays.copyOfRange(reply.getData(), 4 * i, 4 * i + 4);
                     result[i] = ByteBuffer.wrap(bData).order(ByteOrder.LITTLE_ENDIAN).getFloat();
                 }
                 return result;
@@ -179,11 +182,13 @@ public class EV3 {
         }
 
         @NonNull
-        public Future<short[]> getPercentValue(InputPort port, int type, int mode, int nvalue) throws IOException {
+        public Future<short[]> getPercentValue(byte port, int type, int mode, int nvalue) throws IOException {
             Bytecode bc = prefaceGetValue(Const.READY_PCT, port, type, mode, nvalue);
             Future<Reply> fr = ev3.channel.send(2 * nvalue, bc);
             return execAsync(() -> {
                 Reply r = fr.get();
+                if (r.isError())
+                    Log.e(TAG, String.format("getPercentValue() Reply error"));
                 byte[] reply = r.getData();
                 short[] result = new short[nvalue];
                 for (int i = 0; i < nvalue; i++) {
@@ -194,7 +199,7 @@ public class EV3 {
         }
 
         public Future<Reply> send(int reservation, @NonNull Bytecode bc) throws IOException {
-            ev3.channel.send(reservation, bc);
+            return ev3.channel.send(reservation, bc);
         }
 
         public void sendNoReply(Bytecode bytecode) throws IOException {
@@ -213,17 +218,24 @@ public class EV3 {
                     return 1;
                 case _3:
                     return 2;
-                case _4:
+                default:
                     return 3;
             }
-            throw new UnexpectedException("invalid input port");
         }
     }
 
     public enum OutputPort {
         A, B, C, D;
 
-        public byte toByte() {
+        public byte toBitmask() {
+            return (byte) (1 << toByteAsWrite());
+        }
+
+        public byte toByteAsRead() {
+            return (byte) (toByteAsWrite() | 0x10);
+        }
+
+        public byte toByteAsWrite() {
             switch (this) {
                 case A:
                     return 0;
@@ -231,10 +243,9 @@ public class EV3 {
                     return 1;
                 case C:
                     return 2;
-                case D:
+                default:
                     return 3;
             }
-            throw new UnexpectedException("invalid output port");
         }
     }
 }

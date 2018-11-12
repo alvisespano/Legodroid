@@ -23,7 +23,7 @@ public abstract class AbstractSensor {
 
     @NonNull
     protected <T> Future<T> getPercent(int mode, int nvalue, @NonNull Function<short[], T> f) throws IOException {
-        Future<short[]> r = api.getPercentValue(port, type, mode, nvalue);
+        Future<short[]> r = api.getPercentValue(port.toByte(), type, mode, nvalue);
         return api.execAsync(() -> f.apply(r.get()));
     }
 
@@ -40,7 +40,7 @@ public abstract class AbstractSensor {
     @SuppressWarnings("SameParameterValue")
     @NonNull
     protected <T> Future<T> getSi(int mode, int nvalue, @NonNull Function<float[], T> f) throws IOException {
-        Future<float[]> r = api.getSiValue(port, type, mode, nvalue);
+        Future<float[]> r = api.getSiValue(port.toByte(), type, mode, nvalue);
         return api.execAsync(() -> f.apply(r.get()));
     }
 

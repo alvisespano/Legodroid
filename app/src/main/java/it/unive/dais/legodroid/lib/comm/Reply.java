@@ -11,7 +11,7 @@ public class Reply extends Packet {
         System.arraycopy(bytes, 3, getData(), 0, getData().length);
     }
 
-    public boolean getError() {
+    public boolean isError() {
         return error;
     }
 }

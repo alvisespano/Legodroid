@@ -15,7 +15,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static it.unive.dais.legodroid.lib.comm.Const.ReTAG;
+import static it.unive.dais.legodroid.lib.util.Prelude.ReTAG;
 
 public class SpooledAsyncChannel implements AsyncChannel {
 

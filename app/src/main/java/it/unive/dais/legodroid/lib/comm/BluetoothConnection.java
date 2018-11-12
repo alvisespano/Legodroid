@@ -10,12 +10,13 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-import static it.unive.dais.legodroid.lib.comm.Const.ReTAG;
+import it.unive.dais.legodroid.lib.util.Prelude;
+
+import static it.unive.dais.legodroid.lib.util.Prelude.ReTAG;
 
 public class BluetoothConnection implements Connection {
     private static final String TAG = ReTAG("BluetoothConnection");
@@ -83,32 +84,12 @@ public class BluetoothConnection implements Connection {
             out = socket.getOutputStream();
         }
 
-        @NonNull
-        private byte[] concat(@NonNull byte[] first, @NonNull byte[] second) {
-            byte[] result = Arrays.copyOf(first, first.length + second.length);
-            System.arraycopy(second, 0, result, first.length, second.length);
-            return result;
-        }
-
-        private final char[] hexArray = "0123456789ABCDEF".toCharArray();
-
-        @NonNull
-        private String bytesToHex(byte[] bytes) {
-            char[] hexChars = new char[bytes.length * 2];
-            for (int j = 0; j < bytes.length; j++) {
-                int v = bytes[j] & 0xFF;
-                hexChars[j * 2] = hexArray[v >>> 4];
-                hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-            }
-            return new String(hexChars);
-        }
-
         @Override
         public void write(@NonNull Command p) throws IOException {
             byte[] a = p.marshal();
             byte[] l = new byte[]{(byte) (a.length & 0xFF), (byte) ((a.length >> 8) & 0xFF)};
-            byte[] w = concat(l, a);
-//            Log.d(TAG, String.format("write: { %s }", bytesToHex(w)));
+            byte[] w = Prelude.concat(l, a);
+//            Log.d(TAG, String.format("write: { %s }", Prelude.bytesToHex(w)));
             out.write(w);
         }
 
@@ -128,7 +109,7 @@ public class BluetoothConnection implements Connection {
             while (off < size) {
 //                Log.d(TAG, "reading...");
                 off += in.read(r, off, size - off);
-//                Log.d(TAG, String.format("read: %s", bytesToHex(r)));
+//                Log.d(TAG, String.format("read: %s", Prelude.bytesToHex(r)));
             }
             return r;
         }

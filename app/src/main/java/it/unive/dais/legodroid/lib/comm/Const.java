@@ -1,5 +1,7 @@
 package it.unive.dais.legodroid.lib.comm;
 
+import it.unive.dais.legodroid.lib.util.Prelude;
+
 public class Const {
     // Command Types
     public static final byte DIRECT_COMMAND_REPLY = (byte) 0x00;
@@ -144,17 +146,6 @@ public class Const {
     public static final byte M_MOTOR_ROTATE = (byte) 0x01;
     public static final byte M_MOTOR_SPEED = (byte) 0x02;
 
-    public static final byte OUTPUT_PORT_OFFSET = 0x10;
-
     // activity tagging facilities
 
-    public static final String TAG_BASE = "LegodroidLib";
-
-    public static String ReTAG(String tag) {
-        return String.format("%s/%s", TAG_BASE, tag);
-    }
-
-    public static String ReTAG(String parent, String tag) {
-        return ReTAG(String.format("%s/%s", parent, tag));
-    }
 }
