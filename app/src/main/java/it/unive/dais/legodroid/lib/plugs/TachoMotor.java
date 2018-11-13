@@ -42,12 +42,22 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
 
     public void setSpeed(int speed) throws IOException {
         Bytecode bc = new Bytecode();
-        bc.addOpCode(Const.OUTPUT_POWER);
+        bc.addOpCode(Const.OUTPUT_SPEED);
         bc.addParameter(Const.LAYER_MASTER);
         bc.addParameter(port.toBitmask());
         bc.addParameter((byte) speed);
         api.sendNoReply(bc);
     }
+
+    public void setPower(int power) throws IOException {
+        Bytecode bc = new Bytecode();
+        bc.addOpCode(Const.OUTPUT_POWER);
+        bc.addParameter(Const.LAYER_MASTER);
+        bc.addParameter(port.toBitmask());
+        bc.addParameter((byte) power);
+        api.sendNoReply(bc);
+    }
+
 
     public void start() throws IOException {
         Bytecode bc = new Bytecode();

@@ -31,13 +31,13 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = Prelude.ReTAG("MainActivity");
 
     private TextView textView;
-    private final Map<String, Number> statusMap = new HashMap<>();
+    private final Map<String, Object> statusMap = new HashMap<>();
     @Nullable
     private EV3 ev3;
     @Nullable
     private TachoMotor motor;
 
-    private void updateStatus(Plug p, String key, Number value) {
+    private void updateStatus(Plug p, String key, Object value) {
         Log.d(TAG, String.format("%s: %s: %s", p, key, value));
         statusMap.put(key, value);
         runOnUiThread(() -> textView.setText(statusMap.toString()));
@@ -51,50 +51,82 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             ev3 = new EV3(new BluetoothConnection("EV3").connect());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        Button stopButton = findViewById(R.id.stopButton);
-        stopButton.setOnClickListener(v -> ev3.cancel());
+            Button stopButton = findViewById(R.id.stopButton);
+            stopButton.setOnClickListener(v -> ev3.cancel());
 
-        Button startButton = findViewById(R.id.startButton);
-        startButton.setOnClickListener(v -> {
-            try {
-                ev3.run(this::legomain);
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
-
-        EditText e = findViewById(R.id.motorEdit);
-        e.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                int speed = 0;
+            Button startButton = findViewById(R.id.startButton);
+            startButton.setOnClickListener(v -> {
                 try {
-                    speed = Integer.parseInt(s.toString());
-                } catch (NumberFormatException e) {
+                    ev3.run(this::legomain);
+                } catch (ExecutionException e) {
                     e.printStackTrace();
                 }
-                if (motor != null) {
-                    updateStatus(motor, "speed", speed);
+            });
+
+            EditText e1 = findViewById(R.id.powerEdit);
+            e1.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    int speed = 0;
                     try {
-                        motor.setSpeed(speed);
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
+                        speed = Integer.parseInt(s.toString());
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                    }
+                    if (motor != null) {
+                        updateStatus(motor, "power", speed);
+                        try {
+                            motor.setPower(speed);
+                            motor.start();
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
                     }
                 }
-            }
-        });
+            });
+
+            EditText e2 = findViewById(R.id.speedEdit);
+            e2.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    int speed = 0;
+                    try {
+                        speed = Integer.parseInt(s.toString());
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                    }
+                    if (motor != null) {
+                        updateStatus(motor, "speed", speed);
+                        try {
+                            motor.setSpeed(speed);
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                }
+            });
+
+        } catch (IOException e) {
+            Log.e(TAG, "fatal error: cannot connect to EV3");
+            e.printStackTrace();
+        }
 
     }
 
@@ -122,9 +154,14 @@ public class MainActivity extends AppCompatActivity {
                     Future<Short> reflected = lightSensor.getReflected();
                     updateStatus(lightSensor, "reflected", reflected.get());
 
-                    Future<LightSensor.Rgb> rgb = lightSensor.getRgb();
-                    int rgbv = rgb.get().R << 16 | rgb.get().G << 8 | rgb.get().B;
-                    updateStatus(lightSensor, "rgb", rgbv);
+                    Future<LightSensor.Color> colf = lightSensor.getColor();
+                    LightSensor.Color col = colf.get();
+                    updateStatus(lightSensor, "color", col);
+                    runOnUiThread(() -> findViewById(R.id.colorView).setBackgroundColor(col.toARGB32()));
+
+//                    Future<LightSensor.Rgb> rgb = lightSensor.getRgb();
+//                    LightSensor.Rgb rgbv = rgb.get();
+//                    updateStatus(lightSensor, "rgb", String.format("0x%06x", rgbv.toRGB24()));
 
                     Future<Boolean> touched = touchSensor.getPressed();
                     updateStatus(touchSensor, "touch", touched.get() ? 1 : 0);

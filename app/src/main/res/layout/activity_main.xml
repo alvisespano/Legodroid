@@ -10,10 +10,17 @@
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="200dp"
         android:layout_margin="10dp"
         android:text="Premi START per partire"
         tools:ignore="HardcodedText" />
+
+    <View
+        android:id="@+id/colorView"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="#ff00ff"
+        />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -38,6 +45,28 @@
 
     </LinearLayout>
 
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Motor Power:"
+            />
+
+        <EditText
+            android:id="@+id/powerEdit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="numberSigned" />
+
+    </LinearLayout>
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -50,10 +79,10 @@
             />
 
         <EditText
-            android:id="@+id/motorEdit"
+            android:id="@+id/speedEdit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:inputType="numberSigned" />
-    </LinearLayout>
 
+    </LinearLayout>
 </LinearLayout>

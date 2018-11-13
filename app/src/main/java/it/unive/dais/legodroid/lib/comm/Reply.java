@@ -1,8 +1,10 @@
 package it.unive.dais.legodroid.lib.comm;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 public class Reply extends Packet {
+    private static final String TAG = "Reply";
     private final boolean error;
 
     public Reply(@NonNull byte[] bytes) {
@@ -17,7 +19,7 @@ public class Reply extends Packet {
 
     @NonNull
     public byte[] getData() {
-        if (isError()) throw new IllegalStateException(String.format("reply returned error (counter = %d)", getCounter()));
+        if (isError()) Log.e(TAG, String.format("error on reply #%d", counter)); //throw new IllegalStateException(String.format("reply returned error (counter = %d)", getCounter()));
         return data;
     }
 }

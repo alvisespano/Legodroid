@@ -189,7 +189,8 @@ public class EV3 {
                 byte[] reply = r.getData();
                 short[] result = new short[nvalue];
                 for (int i = 0; i < nvalue; i++) {
-                    result[i] = (short) reply[i];
+                    byte[] bData = Arrays.copyOfRange(reply, 2 * i, 2 * i + 2);
+                    result[i] = ByteBuffer.wrap(bData).order(ByteOrder.LITTLE_ENDIAN).getShort();
                 }
                 return result;
             });
