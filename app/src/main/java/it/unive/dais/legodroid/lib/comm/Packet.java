@@ -3,9 +3,9 @@ package it.unive.dais.legodroid.lib.comm;
 import android.support.annotation.NonNull;
 
 public abstract class Packet {
-    private final int counter;
+    protected final int counter;
     @NonNull
-    private final byte[] data;
+    protected final byte[] data;
 
     protected Packet(int counter, @NonNull byte[] data) {
         this.counter = counter;

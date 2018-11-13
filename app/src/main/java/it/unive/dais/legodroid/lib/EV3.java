@@ -1,5 +1,6 @@
 package it.unive.dais.legodroid.lib;
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -10,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -21,11 +23,11 @@ import it.unive.dais.legodroid.lib.comm.Channel;
 import it.unive.dais.legodroid.lib.comm.Const;
 import it.unive.dais.legodroid.lib.comm.Reply;
 import it.unive.dais.legodroid.lib.comm.SpooledAsyncChannel;
-import it.unive.dais.legodroid.lib.motors.TachoMotor;
-import it.unive.dais.legodroid.lib.sensors.GyroSensor;
-import it.unive.dais.legodroid.lib.sensors.LightSensor;
-import it.unive.dais.legodroid.lib.sensors.TouchSensor;
-import it.unive.dais.legodroid.lib.sensors.UltrasonicSensor;
+import it.unive.dais.legodroid.lib.plugs.TachoMotor;
+import it.unive.dais.legodroid.lib.plugs.GyroSensor;
+import it.unive.dais.legodroid.lib.plugs.LightSensor;
+import it.unive.dais.legodroid.lib.plugs.TouchSensor;
+import it.unive.dais.legodroid.lib.plugs.UltrasonicSensor;
 import it.unive.dais.legodroid.lib.util.Consumer;
 
 import static it.unive.dais.legodroid.lib.util.Prelude.ReTAG;
@@ -46,8 +48,9 @@ public class EV3 {
         this(new SpooledAsyncChannel(channel));
     }
 
-    public synchronized void run(@NonNull Consumer<Api> f) {
-        if (task != null) throw new IllegalStateException("EV3 is already running a task");
+    public synchronized void run(@NonNull Consumer<Api> f) throws ExecutionException {
+        if (task != null)
+            throw new ExecutionException(new IllegalStateException("EV3 task is already running"));
         task = new MyAsyncTask(this, f).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -67,32 +70,30 @@ public class EV3 {
         @Override
         protected Void doInBackground(Void... voids) {
             Thread.currentThread().setName(TAG);
-            Log.v(TAG, "starting task");
+            Log.v(TAG, "starting EV3 task");
             try {
                 f.call(new Api(ev3));
-            } catch (Exception e) {
-                Log.e(TAG, String.format("uncaught exception: %s. Aborting.", e.getMessage()));
+                Log.v(TAG, "exiting EV3 task");
+            } catch (Throwable e) {
+                Log.e(TAG, String.format("uncaught exception: %s. Aborting EV3 task", e.getMessage()));
                 e.printStackTrace();
             }
             synchronized (ev3) {
                 ev3.task = null;
             }
-            Log.v(TAG, "exiting task");
             return null;
         }
     }
 
     public synchronized void cancel() {
         if (task != null) {
-            Log.d(TAG, "cancelling task");
+            Log.v(TAG, "cancelling task");
             task.cancel(true);
         }
     }
 
     public synchronized boolean isCancelled() {
-        if (task != null) {
-            return task.isCancelled();
-        } else return true;
+        return task == null || task.isCancelled();
     }
 
     public static class Api {
@@ -163,8 +164,6 @@ public class EV3 {
             Future<Reply> r = ev3.channel.send(4 * nvalue, bc);
             return execAsync(() -> {
                 Reply reply = r.get();
-                if (reply.isError())
-                    Log.e(TAG, String.format("getSiValue() Reply error"));
                 float[] result = new float[nvalue];
                 for (int i = 0; i < nvalue; i++) {
                     byte[] bData = Arrays.copyOfRange(reply.getData(), 4 * i, 4 * i + 4);
@@ -187,8 +186,6 @@ public class EV3 {
             Future<Reply> fr = ev3.channel.send(2 * nvalue, bc);
             return execAsync(() -> {
                 Reply r = fr.get();
-                if (r.isError())
-                    Log.e(TAG, String.format("getPercentValue() Reply error"));
                 byte[] reply = r.getData();
                 short[] result = new short[nvalue];
                 for (int i = 0; i < nvalue; i++) {
@@ -222,6 +219,13 @@ public class EV3 {
                     return 3;
             }
         }
+
+        @SuppressLint("DefaultLocale")
+        @Override
+        @NonNull
+        public String toString() {
+            return String.format("In/%d", toByte());
+        }
     }
 
     public enum OutputPort {
@@ -246,6 +250,24 @@ public class EV3 {
                 default:
                     return 3;
             }
+        }
+
+        @SuppressLint("DefaultLocale")
+        @Override
+        @NonNull
+        public String toString() {
+            String s;
+            switch (this) {
+                case A:
+                    s = "A";
+                case B:
+                    s = "B";
+                case C:
+                    s = "C";
+                default:
+                    s = "D";
+            }
+            return String.format("Out/%s", s);
         }
     }
 }

@@ -1,4 +1,4 @@
-package it.unive.dais.legodroid.lib.sensors;
+package it.unive.dais.legodroid.lib.plugs;
 
 import android.support.annotation.NonNull;
 

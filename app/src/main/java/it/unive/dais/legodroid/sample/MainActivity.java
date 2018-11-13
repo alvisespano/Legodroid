@@ -1,6 +1,7 @@
 package it.unive.dais.legodroid.sample;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,11 +19,11 @@ import java.util.concurrent.Future;
 import it.unive.dais.legodroid.R;
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.comm.BluetoothConnection;
-import it.unive.dais.legodroid.lib.comm.Const;
-import it.unive.dais.legodroid.lib.motors.TachoMotor;
-import it.unive.dais.legodroid.lib.sensors.LightSensor;
-import it.unive.dais.legodroid.lib.sensors.TouchSensor;
-import it.unive.dais.legodroid.lib.sensors.GyroSensor;
+import it.unive.dais.legodroid.lib.plugs.Plug;
+import it.unive.dais.legodroid.lib.plugs.TachoMotor;
+import it.unive.dais.legodroid.lib.plugs.LightSensor;
+import it.unive.dais.legodroid.lib.plugs.TouchSensor;
+import it.unive.dais.legodroid.lib.plugs.GyroSensor;
 import it.unive.dais.legodroid.lib.util.Prelude;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,11 +31,14 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = Prelude.ReTAG("MainActivity");
 
     private TextView textView;
-
     private final Map<String, Number> statusMap = new HashMap<>();
+    @Nullable
+    private EV3 ev3;
+    @Nullable
+    private TachoMotor motor;
 
-    private void updateStatus(EV3 ev3, String key, Number value) {
-        Log.d(TAG, String.format("%s: %s", key, value));
+    private void updateStatus(Plug p, String key, Number value) {
+        Log.d(TAG, String.format("%s: %s: %s", p, key, value));
         statusMap.put(key, value);
         runOnUiThread(() -> textView.setText(statusMap.toString()));
     }
@@ -46,90 +50,103 @@ public class MainActivity extends AppCompatActivity {
         textView = findViewById(R.id.textView);
 
         try {
-            final EV3 ev3 = new EV3(new BluetoothConnection("EV3").connect());
-
-            Button startButton = findViewById(R.id.startButton);
-            startButton.setOnClickListener(v -> {
-
-                // main program executed by EV3
-
-                ev3.run(api -> {
-                    LightSensor lightSensor = api.getLightSensor(EV3.InputPort._3);
-                    TouchSensor touchSensor = api.getTouchSensor(EV3.InputPort._1);
-                    GyroSensor gyroSensor = api.getGyroSensor(EV3.InputPort._4);
-                    TachoMotor motor1 = api.getTachoMotor(EV3.OutputPort.A);    // TODO: testare il comportamento quando non sono collegati davvero i motori/sensori alle porte
-
-                    try {
-                        motor1.start();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    EditText e = findViewById(R.id.motorEdit);
-                    e.addTextChangedListener(new TextWatcher() {
-                        @Override
-                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        }
-
-                        @Override
-                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        }
-
-                        @Override
-                        public void afterTextChanged(Editable s) {
-                            int speed = 0;
-                            try {
-                                speed = Integer.parseInt(s.toString());
-                            } catch (NumberFormatException e) {
-                                e.printStackTrace();
-                            }
-                            Log.d(TAG, String.format("motor speed set to %d", speed));
-                            try {
-                                motor1.setSpeed(speed);
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
-                            }
-
-                        }
-                    });
-
-
-                    while (!ev3.isCancelled()) {
-                        try {
-                            Future<Float> pos1 = motor1.getPosition();
-                            updateStatus(ev3, "motor1 position", pos1.get());
-
-                            Future<Float> gyro = gyroSensor.getAngle();
-                            updateStatus(ev3, "gyro angle", gyro.get());
-
-                            Future<Short> ambient = lightSensor.getAmbient();
-                            updateStatus(ev3, "ambient", ambient.get());
-
-                            Future<Short> reflected = lightSensor.getReflected();
-                            updateStatus(ev3, "reflected", reflected.get());
-
-                            Future<LightSensor.Rgb> rgb = lightSensor.getRgb();
-                            int rgbv = rgb.get().R << 16 | rgb.get().G << 8 | rgb.get().B;
-                            updateStatus(ev3, "rgb", rgbv);
-
-                            Future<Boolean> touched = touchSensor.getPressed();
-                            updateStatus(ev3, "touch", touched.get() ? 1 : 0);
-
-                        } catch (IOException | InterruptedException | ExecutionException e1) {
-                            e1.printStackTrace();
-                        }
-
-                    }
-
-                });
-            });
-
-            Button stopButton = findViewById(R.id.stopButton);
-            stopButton.setOnClickListener(v -> ev3.cancel());
-
+            ev3 = new EV3(new BluetoothConnection("EV3").connect());
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        Button stopButton = findViewById(R.id.stopButton);
+        stopButton.setOnClickListener(v -> ev3.cancel());
+
+        Button startButton = findViewById(R.id.startButton);
+        startButton.setOnClickListener(v -> {
+            try {
+                ev3.run(this::legomain);
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        });
+
+        EditText e = findViewById(R.id.motorEdit);
+        e.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                int speed = 0;
+                try {
+                    speed = Integer.parseInt(s.toString());
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                }
+                if (motor != null) {
+                    updateStatus(motor, "speed", speed);
+                    try {
+                        motor.setSpeed(speed);
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        });
+
     }
 
+    // main program executed by EV3
+
+    private void legomain(EV3.Api api) {
+        LightSensor lightSensor = api.getLightSensor(EV3.InputPort._3);
+        TouchSensor touchSensor = api.getTouchSensor(EV3.InputPort._1);
+        GyroSensor gyroSensor = api.getGyroSensor(EV3.InputPort._4);
+        motor = api.getTachoMotor(EV3.OutputPort.A);
+        try {
+            motor.start();
+
+            while (!api.ev3.isCancelled()) {
+                try {
+                    Future<Float> pos1 = motor.getPosition();
+                    updateStatus(motor, "position", pos1.get());
+
+                    Future<Float> gyro = gyroSensor.getAngle();
+                    updateStatus(gyroSensor, "angle", gyro.get());
+
+                    Future<Short> ambient = lightSensor.getAmbient();
+                    updateStatus(lightSensor, "ambient", ambient.get());
+
+                    Future<Short> reflected = lightSensor.getReflected();
+                    updateStatus(lightSensor, "reflected", reflected.get());
+
+                    Future<LightSensor.Rgb> rgb = lightSensor.getRgb();
+                    int rgbv = rgb.get().R << 16 | rgb.get().G << 8 | rgb.get().B;
+                    updateStatus(lightSensor, "rgb", rgbv);
+
+                    Future<Boolean> touched = touchSensor.getPressed();
+                    updateStatus(touchSensor, "touch", touched.get() ? 1 : 0);
+
+                } catch (IOException | InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                motor.stop();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+
 }
+
+

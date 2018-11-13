@@ -1,28 +1,20 @@
-package it.unive.dais.legodroid.lib.motors;
+package it.unive.dais.legodroid.lib.plugs;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.comm.Bytecode;
 import it.unive.dais.legodroid.lib.comm.Const;
-import it.unive.dais.legodroid.lib.comm.Reply;
 import it.unive.dais.legodroid.lib.util.Prelude;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.Arrays;
 import java.util.concurrent.Future;
 
-public class TachoMotor {
+public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
     private static final String TAG = Prelude.ReTAG("TachoMotor");
-    private final EV3.Api api;
-    private final EV3.OutputPort port;
 
     public TachoMotor(@NonNull EV3.Api api, EV3.OutputPort port) {
-        this.api = api;
-        this.port = port;
+        super(api, port);
     }
 
     public Future<Float> getPosition() throws IOException {
@@ -85,5 +77,10 @@ public class TachoMotor {
 
     public boolean isMoving() { // TODO: questo non è un doppione con isStill()?
         return false;
+    }
+
+    @Override
+    public void close() throws Exception {
+        stop();
     }
 }

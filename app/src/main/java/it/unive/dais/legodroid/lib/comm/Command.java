@@ -33,4 +33,5 @@ public class Command extends Packet {
         System.arraycopy(getData(), 0, bytes, 5, getData().length);
         return bytes;
     }
+
 }

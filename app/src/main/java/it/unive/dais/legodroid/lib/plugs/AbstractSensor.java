@@ -1,4 +1,4 @@
-package it.unive.dais.legodroid.lib.sensors;
+package it.unive.dais.legodroid.lib.plugs;
 
 import android.support.annotation.NonNull;
 
@@ -8,16 +8,11 @@ import java.util.concurrent.Future;
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.util.Function;
 
-public abstract class AbstractSensor {
+public abstract class AbstractSensor extends Plug<EV3.InputPort> {
     protected final int type;
-    @NonNull
-    protected final EV3.InputPort port;
-    @NonNull
-    protected final EV3.Api api;
 
-    protected AbstractSensor(@NonNull EV3.Api api, @NonNull EV3.InputPort port, int mode) {
-        this.port = port;
-        this.api = api;
+    protected AbstractSensor(@NonNull EV3.Api api, EV3.InputPort port, int mode) {
+        super(api, port);
         this.type = mode;
     }
 
