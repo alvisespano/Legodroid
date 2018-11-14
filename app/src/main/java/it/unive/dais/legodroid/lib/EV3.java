@@ -257,18 +257,7 @@ public class EV3 {
         @Override
         @NonNull
         public String toString() {
-            String s;
-            switch (this) {
-                case A:
-                    s = "A";
-                case B:
-                    s = "B";
-                case C:
-                    s = "C";
-                default:
-                    s = "D";
-            }
-            return String.format("Out/%s", s);
+            return String.format("Out/%s", super.toString());
         }
     }
 }
