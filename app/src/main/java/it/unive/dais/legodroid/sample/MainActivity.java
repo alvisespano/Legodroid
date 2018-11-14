@@ -1,6 +1,7 @@
 package it.unive.dais.legodroid.sample;
 
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -24,6 +25,7 @@ import it.unive.dais.legodroid.lib.plugs.TachoMotor;
 import it.unive.dais.legodroid.lib.plugs.LightSensor;
 import it.unive.dais.legodroid.lib.plugs.TouchSensor;
 import it.unive.dais.legodroid.lib.plugs.GyroSensor;
+import it.unive.dais.legodroid.lib.util.Consumer;
 import it.unive.dais.legodroid.lib.util.Prelude;
 
 public class MainActivity extends AppCompatActivity {
@@ -43,6 +45,28 @@ public class MainActivity extends AppCompatActivity {
         runOnUiThread(() -> textView.setText(statusMap.toString()));
     }
 
+    private void setupEditable(@IdRes int id, Consumer<Integer> f) {
+        EditText e = findViewById(id);
+        e.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                int x = 0;
+                try {
+                    x = Integer.parseInt(s.toString());
+                } catch (NumberFormatException e1) {
+                    e1.printStackTrace();
+                }
+                f.call(x);
+            }
+        });
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +77,16 @@ public class MainActivity extends AppCompatActivity {
             ev3 = new EV3(new BluetoothConnection("EV3").connect());
 
             Button stopButton = findViewById(R.id.stopButton);
-            stopButton.setOnClickListener(v -> ev3.cancel());
+            stopButton.setOnClickListener(v -> {
+                ev3.cancel();
+                try {
+                    if (motor != null) {
+                        motor.stop();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
 
             Button startButton = findViewById(R.id.startButton);
             startButton.setOnClickListener(v -> {
@@ -64,62 +97,23 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-            EditText e1 = findViewById(R.id.powerEdit);
-            e1.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    int speed = 0;
-                    try {
-                        speed = Integer.parseInt(s.toString());
-                    } catch (NumberFormatException e) {
-                        e.printStackTrace();
-                    }
+            setupEditable(R.id.powerEdit, (x) -> {
+                try {
                     if (motor != null) {
-                        updateStatus(motor, "power", speed);
-                        try {
-                            motor.setPower(speed);
-                            motor.start();
-                        } catch (IOException e1) {
-                            e1.printStackTrace();
-                        }
+                        motor.setPower(x);
                     }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             });
 
-            EditText e2 = findViewById(R.id.speedEdit);
-            e2.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    int speed = 0;
-                    try {
-                        speed = Integer.parseInt(s.toString());
-                    } catch (NumberFormatException e) {
-                        e.printStackTrace();
-                    }
+            setupEditable(R.id.speedEdit, (x) -> {
+                try {
                     if (motor != null) {
-                        updateStatus(motor, "speed", speed);
-                        try {
-                            motor.setSpeed(speed);
-                        } catch (IOException e1) {
-                            e1.printStackTrace();
-                        }
+                        motor.setSpeed(x);
                     }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             });
 
@@ -158,10 +152,6 @@ public class MainActivity extends AppCompatActivity {
                     LightSensor.Color col = colf.get();
                     updateStatus(lightSensor, "color", col);
                     runOnUiThread(() -> findViewById(R.id.colorView).setBackgroundColor(col.toARGB32()));
-
-//                    Future<LightSensor.Rgb> rgb = lightSensor.getRgb();
-//                    LightSensor.Rgb rgbv = rgb.get();
-//                    updateStatus(lightSensor, "rgb", String.format("0x%06x", rgbv.toRGB24()));
 
                     Future<Boolean> touched = touchSensor.getPressed();
                     updateStatus(touchSensor, "touch", touched.get() ? 1 : 0);
