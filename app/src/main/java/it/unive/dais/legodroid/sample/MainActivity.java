@@ -2,6 +2,7 @@ package it.unive.dais.legodroid.sample;
 
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -20,13 +21,14 @@ import java.util.concurrent.Future;
 import it.unive.dais.legodroid.R;
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.comm.BluetoothConnection;
+import it.unive.dais.legodroid.lib.plugs.GyroSensor;
+import it.unive.dais.legodroid.lib.plugs.LightSensor;
 import it.unive.dais.legodroid.lib.plugs.Plug;
 import it.unive.dais.legodroid.lib.plugs.TachoMotor;
-import it.unive.dais.legodroid.lib.plugs.LightSensor;
 import it.unive.dais.legodroid.lib.plugs.TouchSensor;
-import it.unive.dais.legodroid.lib.plugs.GyroSensor;
-import it.unive.dais.legodroid.lib.util.Consumer;
 import it.unive.dais.legodroid.lib.util.Prelude;
+import it.unive.dais.legodroid.lib.util.Consumer;
+import it.unive.dais.legodroid.lib.util.ThrowingConsumer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,22 +51,28 @@ public class MainActivity extends AppCompatActivity {
         EditText e = findViewById(id);
         e.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
             public void afterTextChanged(Editable s) {
                 int x = 0;
                 try {
                     x = Integer.parseInt(s.toString());
-                } catch (NumberFormatException e1) {
-                    e1.printStackTrace();
+                } catch (NumberFormatException ignored) {
                 }
                 f.call(x);
             }
         });
+    }
+
+    private void applyMotor(@NonNull ThrowingConsumer<TachoMotor, Throwable> f) {
+        if (motor != null)
+            Prelude.trap(() -> f.call(motor));
     }
 
     @Override
@@ -74,59 +82,29 @@ public class MainActivity extends AppCompatActivity {
         textView = findViewById(R.id.textView);
 
         try {
-            ev3 = new EV3(new BluetoothConnection("EV3").connect());
-
-            Button stopButton = findViewById(R.id.stopButton);
-            stopButton.setOnClickListener(v -> {
-                ev3.cancel();
-                try {
-                    if (motor != null) {
-                        motor.stop();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-
-            Button startButton = findViewById(R.id.startButton);
-            startButton.setOnClickListener(v -> {
-                try {
-                    ev3.run(this::legomain);
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
-            });
-
-            setupEditable(R.id.powerEdit, (x) -> {
-                try {
-                    if (motor != null) {
-                        motor.setPower(x);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-
-            setupEditable(R.id.speedEdit, (x) -> {
-                try {
-                    if (motor != null) {
-                        motor.setSpeed(x);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-
+            ev3 = new EV3(new BluetoothConnection("EV3").connect());    // replace with your own EV3 brick name
         } catch (IOException e) {
             Log.e(TAG, "fatal error: cannot connect to EV3");
             e.printStackTrace();
         }
 
+        Button stopButton = findViewById(R.id.stopButton);
+        stopButton.setOnClickListener(v -> {
+            ev3.cancel();
+            applyMotor(TachoMotor::stop);
+        });
+
+        Button startButton = findViewById(R.id.startButton);
+        startButton.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::legomain)));
+
+        setupEditable(R.id.powerEdit, (x) -> applyMotor((m) -> m.setPower(x)));
+        setupEditable(R.id.speedEdit, (x) -> applyMotor((m) -> m.setSpeed(x)));
     }
 
     // main program executed by EV3
 
     private void legomain(EV3.Api api) {
+        final String TAG = Prelude.ReTAG("legomain");
         LightSensor lightSensor = api.getLightSensor(EV3.InputPort._3);
         TouchSensor touchSensor = api.getTouchSensor(EV3.InputPort._1);
         GyroSensor gyroSensor = api.getGyroSensor(EV3.InputPort._4);
@@ -162,13 +140,10 @@ public class MainActivity extends AppCompatActivity {
             }
 
         } catch (IOException e) {
+            Log.e(TAG, String.format("fatal exception caught in EV3: %s", e));
             e.printStackTrace();
         } finally {
-            try {
-                motor.stop();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            applyMotor(TachoMotor::stop);
         }
 
     }

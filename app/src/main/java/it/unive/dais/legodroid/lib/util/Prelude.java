@@ -1,18 +1,20 @@
 package it.unive.dais.legodroid.lib.util;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.util.Arrays;
 
 public class Prelude {
-    public static final String TAG_BASE = "LegodroidLib";
+    private static final String TAG_BASE = "LegodroidLib";
+    public static final String TAG = ReTAG("Prelude");
 
     public static String ReTAG(String tag) {
-        return String.format("%s/%s", TAG_BASE, tag);
+        return String.format("%s.%s", TAG_BASE, tag);
     }
 
     public static String ReTAG(String parent, String tag) {
-        return ReTAG(String.format("%s/%s", parent, tag));
+        return ReTAG(String.format("%s.%s", parent, tag));
     }
 
     @NonNull
@@ -35,4 +37,12 @@ public class Prelude {
         return new String(hexChars);
     }
 
+    public static void trap(ThrowingRunnable<Throwable> r) {
+        try {
+            r.run();
+        } catch (Throwable e) {
+            Log.e(TAG, String.format("exception trapped: %s", e));
+            e.printStackTrace();
+        }
+    }
 }

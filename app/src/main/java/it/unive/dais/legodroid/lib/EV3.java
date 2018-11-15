@@ -35,6 +35,12 @@ import static it.unive.dais.legodroid.lib.util.Prelude.ReTAG;
 public class EV3 {
     private static final String TAG = ReTAG("EV3");
 
+    public class AlreadyRunningException extends ExecutionException {
+        public AlreadyRunningException(String msg) {
+            super(msg);
+        }
+    }
+
     @NonNull
     private final AsyncChannel channel;
     @Nullable
@@ -48,9 +54,9 @@ public class EV3 {
         this(new SpooledAsyncChannel(channel));
     }
 
-    public synchronized void run(@NonNull Consumer<Api> f) throws ExecutionException {
+    public synchronized void run(@NonNull Consumer<Api> f) throws AlreadyRunningException {
         if (task != null)
-            throw new ExecutionException(new IllegalStateException("EV3 task is already running"));
+            throw new AlreadyRunningException("EV3 task is already running");
         task = new MyAsyncTask(this, f).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -260,4 +266,5 @@ public class EV3 {
             return String.format("Out/%s", super.toString());
         }
     }
+
 }

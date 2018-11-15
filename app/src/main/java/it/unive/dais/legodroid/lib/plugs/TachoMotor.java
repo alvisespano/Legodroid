@@ -1,6 +1,7 @@
 package it.unive.dais.legodroid.lib.plugs;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.comm.Bytecode;
@@ -47,6 +48,7 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
         bc.addParameter(port.toBitmask());
         bc.addParameter((byte) speed);
         api.sendNoReply(bc);
+        Log.d(TAG, String.format("motor speed set: %d", speed));
     }
 
     public void setPower(int power) throws IOException {
@@ -56,6 +58,7 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
         bc.addParameter(port.toBitmask());
         bc.addParameter((byte) power);
         api.sendNoReply(bc);
+        Log.d(TAG, String.format("motor power set: %d", power));
     }
 
 
@@ -65,6 +68,7 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
         bc.addParameter(Const.LAYER_MASTER);
         bc.addParameter(port.toBitmask());
         api.sendNoReply(bc);
+        Log.d(TAG, "motor started");
     }
 
     public void brake() throws IOException {
@@ -74,6 +78,7 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
         bc.addParameter(port.toBitmask());
         bc.addParameter(Const.BRAKE);
         api.sendNoReply(bc);
+        Log.d(TAG, "motor brake");
     }
 
     public void stop() throws IOException {
@@ -83,6 +88,7 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
         bc.addParameter(port.toBitmask());
         bc.addParameter(Const.COAST);
         api.sendNoReply(bc);
+        Log.d(TAG, "motor stop");
     }
 
     public boolean isMoving() { // TODO: questo non è un doppione con isStill()?
