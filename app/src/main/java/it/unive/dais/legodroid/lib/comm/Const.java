@@ -1,7 +1,5 @@
 package it.unive.dais.legodroid.lib.comm;
 
-import it.unive.dais.legodroid.lib.util.Prelude;
-
 public class Const {
     // Command Types
     public static final byte DIRECT_COMMAND_REPLY = (byte) 0x00;

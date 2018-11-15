@@ -36,9 +36,11 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
     }
 
     public void goToPositionRel(int amount) {
+        // TODO
     }
 
     public void goToPositionAbs(int pos) {
+        // TODO
     }
 
     public void setSpeed(int speed) throws IOException {
