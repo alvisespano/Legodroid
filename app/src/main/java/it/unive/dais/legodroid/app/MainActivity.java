@@ -1,4 +1,4 @@
-package it.unive.dais.legodroid.sample;
+package it.unive.dais.legodroid.app;
 
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import it.unive.dais.legodroid.R;
+import it.unive.dais.appu.R;
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.comm.BluetoothConnection;
 import it.unive.dais.legodroid.lib.plugs.GyroSensor;
@@ -26,8 +26,8 @@ import it.unive.dais.legodroid.lib.plugs.LightSensor;
 import it.unive.dais.legodroid.lib.plugs.Plug;
 import it.unive.dais.legodroid.lib.plugs.TachoMotor;
 import it.unive.dais.legodroid.lib.plugs.TouchSensor;
-import it.unive.dais.legodroid.lib.util.Prelude;
 import it.unive.dais.legodroid.lib.util.Consumer;
+import it.unive.dais.legodroid.lib.util.Prelude;
 import it.unive.dais.legodroid.lib.util.ThrowingConsumer;
 
 public class MainActivity extends AppCompatActivity {

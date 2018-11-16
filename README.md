@@ -1,37 +1,28 @@
-# Legodroid
+# Overview
 
-A small library for communicating with the Lego EV3 educational kit from Android.
+Legodroid is a tiny Java library for Android with educational purposes, aimed at writing programs for LEGO Mindstorms in a simple and straightforward way.
 
-## Usage
+Among its features:
+    * strong-typed API for communicating with EV3 bricks: easy connection, robust access to motors and sensors;
+    * bluetooth supported, wifi will come;
+    * sound patterns for transparent asyncronous programming;
+    * layered API allows for easy customization of commands/replies;
 
-First, you have to open the bluetooth connection. Bluetooth device must be already paired from Android Bluetooth Settings.
+## Disclaimer
 
-```java
-BluetoothConnection conn = new BluetoothConnection("EV3");
-Channel channel = conn.connect();
-EV3 ev3 = new EV3(new SpooledAsyncChannel(channel));
-```
+This library is in alpha stage of development: minor bugs and quirks might occur. Be patient please, we will fix them soon :)
+    
+## Credits
 
-Then, you can start a new job to run on the EV3. It will be run on another thread, indipendently from you application.
+Written by Alvise Spanò, additional coding by Giulio Zausa.
+Developed for the course of Software Engeneering, degree in Computer Science, chair professor Agostino Cortesi.
+(C) 2018 Università Ca' Foscari, Venezia, Italy
+        
+## Installation
 
-```java
-ev3.run(() -> {
-  try {
-    TouchSensor touchSensor = api.getTouchSensor(EV3.InputPort._1);
+Open the project on Android Studio and 2 modules will appear: the 'app' module contains a sample MainActivity showing how to use the library; the 'lib' module contains the library code. Add a dependency to the 'lib' module if you need to create your own standalone app and module.
 
-    boolean running = true;
-    while (running) {
-      // Set motor speed to 10 (port A)
-      api.getTachoMotor(EV3.OutputPort.A).setSpeed(10);
+## Documentation
 
-      // Stop job and motor if pressed
-      if (touchSensor.getPressed().get()) {
-        api.getTachoMotor(EV3.OutputPort.A).setSpeed(0);
-        this.running = false;
-      }
-    }
-  } catch (IOException | InterruptedException | ExecutionException e) {
-      e.printStackTrace();
-  }
-});
-```
+The documentation is not yet available.
+Refer to the sample MainActivity code for learning how the library public API works - its usage is pretty straightforward and requires no senior expertise unless you want to delve into its internals.

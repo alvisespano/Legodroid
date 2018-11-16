@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="it.unive.dais.legodroid">
+    package="it.unive.dais.appu">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <application
@@ -10,7 +10,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="it.unive.dais.legodroid.sample.MainActivity">
+        <activity android:name="it.unive.dais.legodroid.app.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />

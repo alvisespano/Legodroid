@@ -6,7 +6,7 @@ import android.util.Log;
 import java.util.Arrays;
 
 public class Prelude {
-    private static final String TAG_BASE = "LegodroidLib";
+    private static final String TAG_BASE = "Legodroid";
     public static final String TAG = ReTAG("Prelude");
 
     public static String ReTAG(String tag) {
