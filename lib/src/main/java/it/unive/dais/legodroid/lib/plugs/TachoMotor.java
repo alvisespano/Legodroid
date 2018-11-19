@@ -106,16 +106,6 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
 
     void setType() {}
 
-    void reset() {}
-
-    void stop() {}
-
-    void power() {}
-
-    void speed() {}
-
-    void start() {}
-
     void polarity() {}
 
     void read() {}
@@ -128,11 +118,57 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
 
     void timePower() {}
 
-    void stepSpeed() {}
+    void stepSpeed(int speed, int step1, int step2, int step3, boolean brake) throws IOException {
+        Bytecode bc = new Bytecode();
+        bc.addOpCode(Const.OUTPUT_STEP_SPEED);
+        bc.addParameter(Const.LAYER_MASTER);
+        bc.addParameter(port.toBitmask());
+        bc.addParameter((byte) speed);
+        bc.addParameter(step1);
+        bc.addParameter(step2);
+        bc.addParameter(step3);
+        bc.addParameter(brake ? Const.BRAKE : Const.COAST);
+        api.sendNoReply(bc);
+        Log.d(TAG, "motor step speed");
+    }
 
-    void timeSpeed() {}
+    void timeSpeed(int speed, int step1, int step2, int step3, boolean brake) throws IOException {
+        Bytecode bc = new Bytecode();
+        bc.addOpCode(Const.OUTPUT_TIME_SPEED);
+        bc.addParameter(Const.LAYER_MASTER);
+        bc.addParameter(port.toBitmask());
+        bc.addParameter((byte) speed);
+        bc.addParameter(step1);
+        bc.addParameter(step2);
+        bc.addParameter(step3);
+        bc.addParameter(brake ? Const.BRAKE : Const.COAST);
+        api.sendNoReply(bc);
+        Log.d(TAG, "motor time speed");
+    }
 
-    void stepSync() {}
+    void stepSync(int power, int turnRatio, int step, boolean brake) throws IOException {
+        Bytecode bc = new Bytecode();
+        bc.addOpCode(Const.OUTPUT_STEP_SYNC);
+        bc.addParameter(Const.LAYER_MASTER);
+        bc.addParameter(port.toBitmask());
+        bc.addParameter((byte) power);
+        bc.addParameter((short) turnRatio);
+        bc.addParameter(step);
+        bc.addParameter(brake ? Const.BRAKE : Const.COAST);
+        api.sendNoReply(bc);
+        Log.d(TAG, "motor step sync");
+    }
 
-    void timeSync() {}
+    void timeSync(int power, int turnRatio, int time, boolean brake) throws IOException {
+        Bytecode bc = new Bytecode();
+        bc.addOpCode(Const.OUTPUT_TIME_SYNC);
+        bc.addParameter(Const.LAYER_MASTER);
+        bc.addParameter(port.toBitmask());
+        bc.addParameter((byte) power);
+        bc.addParameter((short) turnRatio);
+        bc.addParameter(time);
+        bc.addParameter(brake ? Const.BRAKE : Const.COAST);
+        api.sendNoReply(bc);
+        Log.d(TAG, "motor time sync");
+    }
 }
