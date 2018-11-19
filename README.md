@@ -14,6 +14,8 @@ Among its features:
 This library comes *as-is*, without any warranty of future development.
         
 ## Installation
+[![](https://jitpack.io/v/RiccardoM/legodroid.svg)](https://jitpack.io/#RiccardoM/legodroid)
+
 This project can be found on [JitPack](https://jitpack.io).
 In order to use it inside you have to include the Jitpack repository
 inside your project's `build.gradle` file with the following code
@@ -28,14 +30,16 @@ After that, you can start using it inside any `build.gradle` file by
 simply writing
 
 ```
-implementation 'com.github.RiccardoM:legodroid:1.0.1'
+implementation 'com.github.RiccardoM:legodroid:$latest_version'
 ```
 
 or, if you are using a Gradle version before Gradle 3.2
 
 ```
-compile 'com.github.RiccardoM:legodroid:1.0.1'
+compile 'com.github.RiccardoM:legodroid:$latest_version'
 ```
+
+Please replace `$latest_version` with the latest version available on Jitpack: [![](https://jitpack.io/v/RiccardoM/legodroid.svg)](https://jitpack.io/#RiccardoM/legodroid)
 
 
 ## Documentation
