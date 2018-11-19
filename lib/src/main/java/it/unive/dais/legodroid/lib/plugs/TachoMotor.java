@@ -114,9 +114,33 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
 
     void ready() {}
 
-    void stepPower() {}
+    void stepPower(int power, int step1, int step2, int step3, boolean brake) throws IOException {
+        Bytecode bc = new Bytecode();
+        bc.addOpCode(Const.OUTPUT_STEP_POWER);
+        bc.addParameter(Const.LAYER_MASTER);
+        bc.addParameter(port.toBitmask());
+        bc.addParameter((byte) power);
+        bc.addParameter(step1);
+        bc.addParameter(step2);
+        bc.addParameter(step3);
+        bc.addParameter(brake ? Const.BRAKE : Const.COAST);
+        api.sendNoReply(bc);
+        Log.d(TAG, "motor step power");
+    }
 
-    void timePower() {}
+    void timePower(int power, int step1, int step2, int step3, boolean brake) throws IOException {
+        Bytecode bc = new Bytecode();
+        bc.addOpCode(Const.OUTPUT_TIME_POWER);
+        bc.addParameter(Const.LAYER_MASTER);
+        bc.addParameter(port.toBitmask());
+        bc.addParameter((byte) power);
+        bc.addParameter(step1);
+        bc.addParameter(step2);
+        bc.addParameter(step3);
+        bc.addParameter(brake ? Const.BRAKE : Const.COAST);
+        api.sendNoReply(bc);
+        Log.d(TAG, "motor time power");
+    }
 
     void stepSpeed(int speed, int step1, int step2, int step3, boolean brake) throws IOException {
         Bytecode bc = new Bytecode();
