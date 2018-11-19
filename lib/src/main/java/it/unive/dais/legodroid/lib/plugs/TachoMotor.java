@@ -163,7 +163,7 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
 //        Log.d(TAG, String.format("motor polarity set: %s", pol));
 //    }
 
-void stepPower(int power, int step1, int step2, int step3, boolean brake) throws IOException {
+    public void setStepPower(int power, int step1, int step2, int step3, boolean brake) throws IOException {
         Bytecode bc = new Bytecode();
         bc.addOpCode(Const.OUTPUT_STEP_POWER);
         bc.addParameter(Const.LAYER_MASTER);
@@ -177,7 +177,7 @@ void stepPower(int power, int step1, int step2, int step3, boolean brake) throws
         Log.d(TAG, "motor step power");
     }
 
-    void timePower(int power, int step1, int step2, int step3, boolean brake) throws IOException {
+    public void setTimePower(int power, int step1, int step2, int step3, boolean brake) throws IOException {
         Bytecode bc = new Bytecode();
         bc.addOpCode(Const.OUTPUT_TIME_POWER);
         bc.addParameter(Const.LAYER_MASTER);
@@ -191,7 +191,7 @@ void stepPower(int power, int step1, int step2, int step3, boolean brake) throws
         Log.d(TAG, "motor time power");
     }
 
-    void stepSpeed(int speed, int step1, int step2, int step3, boolean brake) throws IOException {
+    public void setStepSpeed(int speed, int step1, int step2, int step3, boolean brake) throws IOException {
         Bytecode bc = new Bytecode();
         bc.addOpCode(Const.OUTPUT_STEP_SPEED);
         bc.addParameter(Const.LAYER_MASTER);
@@ -205,7 +205,7 @@ void stepPower(int power, int step1, int step2, int step3, boolean brake) throws
         Log.d(TAG, "motor step speed");
     }
 
-    void timeSpeed(int speed, int step1, int step2, int step3, boolean brake) throws IOException {
+    public void setTimeSpeed(int speed, int step1, int step2, int step3, boolean brake) throws IOException {
         Bytecode bc = new Bytecode();
         bc.addOpCode(Const.OUTPUT_TIME_SPEED);
         bc.addParameter(Const.LAYER_MASTER);
@@ -219,7 +219,7 @@ void stepPower(int power, int step1, int step2, int step3, boolean brake) throws
         Log.d(TAG, "motor time speed");
     }
 
-    void stepSync(int power, int turnRatio, int step, boolean brake) throws IOException {
+    public void stepSync(int power, int turnRatio, int step, boolean brake) throws IOException {
         Bytecode bc = new Bytecode();
         bc.addOpCode(Const.OUTPUT_STEP_SYNC);
         bc.addParameter(Const.LAYER_MASTER);
@@ -232,7 +232,7 @@ void stepPower(int power, int step1, int step2, int step3, boolean brake) throws
         Log.d(TAG, "motor step sync");
     }
 
-    void timeSync(int power, int turnRatio, int time, boolean brake) throws IOException {
+    public void timeSync(int power, int turnRatio, int time, boolean brake) throws IOException {
         Bytecode bc = new Bytecode();
         bc.addOpCode(Const.OUTPUT_TIME_SYNC);
         bc.addParameter(Const.LAYER_MASTER);
