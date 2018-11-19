@@ -7,6 +7,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class Bytecode {
+    private static final byte BYTE_SIZE = (byte) 0b10000001;
     private static final byte SHORT_SIZE = (byte) 0x82;
     private static final byte INT_SIZE = (byte) 0x83;
 
@@ -25,6 +26,7 @@ public class Bytecode {
     }
 
     public void addParameter(byte param) throws IOException {
+        out.writeByte(BYTE_SIZE);
         out.writeByte(param);
     }
 
