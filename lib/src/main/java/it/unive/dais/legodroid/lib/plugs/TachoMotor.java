@@ -101,4 +101,38 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
     public void close() throws Exception {
         stop();
     }
+
+
+
+    void setType() {}
+
+    void reset() {}
+
+    void stop() {}
+
+    void power() {}
+
+    void speed() {}
+
+    void start() {}
+
+    void polarity() {}
+
+    void read() {}
+
+    void test() {}
+
+    void ready() {}
+
+    void stepPower() {}
+
+    void timePower() {}
+
+    void stepSpeed() {}
+
+    void timeSpeed() {}
+
+    void stepSync() {}
+
+    void timeSync() {}
 }
