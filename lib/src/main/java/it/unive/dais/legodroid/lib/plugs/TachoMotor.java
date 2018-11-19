@@ -33,7 +33,7 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
         return api.execAsync(() -> r.get()[0]);
     }
 
-    // TODO: lo teniamo o basta la resetPosition()?
+    // TODO: lo teniamo o basta resetPosition()?
     public void clearCount() throws IOException {
         Bytecode bc = new Bytecode();
         bc.addOpCode(Const.OUTPUT_CLR_COUNT);

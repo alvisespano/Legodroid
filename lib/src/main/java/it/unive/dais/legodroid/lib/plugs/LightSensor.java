@@ -28,7 +28,7 @@ public class LightSensor extends AbstractSensor {
         return getSi1(Const.COL_COLOR, (x) -> Color.values()[(int) (float) x]);
     }
 
-    // TODO: this does not work on current EV3
+    // on current EV3 firmware this command does not read precise values
     @Deprecated
     @NonNull
     public Future<Rgb> getRgb() throws IOException {
