@@ -1,28 +1,45 @@
 # Overview
-
-Legodroid is a tiny Java library for Android with educational purposes, aimed at writing programs for LEGO Mindstorms in a simple and straightforward way.
+Legodroid is a tiny Java library for Android with educational purposes,
+aimed at writing programs for LEGO Mindstorm in a simple and
+straightforward way.
 
 Among its features:
-    * strong-typed API for communicating with EV3 bricks: easy connection, robust access to motors and sensors;
-    * bluetooth supported, wifi will come;
-    * sound patterns for transparent asyncronous programming;
-    * layered API allows for easy customization of commands/replies;
+ * strong-typed API for communicating with EV3 bricks: easy connection,
+ robust access to motors and sensors;
+ * bluetooth supported, wifi will come;
+ * sound patterns for transparent asyncronous programming;
+ * layered API allows for easy customization of commands/replies;
 
 ## Disclaimer
-
-This library is in alpha stage of development: minor bugs and quirks might occur. Be patient please, we will fix them soon :)
-    
-## Credits
-
-Written by Alvise Spanò, additional coding by Giulio Zausa.
-Developed for the course of Software Engeneering, degree in Computer Science, chair professor Agostino Cortesi.
-(C) 2018 Università Ca' Foscari, Venezia, Italy
+This library comes *as-is*, without any warranty of future development.
         
 ## Installation
+This project can be found on [JitPack](https://jitpack.io).
+In order to use it inside you have to include the Jitpack repository
+inside your project's `build.gradle` file with the following code
 
-Open the project on Android Studio and 2 modules will appear: the 'app' module contains a sample MainActivity showing how to use the library; the 'lib' module contains the library code. Add a dependency to the 'lib' module if you need to create your own standalone app and module.
+```
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+```
+
+After that, you can start using it inside any `build.gradle` file by
+simply writing
+
+```
+implementation 'com.github.RiccardoM:legodroid:1.0.1'
+```
+
+or, if you are using a Gradle version before Gradle 3.2
+
+```
+compile 'com.github.RiccardoM:legodroid:1.0.1'
+```
+
 
 ## Documentation
-
 The documentation is not yet available.
-Refer to the sample MainActivity code for learning how the library public API works - its usage is pretty straightforward and requires no senior expertise unless you want to delve into its internals.
+Refer to the sample MainActivity code for learning how the library
+public API works. Its usage is pretty straightforward and requires no
+senior expertise unless you want to delve into its internals.
