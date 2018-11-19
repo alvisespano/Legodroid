@@ -239,14 +239,14 @@ public class EV3 {
         A, B, C, D;
 
         public byte toBitmask() {
-            return (byte) (1 << toByteAsWrite());
+            return (byte) (1 << toByte());
         }
 
         public byte toByteAsRead() {
-            return (byte) (toByteAsWrite() | 0x10);
+            return (byte) (toByte() | 0x10);
         }
 
-        public byte toByteAsWrite() {
+        public byte toByte() {
             switch (this) {
                 case A:
                     return 0;

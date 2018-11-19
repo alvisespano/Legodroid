@@ -18,6 +18,11 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
         super(api, port);
     }
 
+    @Override
+    public void close() throws Exception {
+        stop();
+    }
+
     public Future<Float> getPosition() throws IOException {
         Future<float[]> r = api.getSiValue(port.toByteAsRead(), Const.L_MOTOR, Const.L_MOTOR_DEGREE, 1);
         return api.execAsync(() -> r.get()[0]);
@@ -97,42 +102,65 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
         return false;
     }
 
-    @Override
-    public void close() throws Exception {
-        stop();
+    public enum Type {
+        MEDIUM, LARGE;
+
+        public byte toByte() {
+            switch (this) {
+                case MEDIUM:
+                    return Const.M_MOTOR;
+                default:
+                    return Const.L_MOTOR;
+            }
+        }
+    }
+
+    public void setType(Type mt) throws IOException {
+        Bytecode bc = new Bytecode();
+        bc.addOpCode(Const.OUTPUT_SET_TYPE);
+        bc.addParameter(Const.LAYER_MASTER);
+        bc.addParameter(port.toByte());
+        bc.addParameter(mt.toByte());
+        api.sendNoReply(bc);
+        Log.d(TAG, String.format("motor type set: %s", mt));
+    }
+
+    public enum Polarity {
+        BACKWARDS, OPPOSITE, FORWARD;
+
+        public byte toByte() {
+            switch (this) {
+                case BACKWARDS:
+                    return -1;
+                case OPPOSITE:
+                    return 0;
+                default:
+                    return 1;
+            }
+        }
+    }
+
+    public void setPolarity(Polarity pol) throws IOException {
+        Bytecode bc = new Bytecode();
+        bc.addOpCode(Const.OUTPUT_SET_TYPE);
+        bc.addParameter(Const.LAYER_MASTER);
+        bc.addParameter(port.toByte());
+        bc.addParameter(pol.toByte());
+        api.sendNoReply(bc);
+        Log.d(TAG, String.format("motor polarity set: %s", pol));
     }
 
 
+    // TODO: serve davvero?
+//    public Pair<> getSpeed() {
+//        Bytecode bc = new Bytecode();
+//        bc.addOpCode(Const.OUTPUT_READ);
+//        bc.addParameter(Const.LAYER_MASTER);
+//        bc.addParameter(port.toByte());
+//        bc.addParameter(0);
+//        bc.addParameter(0);
+//        api.sendNoReply(bc);
+//        Log.d(TAG, String.format("motor polarity set: %s", pol));
+//    }
 
-    void setType() {}
-
-    void reset() {}
-
-    void stop() {}
-
-    void power() {}
-
-    void speed() {}
-
-    void start() {}
-
-    void polarity() {}
-
-    void read() {}
-
-    void test() {}
-
-    void ready() {}
-
-    void stepPower() {}
-
-    void timePower() {}
-
-    void stepSpeed() {}
-
-    void timeSpeed() {}
-
-    void stepSync() {}
-
-    void timeSync() {}
 }
