@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
         Button startButton = findViewById(R.id.startButton);
         startButton.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::legomain)));
 
-        setupEditable(R.id.powerEdit, (x) -> applyMotor((m) -> m.setPower(x)));
+        setupEditable(R.id.powerEdit, (x) -> applyMotor((m) -> { m.setPower(x); m.start(); }));
         setupEditable(R.id.speedEdit, (x) -> applyMotor((m) -> m.setSpeed(x)));
     }
 

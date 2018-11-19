@@ -28,24 +28,28 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
         return api.execAsync(() -> r.get()[0]);
     }
 
+    public Future<Float> getSpeed() throws IOException {
+        Future<float[]> r = api.getSiValue(port.toByteAsRead(), Const.L_MOTOR, Const.L_MOTOR_SPEED, 1);
+        return api.execAsync(() -> r.get()[0]);
+    }
+
+    // TODO: lo teniamo o basta la resetPosition()?
+    public void clearCount() throws IOException {
+        Bytecode bc = new Bytecode();
+        bc.addOpCode(Const.OUTPUT_CLR_COUNT);
+        bc.addParameter(Const.LAYER_MASTER);
+        bc.addParameter(port.toBitmask());
+        api.sendNoReply(bc);
+        Log.d(TAG, "motor clear count");
+    }
+
     public void resetPosition() throws IOException {
         Bytecode bc = new Bytecode();
         bc.addOpCode(Const.OUTPUT_RESET);
         bc.addParameter(Const.LAYER_MASTER);
         bc.addParameter(port.toBitmask());
         api.sendNoReply(bc);
-    }
-
-    public boolean isStalled() {
-        return false;
-    }
-
-    public void goToPositionRel(int amount) {
-        // TODO
-    }
-
-    public void goToPositionAbs(int pos) {
-        // TODO
+        Log.d(TAG, "motor reset position");
     }
 
     public void setSpeed(int speed) throws IOException {
@@ -67,7 +71,6 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
         api.sendNoReply(bc);
         Log.d(TAG, String.format("motor power set: %d", power));
     }
-
 
     public void start() throws IOException {
         Bytecode bc = new Bytecode();
@@ -96,10 +99,6 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
         bc.addParameter(Const.COAST);
         api.sendNoReply(bc);
         Log.d(TAG, "motor stop");
-    }
-
-    public boolean isMoving() { // TODO: questo non è un doppione con isStill()?
-        return false;
     }
 
     public enum Type {
@@ -150,19 +149,6 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
         Log.d(TAG, String.format("motor polarity set: %s", pol));
     }
 
-
-    // TODO: serve davvero?
-//    public Pair<> getSpeed() {
-//        Bytecode bc = new Bytecode();
-//        bc.addOpCode(Const.OUTPUT_READ);
-//        bc.addParameter(Const.LAYER_MASTER);
-//        bc.addParameter(port.toByte());
-//        bc.addParameter(0);
-//        bc.addParameter(0);
-//        api.sendNoReply(bc);
-//        Log.d(TAG, String.format("motor polarity set: %s", pol));
-//    }
-
     public void setStepPower(int power, int step1, int step2, int step3, boolean brake) throws IOException {
         Bytecode bc = new Bytecode();
         bc.addOpCode(Const.OUTPUT_STEP_POWER);
@@ -174,7 +160,7 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
         bc.addParameter(step3);
         bc.addParameter(brake ? Const.BRAKE : Const.COAST);
         api.sendNoReply(bc);
-        Log.d(TAG, "motor step power");
+        Log.d(TAG, String.format("motor step power: power=%d, step1=%d, step2=%d, step3=%d, brake=%s", power, step1, step2, step3, brake));
     }
 
     public void setTimePower(int power, int step1, int step2, int step3, boolean brake) throws IOException {
@@ -188,7 +174,7 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
         bc.addParameter(step3);
         bc.addParameter(brake ? Const.BRAKE : Const.COAST);
         api.sendNoReply(bc);
-        Log.d(TAG, "motor time power");
+        Log.d(TAG, String.format("motor time power: power=%d, step1=%d, step2=%d, step3=%d", power, step1, step2, step3));
     }
 
     public void setStepSpeed(int speed, int step1, int step2, int step3, boolean brake) throws IOException {
@@ -202,7 +188,7 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
         bc.addParameter(step3);
         bc.addParameter(brake ? Const.BRAKE : Const.COAST);
         api.sendNoReply(bc);
-        Log.d(TAG, "motor step speed");
+        Log.d(TAG, String.format("motor step speed: speed=%d, step1=%d, step2=%d, step3=%d", speed, step1, step2, step3));
     }
 
     public void setTimeSpeed(int speed, int step1, int step2, int step3, boolean brake) throws IOException {
@@ -216,7 +202,7 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
         bc.addParameter(step3);
         bc.addParameter(brake ? Const.BRAKE : Const.COAST);
         api.sendNoReply(bc);
-        Log.d(TAG, "motor time speed");
+        Log.d(TAG, String.format("motor time speed: speed=%d, step1=%d, step2=%d, step3=%d", speed, step1, step2, step3));
     }
 
     public void stepSync(int power, int turnRatio, int step, boolean brake) throws IOException {
@@ -229,7 +215,7 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
         bc.addParameter(step);
         bc.addParameter(brake ? Const.BRAKE : Const.COAST);
         api.sendNoReply(bc);
-        Log.d(TAG, "motor step sync");
+        Log.d(TAG, String.format("motor step sync: power=%d, turn=%d, step=%d, brake=%s", power, turnRatio, step, brake));
     }
 
     public void timeSync(int power, int turnRatio, int time, boolean brake) throws IOException {
@@ -242,7 +228,7 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
         bc.addParameter(time);
         bc.addParameter(brake ? Const.BRAKE : Const.COAST);
         api.sendNoReply(bc);
-        Log.d(TAG, "motor time sync");
+        Log.d(TAG, String.format("motor time sync: power=%d, turn=%d, time=%d, brake=%s", power, turnRatio, time, brake));
     }
 
 }
