@@ -32,10 +32,17 @@ import it.unive.dais.legodroid.lib.util.Consumer;
 
 import static it.unive.dais.legodroid.lib.util.Prelude.ReTAG;
 
+/**
+ * Instances of this class represent LEGO Mindstorms EV3 bricks: a program shall create one instance of this class for each physical brick it controls.
+ * An object of type AsyncChannel is required for calling the constructor, making this class instantiable only once a connection with the brick has been established.
+ */
 public class EV3 {
     private static final String TAG = ReTAG("EV3");
 
-    public class AlreadyRunningException extends ExecutionException {
+    /**
+     * Specialized exception subclass.
+     */
+    public static class AlreadyRunningException extends ExecutionException {
         public AlreadyRunningException(String msg) {
             super(msg);
         }
@@ -46,14 +53,35 @@ public class EV3 {
     @Nullable
     private AsyncTask<Void, Void, Void> task = null;
 
+    /**
+     * Main constructor.
+     *
+     * @param channel an asynchronous channel object of type AsyncChannel.
+     */
     public EV3(@NonNull AsyncChannel channel) {
         this.channel = channel;
     }
 
+    /**
+     * Facility constructor. Creates a SpooledAsyncChannel automatically with the given synchrounous channel
+     *
+     * @param channel a synchrounous channel object.
+     */
     public EV3(@NonNull Channel channel) {
         this(new SpooledAsyncChannel(channel));
     }
 
+    /**
+     * Run the given callback as the main program for the EV3 brick.
+     * The callback is a function parametric over an object of type Api and returning nothing, hence the Consumer type.
+     * Programmers can control the EV3 brick by calling methods of the Api object passed as argument.
+     * Notably, there is no other way of getting the Api object for safety reasons.
+     * The callback is executed by a worker thread, thus any operation on the UI must be delegated to runOnUiThread() invocations.
+     * Also, each EV3 instance can have at most one running task - i.e. one worker thread can be up at any given time.
+     *
+     * @param f a callback that takes a parameter of type Api and has no return type.
+     * @throws AlreadyRunningException thrown when the worker thread is already up.
+     */
     public synchronized void run(@NonNull Consumer<Api> f) throws AlreadyRunningException {
         if (task != null)
             throw new AlreadyRunningException("EV3 task is already running");
@@ -91,6 +119,13 @@ public class EV3 {
         }
     }
 
+    /**
+     * Cancel the EV3 task currently being run by the worker thread.
+     * Cancellation is not equivalent to killing the thread, it is just a software flag the task code can peek.
+     * This method is thread-safe and can be either called from the callback or from any other thread.
+     *
+     * @see #isCancelled()
+     */
     public synchronized void cancel() {
         if (task != null) {
             Log.v(TAG, "cancelling task");
@@ -98,10 +133,22 @@ public class EV3 {
         }
     }
 
+    /**
+     * Test the cancellation flag. This is meant to be called from within the EV3 task callback.
+     * @return returns true when a call to cancel() has been performed.
+     *
+     * @see #cancel()
+     */
     public synchronized boolean isCancelled() {
         return task == null || task.isCancelled();
     }
 
+    /**
+     * This class contains the operations that can be performed to control the EV3 brick.
+     * Accesing sensors, moving motors etc. are operations that can be performed only by calling methods of this class.
+     * Instances of this class cannot be created by calling a constructor: an instance can only be obtained from the argument of the callback of type
+     * {@code Consumer<Api>} passed to method {@code EV 3::run()}.
+     */
     public static class Api {
         @NonNull
         public final EV3 ev3;
@@ -110,31 +157,63 @@ public class EV3 {
             this.ev3 = ev3;
         }
 
+        /**
+         * Access the light sensor of EV3.
+         * @param port the input port where the light sensor is connected to on the brick.
+         * @return an object of type LightSensor.
+         */
         @NonNull
         public LightSensor getLightSensor(InputPort port) {
             return new LightSensor(this, port);
         }
 
+        /**
+         * Access the touch sensor of EV3.
+         * @param port the input port where the touch sensor is connected to on the brick.
+         * @return an object of type TouchSensor.
+         */
         @NonNull
         public TouchSensor getTouchSensor(InputPort port) {
             return new TouchSensor(this, port);
         }
 
+        /**
+         * Access the ultrasonic sensor of EV3.
+         * @param port the input port where the ultrasonic sensor is connected to on the brick.
+         * @return an object of type UltrasonicSensor.
+         */
         @NonNull
         public UltrasonicSensor getUltrasonicSensor(InputPort port) {
             return new UltrasonicSensor(this, port);
         }
 
+        /**
+         * Access the gyroscope sensor of EV3.
+         * @param port the input port where the gyroscope sensor is connected to on the brick.
+         * @return an object of type GyroSensor.
+         */
         @NonNull
         public GyroSensor getGyroSensor(InputPort port) {
             return new GyroSensor(this, port);
         }
 
+        /**
+         * Access the tacho motor of EV3.
+         * @param port the output port where the motor is connected to on the brick.
+         * @return an object of type TachoMotor.
+         */
         @NonNull
         public TachoMotor getTachoMotor(OutputPort port) {
             return new TachoMotor(this, port);
         }
 
+        /**
+         * Play a sound tone on the EV3 brick
+         * @param volume volume in range 
+         * @param freq
+         * @param duration
+         * @throws IOException
+         */
         public void soundTone(int volume, int freq, int duration) throws IOException {
             Bytecode bc = new Bytecode();
             bc.addOpCode(Const.SOUND_CONTROL);
