@@ -79,7 +79,7 @@ public class EV3 {
      * The callback is executed by a worker thread, thus any operation on the UI must be delegated to runOnUiThread() invocations.
      * Also, each EV3 instance can have at most one running task - i.e. one worker thread can be up at any given time.
      *
-     * @param f a callback that takes a parameter of type Api and has no return type.
+     * @param f functional object that takes a parameter of type Api and has no return type.
      * @throws AlreadyRunningException thrown when the worker thread is already up.
      */
     public synchronized void run(@NonNull Consumer<Api> f) throws AlreadyRunningException {
@@ -117,13 +117,13 @@ public class EV3 {
             }
             return null;
         }
+
     }
 
     /**
      * Cancel the EV3 task currently being run by the worker thread.
      * Cancellation is not equivalent to killing the thread, it is just a software flag the task code can peek.
      * This method is thread-safe and can be either called from the callback or from any other thread.
-     *
      * @see #isCancelled()
      */
     public synchronized void cancel() {
@@ -136,7 +136,6 @@ public class EV3 {
     /**
      * Test the cancellation flag. This is meant to be called from within the EV3 task callback.
      * @return returns true when a call to cancel() has been performed.
-     *
      * @see #cancel()
      */
     public synchronized boolean isCancelled() {
@@ -144,12 +143,18 @@ public class EV3 {
     }
 
     /**
-     * This class contains the operations that can be performed to control the EV3 brick.
+     * This inner class contains the operations that can be performed to control the EV3 brick.
      * Accesing sensors, moving motors etc. are operations that can be performed only by calling methods of this class.
-     * Instances of this class cannot be created by calling a constructor: an instance can only be obtained from the argument of the callback of type
-     * {@code Consumer<Api>} passed to method {@code EV 3::run()}.
+     * Instances of this class cannot be created by calling a constructor: an instance can only be obtained from the argument of the callback passed to method {@link #run(Consumer)}.
+     * Methods offered by this class belong to two categories: sensor and motor methods are high level operations, though users can directly send low-level
+     * commands to the EV3 brick by calling {@link #getSiValue(byte, int, int, int)} and {@link #getPercentValue(byte, int, int, int)} methods.
+     * @see #getSiValue(byte, int, int, int)
+     * @see #getPercentValue(byte, int, int, int)
      */
     public static class Api {
+        /**
+         * Public field pointing to the EV3 object.
+         */
         @NonNull
         public final EV3 ev3;
 
@@ -208,11 +213,11 @@ public class EV3 {
         }
 
         /**
-         * Play a sound tone on the EV3 brick
-         * @param volume volume in range 
-         * @param freq
-         * @param duration
-         * @throws IOException
+         * Play a sound tone on the EV3 brick.
+         * @param volume volume within the range [0 - 100].
+         * @param freq frequency in the range [ 250 - 10000 ].
+         * @param duration duration in milliseconds.
+         * @throws IOException thown when communication errors occur.
          */
         public void soundTone(int volume, int freq, int duration) throws IOException {
             Bytecode bc = new Bytecode();
@@ -243,6 +248,17 @@ public class EV3 {
             return r;
         }
 
+        /**
+         * Low level method for sending direct commands to the EV3 brick.
+         * This method sends the opInput_Device command for reading SI values according to the official EV3 Developer Kit Documentation.
+         * @param port port number.
+         * @param type type constant as defined in {@link Const}, e.g. {@link Const#EV3_TOUCH} or {@link Const#EV3_COLOR}.
+         * @param mode mode constant as defined in {@link Const}, e.g. {@link Const#COL_AMBIENT} or {@link Const#GYRO_ANGLE}.
+         * @param nvalue number of values the command expects to return in the result array.
+         * @return a future object containing an array of 32-bit floats whose length is equal to parameter {@code nvalues}.
+         * @throws IOException thrown when communication errors occur.
+         * @see <a href="http://google.com</a>https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">EV3 Developer Kit Documentation</a>
+         */
         @NonNull
         public Future<float[]> getSiValue(byte port, int type, int mode, int nvalue) throws IOException {
             Bytecode bc = prefaceGetValue(Const.READY_SI, port, type, mode, nvalue);
@@ -258,13 +274,17 @@ public class EV3 {
             });
         }
 
-        @NonNull
-        public <T> FutureTask<T> execAsync(@NonNull Callable<T> c) {
-            FutureTask<T> t = new FutureTask<>(c);
-            executor.execute(t);
-            return t;
-        }
-
+        /**
+         * Low level method for sending direct commands to the EV3 brick.
+         * This method sends the opInput_Device command for reading PCT values according to the official EV3 Developer Kit Documentation.
+         * @param port port number.
+         * @param type type constant as defined in {@link Const}, e.g. {@link Const#EV3_TOUCH} or {@link Const#EV3_COLOR}.
+         * @param mode mode constant as defined in {@link Const}, e.g. {@link Const#COL_AMBIENT} or {@link Const#GYRO_ANGLE}.
+         * @param nvalue number of values the command expects to return in the result array.
+         * @return a future object containing an array of 16-bit integers whose length is equal to parameter {@code nvalues}.
+         * @throws IOException thrown when communication errors occur.
+         * @see <a href="http://google.com</a>https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">EV3 Developer Kit Documentation</a>
+         */
         @NonNull
         public Future<short[]> getPercentValue(byte port, int type, int mode, int nvalue) throws IOException {
             Bytecode bc = prefaceGetValue(Const.READY_PCT, port, type, mode, nvalue);
@@ -281,18 +301,69 @@ public class EV3 {
             });
         }
 
+        /**
+         * Low level method to execute the callback passed as argument within an Android {@link FutureTask}.
+         * The {@link Executor} in charge of the executing the function the is a builtin single-threaded executor.
+         * @param c functional object of type {@link Callable}.
+         * @param <T> the return type of the callback.
+         * @return a {@link FutureTask} object hosting the result of type {@code T}.
+        */
+        @NonNull
+        public <T> FutureTask<T> execAsync(@NonNull Callable<T> c) {
+            FutureTask<T> t = new FutureTask<>(c);
+            executor.execute(t);
+            return t;
+        }
+
+        /**
+         * Low level send command with reply.
+         * @param reservation global reservation for the result in bytes.
+         * @param bc object of type {@link Bytecode} representing the command to be sent.
+         * @return a {@link Future} object hosting the {@link Reply} object wrapping the reply by EV3.
+         * @throws IOException thrown when communication errors occur.
+         * @see <a href="http://google.com</a>https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">EV3 Developer Kit Documentation</a>
+         */
         public Future<Reply> send(int reservation, @NonNull Bytecode bc) throws IOException {
             return ev3.channel.send(reservation, bc);
         }
 
-        public void sendNoReply(Bytecode bytecode) throws IOException {
-            ev3.channel.sendNoReply(bytecode);
+        /**
+         * Low level send command with no reply.
+         * @param bc object of type {@link Bytecode} representing the command to be sent.
+         * @throws IOException thrown when communication errors occur.
+         * @see <a href="http://google.com</a>https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">EV3 Developer Kit Documentation</a>
+         */
+        public void sendNoReply(Bytecode bc) throws IOException {
+            ev3.channel.sendNoReply(bc);
         }
     }
 
+    /**
+     * This enum type represents the 4 physical input ports on the EV3 brick.
+     */
     public enum InputPort {
-        _1, _2, _3, _4;
+        /**
+         * Input port 1
+         */
+        _1,
+        /**
+         * Input port 2
+         */
+        _2,
+        /**
+         * Input port 3
+         */
+        _3,
+        /**
+         * Input port 4
+         */
+        _4;
 
+        /**
+         * Encode the input port into a byte for use with {@link Api#getPercentValue(byte, int, int, int)} and {@link Api#getSiValue(byte, int, int, int)}.
+         * @return a byte according to the encoding defined by the EV3 Developer Kit Documentation.
+         * @see <a href="http://google.com</a>https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">EV3 Developer Kit Documentation</a>
+         */
         public byte toByte() {
             switch (this) {
                 case _1:
@@ -314,17 +385,51 @@ public class EV3 {
         }
     }
 
+    /**
+     * This enum type represents the 4 physical output ports on the EV3 brick.
+     */
     public enum OutputPort {
-        A, B, C, D;
+        /**
+         * Output port A
+         */
+        A,
+        /**
+         * Output port B
+         */
+        B,
+        /**
+         * Output port C
+         */
+        C,
+        /**
+         * Output port D
+         */
+        D;
 
+        /**
+         * Encode the output port as a bit mask for certain EV3 direct commands that require the bitmask format as parameter.
+         * @return a byte with the bit mask.
+         * @see <a href="http://google.com</a>https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">EV3 Developer Kit Documentation</a>
+         */
         public byte toBitmask() {
             return (byte) (1 << toByte());
         }
 
+        /**
+         * Encode the output port into a byte for use with {@link Api#getPercentValue(byte, int, int, int)} and {@link Api#getSiValue(byte, int, int, int)}.
+         * Using output ports for read operations is possible, though a special encoding is needed according to the EV3 Developer Kit Documentation - this is provided by this method.
+         * @return a byte according to the encoding defined by the EV3 Developer Kit Documentation.
+         * @see <a href="http://google.com</a>https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">EV3 Developer Kit Documentation</a>
+         */
         public byte toByteAsRead() {
             return (byte) (toByte() | 0x10);
         }
 
+        /**
+         * Encode the output port into a byte for use with {@link Api#getPercentValue(byte, int, int, int)} and {@link Api#getSiValue(byte, int, int, int)}.
+         * @return a byte according to the encoding defined by the EV3 Developer Kit Documentation.
+         * @see <a href="http://google.com</a>https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">EV3 Developer Kit Documentation</a>
+         */
         public byte toByte() {
             switch (this) {
                 case A:

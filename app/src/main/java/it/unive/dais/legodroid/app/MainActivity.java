@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
             setupEditable(R.id.powerEdit, (x) -> applyMotor((m) -> {
                 m.setPower(x);
-                m.start();  // setPower() and setSpeed() require call to start() afterwards
+                m.start();      // setPower() and setSpeed() require call to start() afterwards
             }));
             setupEditable(R.id.speedEdit, (x) -> applyMotor((m) -> {
                 m.setSpeed(x);
