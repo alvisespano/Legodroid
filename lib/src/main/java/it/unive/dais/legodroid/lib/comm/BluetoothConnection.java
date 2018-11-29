@@ -18,7 +18,12 @@ import it.unive.dais.legodroid.lib.util.Prelude;
 
 import static it.unive.dais.legodroid.lib.util.Prelude.ReTAG;
 
-public class BluetoothConnection implements Connection {
+/**
+ * This class implements a {@link Connection} between the Android device and the EV3 via the Bluetooth protocol.
+ * Instances of this class do not represent an active connection but rather a factory for creating the actual connection channel.
+ * The type of the channel is the inner class {@link BluetoothChannel}.
+ */
+public class BluetoothConnection implements Connection<BluetoothConnection.BluetoothChannel> {
     private static final String TAG = ReTAG("BluetoothConnection");
     private static final long READ_TIMEOUT_MS = 10000;
 
@@ -31,10 +36,22 @@ public class BluetoothConnection implements Connection {
     @Nullable
     private BluetoothSocket socket = null;
 
+    /**
+     * Create an object given the name of the EV3 device, as configured on the brick settings.
+     * @param name the name of the EV3 device. LEGO factory settings default to "EV3".
+     */
     public BluetoothConnection(@NonNull String name) {
         this.name = name;
     }
 
+    /**
+     * Create a channel for communication.
+     * Multiple calls to this method do not produce multiple channels: only one active channel is supported.
+     * This method internally performs the bluetooth discovery, searching among paired devices for the device whose name has been passed as argument to the constructor.
+     * @apiNote The EV3 device must be first paired with the mobile Android device; refer to the device Bluetooth settings for more info.
+     * @return an object of type {@link BluetoothChannel}.
+     * @throws IOException thrown when communication errors occur.
+     */
     @NonNull
     @Override
     public BluetoothChannel connect() throws IOException {
@@ -59,19 +76,10 @@ public class BluetoothConnection implements Connection {
         return new BluetoothChannel(socket);
     }
 
-    @Override
-    public void disconnect() throws IOException {
-        if (socket != null) {
-            Log.v(TAG, String.format("bluetooth disconnected from device '%s'", Objects.requireNonNull(device).getName()));
-            socket.close();
-        }
-    }
-
-    @Override
-    public void close() throws Exception {
-        disconnect();
-    }
-
+    /**
+     * This inner non-static class represents an active bluetooth channel through which the two connected devices communicate sending commands and receiving replies.
+     * @see Channel
+     */
     public class BluetoothChannel implements Channel {
         private final String TAG = ReTAG(BluetoothConnection.TAG, ".BluetoothChannel");
         @NonNull
@@ -85,20 +93,20 @@ public class BluetoothConnection implements Connection {
         }
 
         @Override
-        public void write(@NonNull Command p) throws IOException {
+        public void send(@NonNull Command p) throws IOException {
             byte[] a = p.marshal();
             byte[] l = new byte[]{(byte) (a.length & 0xFF), (byte) ((a.length >> 8) & 0xFF)};
             byte[] w = Prelude.concat(l, a);
-//            Log.d(TAG, String.format("write: { %s }", Prelude.bytesToHex(w)));
+//            Log.d(TAG, String.format("send: { %s }", Prelude.bytesToHex(w)));
             out.write(w);
         }
 
         @NonNull
         @Override
-        public Reply read() throws IOException {
+        public Reply receive() throws IOException {
             byte[] lb = readSized(2);
             int len = ((lb[1] & 0xff) << 8) | (lb[0] & 0xff);
-//            Log.d(TAG, String.format("read len = %d", len));
+//            Log.d(TAG, String.format("receive len = %d", len));
             return new Reply(readSized(len));
         }
 
@@ -109,14 +117,17 @@ public class BluetoothConnection implements Connection {
             while (off < size) {
 //                Log.d(TAG, "reading...");
                 off += in.read(r, off, size - off);
-//                Log.d(TAG, String.format("read: %s", Prelude.bytesToHex(r)));
+//                Log.d(TAG, String.format("receive: %s", Prelude.bytesToHex(r)));
             }
             return r;
         }
 
         @Override
-        public void close() throws Exception {
-            disconnect();
+        public void close() throws IOException {
+            if (socket != null) {
+                Log.v(TAG, String.format("bluetooth disconnected from device '%s'", Objects.requireNonNull(device).getName()));
+                socket.close();
+            }
         }
     }
 

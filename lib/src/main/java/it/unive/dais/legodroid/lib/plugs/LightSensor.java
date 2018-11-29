@@ -71,9 +71,9 @@ public class LightSensor extends AbstractSensor {
 
         /**
          * Create an object given the 3 integer values for each color component.
-         * @param R
-         * @param G
-         * @param B
+         * @param R 8-bit red component in range [ 0 - 255 ]
+         * @param G 8-bit red component in range [ 0 - 255 ]
+         * @param B 8-bit red component in range [ 0 - 255 ]
          */
         public Rgb(int R, int G, int B) {
             this.R = R;
@@ -90,7 +90,8 @@ public class LightSensor extends AbstractSensor {
         }
 
         /**
-         * Calculate the ARGB 32-bit color value (8 bits for each component, including alpha channel).
+         * Calculate the ARGB 32-bit color value (four 8-bit components, including alpha channel).
+         * Alpha channel defaults to 255 for maximum opaqueness.
          * @return the ARGB32 value as an integer.
          */
         public int toARGB32() {

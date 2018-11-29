@@ -417,7 +417,7 @@ public class EV3 {
 
         /**
          * Encode the output port into a byte for use with {@link Api#getPercentValue(byte, int, int, int)} and {@link Api#getSiValue(byte, int, int, int)}.
-         * Using output ports for read operations is possible, though a special encoding is needed according to the EV3 Developer Kit Documentation - this is provided by this method.
+         * Using output ports for receive operations is possible, though a special encoding is needed according to the EV3 Developer Kit Documentation - this is provided by this method.
          * @return a byte according to the encoding defined by the EV3 Developer Kit Documentation.
          * @see <a href="http://google.com</a>https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">EV3 Developer Kit Documentation</a>
          */

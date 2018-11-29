@@ -16,6 +16,7 @@ This library is in alpha stage of development: minor bugs and quirks might occur
 
 Written by Alvise Spanò, additional coding by Giulio Zausa.
 Developed for the course of Software Engeneering, degree in Computer Science, chair professor Agostino Cortesi.
+Documentation written by Alvise Spanò.
 (C) 2018 Università Ca' Foscari, Venezia, Italy
         
 ## Installation
@@ -24,5 +25,5 @@ Open the project on Android Studio and 2 modules will appear: the 'app' module c
 
 ## Documentation
 
-The documentation is not yet available.
-Refer to the sample MainActivity code for learning how the library public API works - its usage is pretty straightforward and requires no senior expertise unless you want to delve into its internals.
+The documentation is available as javadoc. Refer to the doc directory for pre-generated html.
+Also, the project includes a sample MainActivity aimed at showing how the library public API works - its usage is pretty straightforward and requires no senior expertise unless you want to delve into its internals.

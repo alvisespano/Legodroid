@@ -18,6 +18,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import static it.unive.dais.legodroid.lib.util.Prelude.ReTAG;
 
+/**
+ * This class implements an asynchronous channel that sends commands and receives replies via a spooler thread.
+ */
 public class SpooledAsyncChannel implements AsyncChannel {
 
     @NonNull
@@ -62,7 +65,7 @@ public class SpooledAsyncChannel implements AsyncChannel {
             @Nullable Throwable last = null;
             while (!isCancelled()) {
                 try {
-                    Reply r = channel.read();
+                    Reply r = channel.receive();
                     synchronized (q) {
                         for (FutureReply t : q) {
                             if (t.id == r.getCounter()) {
@@ -82,8 +85,7 @@ public class SpooledAsyncChannel implements AsyncChannel {
                             cause = String.format("max retries (%d) reached for exception %s", MAX_RETRIES, e.getMessage());
                             break;
                         }
-                    }
-                    else retries = MAX_RETRIES;
+                    } else retries = MAX_RETRIES;
                     last = e;
                 }
             }
@@ -92,7 +94,14 @@ public class SpooledAsyncChannel implements AsyncChannel {
         }
     }
 
-    public class FutureReply implements Future<Reply> {
+    /**
+     * This class implements a {@link Future} over a {@link Reply} object specifically tailored for the {@link SpooledAsyncChannel} outer class.
+     * Access is thread-safe and the hosted reply is <b>stored once</b> and returned at each call of the {@link #get()} method.
+     * Calls to {@link #get()} and {@link #get(long, TimeUnit)} are <b>blocking</b> when the reply is yet to be received; subsequent calls return immediately.
+     * Cancellation is not supported.
+     * @see Future
+     */
+    public static class FutureReply implements Future<Reply> {
         private static final long GET_MAX_TIMEOUT_MS = 5000;
         private final int id;
         @NonNull
@@ -101,12 +110,13 @@ public class SpooledAsyncChannel implements AsyncChannel {
         private final Condition cond = lock.newCondition();
         @Nullable
         private Reply reply = null;
+        private boolean waiting;
 
         public FutureReply(int id) {
             this.id = id;
         }
 
-        private void setReply(Reply r) {
+        private void setReply(@Nullable Reply r) {
             lock.lock();
             try {
                 reply = r;
@@ -160,7 +170,7 @@ public class SpooledAsyncChannel implements AsyncChannel {
     @Override
     @NonNull
     public FutureReply send(@NonNull Command cmd) throws IOException {
-        channel.write(cmd);
+        channel.send(cmd);
         FutureReply r = new FutureReply(cmd.getCounter());
         q.add(r);
         return r;
@@ -174,7 +184,7 @@ public class SpooledAsyncChannel implements AsyncChannel {
 
     @Override
     public void sendNoReply(@NonNull Bytecode bc) throws IOException {
-        channel.write(new Command(false, 0, 0, bc.getBytes()));
+        channel.send(new Command(false, 0, 0, bc.getBytes()));
     }
 
 
