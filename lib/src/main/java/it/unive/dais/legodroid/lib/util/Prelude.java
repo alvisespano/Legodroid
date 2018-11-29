@@ -5,6 +5,9 @@ import android.util.Log;
 
 import java.util.Arrays;
 
+/**
+ * This class provides miscellaneous utilities.
+ */
 public class Prelude {
     private static final String TAG_BASE = "Legodroid";
     public static final String TAG = ReTAG("Prelude");
@@ -37,6 +40,10 @@ public class Prelude {
         return new String(hexChars);
     }
 
+    /**
+     * Call a runnable that can throw an exception and trap the invocation surrounding it with a try-catch block.
+     * @param r the object of type {@link ThrowingRunnable}.
+     */
     public static void trap(ThrowingRunnable<Throwable> r) {
         try {
             r.run();

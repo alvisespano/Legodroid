@@ -123,10 +123,10 @@ public class BluetoothConnection implements Connection<BluetoothConnection.Bluet
         }
 
         @Override
-        public void close() throws IOException {
+        public void close() {
             if (socket != null) {
                 Log.v(TAG, String.format("bluetooth disconnected from device '%s'", Objects.requireNonNull(device).getName()));
-                socket.close();
+                Prelude.trap(socket::close);
             }
         }
     }

@@ -20,6 +20,8 @@ import static it.unive.dais.legodroid.lib.util.Prelude.ReTAG;
 
 /**
  * This class implements an asynchronous channel that sends commands and receives replies via a spooler thread.
+ *
+ * @see AsyncChannel
  */
 public class SpooledAsyncChannel implements AsyncChannel {
 
@@ -30,6 +32,11 @@ public class SpooledAsyncChannel implements AsyncChannel {
     @NonNull
     private final SpoolerTask task;
 
+    /**
+     * Create an asynchronous channel given a synchrounous channel.
+     *
+     * @param channel a synchrounous channel.
+     */
     public SpooledAsyncChannel(@NonNull Channel channel) {
         this.channel = channel;
         this.task = new SpoolerTask(channel, q);
@@ -50,7 +57,7 @@ public class SpooledAsyncChannel implements AsyncChannel {
         @NonNull
         private final List<FutureReply> q;
 
-        public SpoolerTask(@NonNull Channel ch, @NonNull List<FutureReply> q) {
+        private SpoolerTask(@NonNull Channel ch, @NonNull List<FutureReply> q) {
             this.channel = ch;
             this.q = q;
         }
@@ -99,6 +106,7 @@ public class SpooledAsyncChannel implements AsyncChannel {
      * Access is thread-safe and the hosted reply is <b>stored once</b> and returned at each call of the {@link #get()} method.
      * Calls to {@link #get()} and {@link #get(long, TimeUnit)} are <b>blocking</b> when the reply is yet to be received; subsequent calls return immediately.
      * Cancellation is not supported.
+     *
      * @see Future
      */
     public static class FutureReply implements Future<Reply> {
@@ -112,7 +120,7 @@ public class SpooledAsyncChannel implements AsyncChannel {
         private Reply reply = null;
         private boolean waiting;
 
-        public FutureReply(int id) {
+        private FutureReply(int id) {
             this.id = id;
         }
 
@@ -126,16 +134,34 @@ public class SpooledAsyncChannel implements AsyncChannel {
             }
         }
 
+        /**
+         * Attempt at cancelling the blocking wait performed by {@link #get(long, TimeUnit)} and {@link #get()}.
+         *
+         * @param b may interrupt.
+         * @return always false.
+         * @implNote Cancellation is not supported.
+         */
         @Override
         public boolean cancel(boolean b) {
             return false;
         }
 
+        /**
+         * Tests if wait has been cancelled
+         *
+         * @return always false.
+         * @implNote Cancellation is not supported.
+         */
         @Override
         public boolean isCancelled() {
             return false;
         }
 
+        /**
+         * Check whether the future hosts the internal reply.
+         *
+         * @return true when the reply has been stored.
+         */
         @Override
         public boolean isDone() {
             lock.lock();
@@ -146,12 +172,28 @@ public class SpooledAsyncChannel implements AsyncChannel {
             }
         }
 
+        /**
+         * Get the reply with the default timeout (5 seconds).
+         * This method is <b>blocking</b> when the reply is yet to be received; subsequent calls return immediately.
+         *
+         * @return the {@link Reply} object.
+         * @throws InterruptedException thrown when interrupted.
+         */
         @Override
         @NonNull
         public Reply get() throws InterruptedException {
             return get(GET_MAX_TIMEOUT_MS, TimeUnit.MILLISECONDS);
         }
 
+        /**
+         * Get the reply with the given timeout.
+         * This method is <b>blocking</b> when the reply is yet to be received; subsequent calls return immediately.
+         *
+         * @param l        amount of time units to wait.
+         * @param timeUnit the time unit.
+         * @return the {@link Reply} object.
+         * @throws InterruptedException thrown when interrupted.
+         */
         @NonNull
         @Override
         public Reply get(long l, @NonNull TimeUnit timeUnit) throws InterruptedException {
@@ -186,6 +228,5 @@ public class SpooledAsyncChannel implements AsyncChannel {
     public void sendNoReply(@NonNull Bytecode bc) throws IOException {
         channel.send(new Command(false, 0, 0, bc.getBytes()));
     }
-
 
 }

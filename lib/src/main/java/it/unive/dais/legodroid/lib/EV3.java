@@ -250,14 +250,14 @@ public class EV3 {
 
         /**
          * Low level method for sending direct commands to the EV3 brick.
-         * This method sends the opInput_Device command for reading SI values according to the official EV3 Developer Kit Documentation.
+         * This method sends the opInput_Device command READY_SI according to the official EV3 Developer Kit Documentation.
          * @param port port number.
          * @param type type constant as defined in {@link Const}, e.g. {@link Const#EV3_TOUCH} or {@link Const#EV3_COLOR}.
          * @param mode mode constant as defined in {@link Const}, e.g. {@link Const#COL_AMBIENT} or {@link Const#GYRO_ANGLE}.
          * @param nvalue number of values the command expects to return in the result array.
          * @return a future object containing an array of 32-bit floats whose length is equal to parameter {@code nvalues}.
          * @throws IOException thrown when communication errors occur.
-         * @see <a href="http://google.com</a>https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">EV3 Developer Kit Documentation</a>
+         * @see <a href="https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">LEGO Mindstorms EV3 Firmware Developer Kit</a>
          */
         @NonNull
         public Future<float[]> getSiValue(byte port, int type, int mode, int nvalue) throws IOException {
@@ -276,14 +276,14 @@ public class EV3 {
 
         /**
          * Low level method for sending direct commands to the EV3 brick.
-         * This method sends the opInput_Device command for reading PCT values according to the official EV3 Developer Kit Documentation.
+         * This method sends the opInput_Device command READY_PCT according to the official EV3 Developer Kit Documentation.
          * @param port port number.
          * @param type type constant as defined in {@link Const}, e.g. {@link Const#EV3_TOUCH} or {@link Const#EV3_COLOR}.
          * @param mode mode constant as defined in {@link Const}, e.g. {@link Const#COL_AMBIENT} or {@link Const#GYRO_ANGLE}.
          * @param nvalue number of values the command expects to return in the result array.
          * @return a future object containing an array of 16-bit integers whose length is equal to parameter {@code nvalues}.
          * @throws IOException thrown when communication errors occur.
-         * @see <a href="http://google.com</a>https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">EV3 Developer Kit Documentation</a>
+         * @see <a href="https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">LEGO Mindstorms EV3 Firmware Developer Kit</a>
          */
         @NonNull
         public Future<short[]> getPercentValue(byte port, int type, int mode, int nvalue) throws IOException {
@@ -300,6 +300,8 @@ public class EV3 {
                 return result;
             });
         }
+
+        // TODO: fare la getRawValue() per i mandare opInput_Device col comando READY_RAW; e riprovare poi la lettura dell'RGB come raw
 
         /**
          * Low level method to execute the callback passed as argument within an Android {@link FutureTask}.
@@ -321,7 +323,7 @@ public class EV3 {
          * @param bc object of type {@link Bytecode} representing the command to be sent.
          * @return a {@link Future} object hosting the {@link Reply} object wrapping the reply by EV3.
          * @throws IOException thrown when communication errors occur.
-         * @see <a href="http://google.com</a>https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">EV3 Developer Kit Documentation</a>
+         * @see <a href="https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">LEGO Mindstorms EV3 Firmware Developer Kit</a>
          */
         public Future<Reply> send(int reservation, @NonNull Bytecode bc) throws IOException {
             return ev3.channel.send(reservation, bc);
@@ -331,7 +333,7 @@ public class EV3 {
          * Low level send command with no reply.
          * @param bc object of type {@link Bytecode} representing the command to be sent.
          * @throws IOException thrown when communication errors occur.
-         * @see <a href="http://google.com</a>https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">EV3 Developer Kit Documentation</a>
+         * @see <a href="https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">LEGO Mindstorms EV3 Firmware Developer Kit</a>
          */
         public void sendNoReply(Bytecode bc) throws IOException {
             ev3.channel.sendNoReply(bc);
@@ -362,7 +364,7 @@ public class EV3 {
         /**
          * Encode the input port into a byte for use with {@link Api#getPercentValue(byte, int, int, int)} and {@link Api#getSiValue(byte, int, int, int)}.
          * @return a byte according to the encoding defined by the EV3 Developer Kit Documentation.
-         * @see <a href="http://google.com</a>https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">EV3 Developer Kit Documentation</a>
+         * @see <a href="https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">LEGO Mindstorms EV3 Firmware Developer Kit</a>
          */
         public byte toByte() {
             switch (this) {
