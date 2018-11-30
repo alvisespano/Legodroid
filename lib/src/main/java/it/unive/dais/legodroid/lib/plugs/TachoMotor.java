@@ -37,7 +37,7 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
     /**
      * Get the current position of the motor in tacho ticks.
      *
-     * @return the current position of the motor in tacho ticks as float.
+     * @return the current position of the motor in tacho ticks.
      * @throws IOException thrown when communication errors occur.
      */
     public Future<Float> getPosition() throws IOException {
@@ -47,8 +47,10 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
 
     /**
      * Get the current speed of the motor.
+     * Returns the current motor speed in tacho counts per second.
+     * Note, this is not necessarily degrees (although it is for LEGO motors).
      *
-     * @return the current position of the motor in tacho ticks as float.
+     * @return the current motor speed in tacho counts per second.
      * @throws IOException thrown when communication errors occur.
      */
     public Future<Float> getSpeed() throws IOException {
