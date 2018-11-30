@@ -451,6 +451,8 @@ public class EV3 {
         public String toString() {
             return String.format("Out/%s", super.toString());
         }
+
+        // TODO: implementare il comando opOutput_Test che verifica se le output port sono occupate
     }
 
 }

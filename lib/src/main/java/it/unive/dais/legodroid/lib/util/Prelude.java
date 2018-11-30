@@ -42,6 +42,7 @@ public class Prelude {
 
     /**
      * Call a runnable that can throw an exception and trap the invocation surrounding it with a try-catch block.
+     *
      * @param r the object of type {@link ThrowingRunnable}.
      */
     public static void trap(ThrowingRunnable<Throwable> r) {
