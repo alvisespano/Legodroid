@@ -256,7 +256,7 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
         Bytecode bc = new Bytecode();
         bc.addOpCode(Const.OUTPUT_POLARITY);
         bc.addParameter(Const.LAYER_MASTER);
-        bc.addParameter(port.toByte());
+        bc.addParameter(port.toBitmask());
         bc.addParameter(pol.toByte());
         api.sendNoReply(bc);
         Log.d(TAG, String.format("motor polarity set: %s", pol));
