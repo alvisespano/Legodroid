@@ -154,6 +154,12 @@ public class MainActivity extends AppCompatActivity {
                     Future<Float> speed = motor.getSpeed();
                     updateStatus(motor, "motor speed", speed.get());
 
+                    motor.setStepSpeed(20, 0, 5000, 0, true);
+                    motor.waitCompletion();
+                    motor.setStepSpeed(-20, 0, 5000, 0, true);
+                    Log.d(TAG, "waiting for long motor operation completed...");
+                    motor.waitUntilReady();
+                    Log.d(TAG, "long motor operation completed");
 
                 } catch (IOException | InterruptedException | ExecutionException e) {
                     e.printStackTrace();

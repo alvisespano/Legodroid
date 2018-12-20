@@ -10,8 +10,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -110,7 +112,7 @@ public class SpooledAsyncChannel implements AsyncChannel {
      * @see Future
      */
     public static class FutureReply implements Future<Reply> {
-        private static final long GET_MAX_TIMEOUT_MS = 5000;
+        private static final long GET_MAX_TIMEOUT_MS = 30000;
         private final int id;
         @NonNull
         private final Lock lock = new ReentrantLock();
@@ -173,7 +175,7 @@ public class SpooledAsyncChannel implements AsyncChannel {
         }
 
         /**
-         * Get the reply with the default timeout (5 seconds).
+         * Get the reply with the default timeout (30 seconds).
          * This method is <b>blocking</b> when the reply is yet to be received; subsequent calls return immediately.
          *
          * @return the {@link Reply} object.
@@ -181,8 +183,12 @@ public class SpooledAsyncChannel implements AsyncChannel {
          */
         @Override
         @NonNull
-        public Reply get() throws InterruptedException {
-            return get(GET_MAX_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        public Reply get() throws InterruptedException, ExecutionException {
+            try {
+                return get(GET_MAX_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+            } catch (TimeoutException e) {
+                throw new ExecutionException(e);
+            }
         }
 
         /**
@@ -196,12 +202,12 @@ public class SpooledAsyncChannel implements AsyncChannel {
          */
         @NonNull
         @Override
-        public Reply get(long l, @NonNull TimeUnit timeUnit) throws InterruptedException {
+        public Reply get(long l, @NonNull TimeUnit timeUnit) throws InterruptedException, TimeoutException {
             lock.lock();
             try {
                 if (reply == null)
                     cond.await(l, timeUnit);
-                assert reply != null;
+                if (reply == null) throw new TimeoutException(String.format("FutureReply.get() timed out (%d %s)", l, timeUnit));
                 return reply;
             } finally {
                 lock.unlock();

@@ -6,9 +6,11 @@ import android.util.Log;
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.comm.Bytecode;
 import it.unive.dais.legodroid.lib.comm.Const;
+import it.unive.dais.legodroid.lib.comm.Reply;
 import it.unive.dais.legodroid.lib.util.Prelude;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 // TODO: write more details in the javadoc of these methods
@@ -72,6 +74,46 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
         bc.addParameter(port.toBitmask());
         api.sendNoReply(bc);
         Log.d(TAG, "motor clear count");
+    }
+
+    /**
+     * Tests whether the motor is busy or not.
+     *
+     * @throws IOException thrown when communication errors occur.
+     */
+    public Future<Boolean> isBusy() throws IOException {
+        Bytecode bc = new Bytecode();
+        bc.addOpCode(Const.OUTPUT_TEST);
+        bc.addParameter(Const.LAYER_MASTER);
+        bc.addParameter(port.toBitmask());
+        Future<Reply> r = api.send(1, bc);
+        Log.d(TAG, "motor is busy");
+        return api.execAsync(() -> r.get().getData()[0] != 0);
+    }
+
+    /**
+     * Wait until the motor is ready.
+     * This method blocks the caller thread.
+     *
+     * @throws IOException thrown when communication errors occur.
+     */
+    public void waitUntilReady() throws IOException, ExecutionException, InterruptedException {
+        while (isBusy().get()) waitCompletion();
+    }
+
+    /**
+     * Make the EV3 wait until the current command has been completed.
+     * This method is NOT blocking the caller thread.
+     *
+     * @throws IOException thrown when communication errors occur.
+     */
+    public void waitCompletion() throws IOException {
+        Bytecode bc = new Bytecode();
+        bc.addOpCode(Const.OUTPUT_READY);
+        bc.addParameter(Const.LAYER_MASTER);
+        bc.addParameter(port.toBitmask());
+        api.sendNoReply(bc);
+        Log.d(TAG, "motor wait until ready");
     }
 
     /**
