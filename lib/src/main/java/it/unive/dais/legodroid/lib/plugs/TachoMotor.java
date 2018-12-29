@@ -97,8 +97,15 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
      *
      * @throws IOException thrown when communication errors occur.
      */
-    public void waitUntilReady() throws IOException, ExecutionException, InterruptedException {
-        while (isBusy().get()) waitCompletion();
+     public void waitUntilReady() throws IOException, ExecutionException, InterruptedException {
+        while (isBusy().get()) {
+            if (isBusy().get()) {
+                Log.d(TAG, "motor ready");
+                break;
+            } else {
+                waitCompletion();
+            }
+        }
     }
 
     /**
