@@ -45,12 +45,22 @@ public class Prelude {
      *
      * @param r the object of type {@link ThrowingRunnable}.
      */
-    public static void trap(ThrowingRunnable<Throwable> r) {
+    public static void trap(ThrowingRunnable<? extends Throwable> r) {
         try {
             r.run();
         } catch (Throwable e) {
             Log.e(TAG, String.format("exception trapped: %s", e));
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Call a ThrowingConsumer with the given argument of type T.
+     * @param c the ThrowingConsumer picking an argument of type T.
+     * @param x the argument of type T to be applied.
+     * @param <T> automatically inferred local generic.
+     */
+    public static <T> void trap(ThrowingConsumer<T, ? extends Throwable> c, T x) {
+        trap(() -> { c.call(x); });
     }
 }
