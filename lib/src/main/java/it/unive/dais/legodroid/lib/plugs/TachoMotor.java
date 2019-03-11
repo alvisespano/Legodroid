@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import it.unive.dais.legodroid.lib.EV3;
+import it.unive.dais.legodroid.lib.GenEV3;
 import it.unive.dais.legodroid.lib.comm.Bytecode;
 import it.unive.dais.legodroid.lib.comm.Const;
 import it.unive.dais.legodroid.lib.comm.Reply;
@@ -16,18 +17,18 @@ import java.util.concurrent.Future;
 // TODO: write more details in the javadoc of these methods
 
 /**
- * This class offers methods for controlling the tacho motor of EV3 devices.
+ * This class offers methods for controlling the tacho motor of GenEV3 devices.
  */
-public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
+public class TachoMotor extends Plug<GenEV3.OutputPort> implements AutoCloseable {
     private static final String TAG = Prelude.ReTAG("TachoMotor");
 
     /**
      * Constructor.
      *
-     * @param api  the object of type {@link it.unive.dais.legodroid.lib.EV3.Api}.
+     * @param api  the object of type {@link EV3.Api}.
      * @param port the output port.
      */
-    public TachoMotor(@NonNull EV3.Api api, EV3.OutputPort port) {
+    public TachoMotor(@NonNull EV3.Api api, GenEV3.OutputPort port) {
         super(api, port);
     }
 
@@ -109,7 +110,7 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
     }
 
     /**
-     * Make the EV3 wait until the current command has been completed.
+     * Make the GenEV3 wait until the current command has been completed.
      * This method is NOT blocking the caller thread.
      *
      * @throws IOException thrown when communication errors occur.
@@ -219,11 +220,11 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
      */
     public enum Type {
         /**
-         * Medium motor: the small ones, e.g. EV3 Medium Servo motor
+         * Medium motor: the small ones, e.g. GenEV3 Medium Servo motor
          */
         MEDIUM,
         /**
-         * Large motor: the standard ones, e.g. EV3 Large Servo Motor.
+         * Large motor: the standard ones, e.g. GenEV3 Large Servo Motor.
          */
         LARGE;
 

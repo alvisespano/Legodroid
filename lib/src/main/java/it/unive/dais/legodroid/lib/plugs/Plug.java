@@ -18,7 +18,7 @@ public abstract class Plug<Port> {
     /**
      * Constructor.
      *
-     * @param api  the {@link it.unive.dais.legodroid.lib.EV3.Api} object.
+     * @param api  the {@link EV3.Api} object.
      * @param port the port of type {@link Port}.
      */
     protected Plug(@NonNull EV3.Api api, @NonNull Port port) {

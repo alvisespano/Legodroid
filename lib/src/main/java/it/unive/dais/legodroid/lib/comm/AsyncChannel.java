@@ -22,9 +22,9 @@ public interface AsyncChannel extends AutoCloseable {
 
     /**
      * Send a {@link Command} asynchronously and returns a future object hosting the {@link Reply} object.
-     * Can specify the global reservation for the command on the EV3 side.
+     * Can specify the global reservation for the command on the GenEV3 side.
      *
-     * @param reservation number of bytes for the global reservation on the EV3.
+     * @param reservation number of bytes for the global reservation on the GenEV3.
      * @param bc          object of type Bytecode with the command.
      * @return the future object hossting the reply.
      * @throws IOException thrown when communication errors occur.

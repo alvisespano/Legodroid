@@ -20,6 +20,7 @@ import java.util.concurrent.Future;
 
 import it.unive.dais.appu.R;
 import it.unive.dais.legodroid.lib.EV3;
+import it.unive.dais.legodroid.lib.GenEV3;
 import it.unive.dais.legodroid.lib.comm.BluetoothConnection;
 import it.unive.dais.legodroid.lib.plugs.GyroSensor;
 import it.unive.dais.legodroid.lib.plugs.LightSensor;
@@ -69,6 +70,16 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private static class CustomApi extends EV3.Api {
+
+        private CustomApi(@NonNull GenEV3<? extends EV3.Api> ev3) {
+            super(ev3);
+        }
+
+        public void myspecialmethod() {
+        }
+    }
+
     // quick wrapper for accessing field 'motor' only when not-null; also ignores any exception thrown
     private void applyMotor(@NonNull ThrowingConsumer<TachoMotor, Throwable> f) {
         if (motor != null)
@@ -82,16 +93,20 @@ public class MainActivity extends AppCompatActivity {
         textView = findViewById(R.id.textView);
 
         try {
+            BluetoothConnection.BluetoothChannel conn = new BluetoothConnection("EV3").connect(); // replace with your own brick name
+
             // connect to EV3 via bluetooth
-            EV3 ev3 = new EV3(new BluetoothConnection("EV3").connect());    // replace with your own brick name
+            GenEV3<CustomApi> gev3 = new GenEV3<>(conn);
+            EV3 ev3 = new EV3(conn);
 
             Button stopButton = findViewById(R.id.stopButton);
             stopButton.setOnClickListener(v -> {
-                ev3.cancel();   // fire cancellation signal to the EV3 task
+                gev3.cancel();   // fire cancellation signal to the EV3 task
             });
 
             Button startButton = findViewById(R.id.startButton);
-            startButton.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::legomain)));
+            startButton.setOnClickListener(v -> Prelude.trap(() -> gev3.run(this::legoMainCustomApi, CustomApi::new)));
+            startButton.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::legoMain)));
 
             setupEditable(R.id.powerEdit, (x) -> applyMotor((m) -> {
                 m.setPower(x);
@@ -109,8 +124,8 @@ public class MainActivity extends AppCompatActivity {
 
     // main program executed by EV3
 
-    private void legomain(EV3.Api api) {
-        final String TAG = Prelude.ReTAG("legomain");
+    private void legoMain(EV3.Api api) {
+        final String TAG = Prelude.ReTAG("legoMain");
 
         // get sensors
         final LightSensor lightSensor = api.getLightSensor(EV3.InputPort._3);
@@ -169,7 +184,14 @@ public class MainActivity extends AppCompatActivity {
         } finally {
             applyMotor(TachoMotor::stop);
         }
+    }
 
+    private void legoMainCustomApi(CustomApi api) {
+        final String TAG = Prelude.ReTAG("legoMainCustomApi");
+
+        api.myspecialmethod();
+
+        legoMain(api);
     }
 
 
