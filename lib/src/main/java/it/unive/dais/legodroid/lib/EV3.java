@@ -1,5 +1,6 @@
 package it.unive.dais.legodroid.lib;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 
 import java.io.IOException;
@@ -32,6 +33,7 @@ import it.unive.dais.legodroid.lib.util.Function;
 public class EV3 extends GenEV3<EV3.Api> {
     /**
      * Facility constructor. Creates a SpooledAsyncChannel automatically with the given synchrounous channel
+     *
      * @param ch a synchrounous channel object.
      */
     public EV3(@NonNull AsyncChannel ch) {
@@ -40,6 +42,7 @@ public class EV3 extends GenEV3<EV3.Api> {
 
     /**
      * Facility constructor. Creates a SpooledAsyncChannel automatically with the given synchrounous channel
+     *
      * @param ch a synchrounous channel object.
      */
     public EV3(@NonNull Channel ch) {
@@ -48,11 +51,137 @@ public class EV3 extends GenEV3<EV3.Api> {
 
     /**
      * Run the given callback as the main program for the EV3 brick.
+     *
      * @param f the function object representing the main code for the EV3 brick.
      * @throws AlreadyRunningException thrown when a program is already running on the EV3 brick.
      */
     public void run(@NonNull Consumer<Api> f) throws AlreadyRunningException {
         run(f, Api::new);
+
+        try (Api api = new Api(this)) {
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * This enum type represents the 4 physical input ports on the EV3 brick.
+     */
+    public enum InputPort {
+        /**
+         * Input port 1
+         */
+        _1,
+        /**
+         * Input port 2
+         */
+        _2,
+        /**
+         * Input port 3
+         */
+        _3,
+        /**
+         * Input port 4
+         */
+        _4;
+
+        /**
+         * Encode the input port into a byte for use with {@link Api#getPercentValue(byte, int, int, int)} and {@link Api#getSiValue(byte, int, int, int)}.
+         *
+         * @return a byte according to the encoding defined by the GenEV3 Developer Kit Documentation.
+         * @see <a href="https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">LEGO Mindstorms GenEV3 Firmware Developer Kit</a>
+         */
+        public byte toByte() {
+            switch (this) {
+                case _1:
+                    return 0;
+                case _2:
+                    return 1;
+                case _3:
+                    return 2;
+                default:
+                    return 3;
+            }
+        }
+
+        @SuppressLint("DefaultLocale")
+        @Override
+        @NonNull
+        public String toString() {
+            return String.format("In/%d", toByte());
+        }
+    }
+
+    /**
+     * This enum type represents the 4 physical output ports on the EV3 brick.
+     */
+    public enum OutputPort {
+        /**
+         * Output port A
+         */
+        A,
+        /**
+         * Output port B
+         */
+        B,
+        /**
+         * Output port C
+         */
+        C,
+        /**
+         * Output port D
+         */
+        D;
+
+        /**
+         * Encode the output port as a bit mask for certain GenEV3 direct commands that require the bitmask format as parameter.
+         *
+         * @return a byte with the bit mask.
+         * @see <a href="http://google.com</a>https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">GenEV3 Developer Kit Documentation</a>
+         */
+        public byte toBitmask() {
+            return (byte) (1 << toByte());
+        }
+
+        /**
+         * Encode the output port into a byte for use with {@link Api#getPercentValue(byte, int, int, int)} and {@link Api#getSiValue(byte, int, int, int)}.
+         * Using output ports for receive operations is possible, though a special encoding is needed according to the GenEV3 Developer Kit Documentation - this is provided by this method.
+         *
+         * @return a byte according to the encoding defined by the GenEV3 Developer Kit Documentation.
+         * @see <a href="http://google.com</a>https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">GenEV3 Developer Kit Documentation</a>
+         */
+        public byte toByteAsRead() {
+            return (byte) (toByte() | 0x10);
+        }
+
+        /**
+         * Encode the output port into a byte for use with {@link Api#getPercentValue(byte, int, int, int)} and {@link Api#getSiValue(byte, int, int, int)}.
+         *
+         * @return a byte according to the encoding defined by the GenEV3 Developer Kit Documentation.
+         * @see <a href="http://google.com</a>https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">GenEV3 Developer Kit Documentation</a>
+         */
+        public byte toByte() {
+            switch (this) {
+                case A:
+                    return 0;
+                case B:
+                    return 1;
+                case C:
+                    return 2;
+                default:
+                    return 3;
+            }
+        }
+
+        @SuppressLint("DefaultLocale")
+        @Override
+        @NonNull
+        public String toString() {
+            return String.format("Out/%s", super.toString());
+        }
+
+        // TODO: implementare il comando opOutput_Test che verifica se le output port sono occupate
     }
 
     /**
@@ -65,7 +194,7 @@ public class EV3 extends GenEV3<EV3.Api> {
      * @see #getSiValue(byte, int, int, int)
      * @see #getPercentValue(byte, int, int, int)
      */
-    public static class Api {
+    public static class Api implements AutoCloseable {
         /**
          * Public field pointing to the GenEV3 object.
          */
@@ -263,6 +392,11 @@ public class EV3 extends GenEV3<EV3.Api> {
          */
         public void sendNoReply(Bytecode bc) throws IOException {
             ev3.channel.sendNoReply(bc);
+        }
+
+        @Override
+        public void close() throws Exception {
+
         }
     }
 }

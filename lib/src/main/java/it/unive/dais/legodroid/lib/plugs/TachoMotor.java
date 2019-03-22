@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import it.unive.dais.legodroid.lib.EV3;
-import it.unive.dais.legodroid.lib.GenEV3;
 import it.unive.dais.legodroid.lib.comm.Bytecode;
 import it.unive.dais.legodroid.lib.comm.Const;
 import it.unive.dais.legodroid.lib.comm.Reply;
@@ -19,7 +18,7 @@ import java.util.concurrent.Future;
 /**
  * This class offers methods for controlling the tacho motor of GenEV3 devices.
  */
-public class TachoMotor extends Plug<GenEV3.OutputPort> implements AutoCloseable {
+public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
     private static final String TAG = Prelude.ReTAG("TachoMotor");
 
     /**
@@ -28,7 +27,7 @@ public class TachoMotor extends Plug<GenEV3.OutputPort> implements AutoCloseable
      * @param api  the object of type {@link EV3.Api}.
      * @param port the output port.
      */
-    public TachoMotor(@NonNull EV3.Api api, GenEV3.OutputPort port) {
+    public TachoMotor(@NonNull EV3.Api api, EV3.OutputPort port) {
         super(api, port);
     }
 

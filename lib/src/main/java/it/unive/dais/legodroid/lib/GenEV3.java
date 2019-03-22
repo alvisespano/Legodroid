@@ -96,12 +96,12 @@ public class GenEV3<A extends EV3.Api> {
         @Override
         protected Void doInBackground(Void... voids) {
             Thread.currentThread().setName(TAG);
-            Log.v(TAG, "starting GenEV3 task");
+            Log.v(TAG, "starting EV3 task");
             try {
                 main.call(make.apply(ev3));
-                Log.v(TAG, "exiting GenEV3 task");
+                Log.v(TAG, "exiting EV3 task");
             } catch (Throwable e) {
-                Log.e(TAG, String.format("uncaught exception: %s. Aborting GenEV3 task", e.getMessage()));
+                Log.e(TAG, String.format("uncaught exception: %s. Aborting EV3 task", e.getMessage()));
                 e.printStackTrace();
             }
             synchronized (ev3) {
@@ -133,125 +133,6 @@ public class GenEV3<A extends EV3.Api> {
      */
     public synchronized boolean isCancelled() {
         return task == null || task.isCancelled();
-    }
-
-    /**
-     * This enum type represents the 4 physical input ports on the EV3 brick.
-     */
-    public enum InputPort {
-        /**
-         * Input port 1
-         */
-        _1,
-        /**
-         * Input port 2
-         */
-        _2,
-        /**
-         * Input port 3
-         */
-        _3,
-        /**
-         * Input port 4
-         */
-        _4;
-
-        /**
-         * Encode the input port into a byte for use with {@link EV3.Api#getPercentValue(byte, int, int, int)} and {@link EV3.Api#getSiValue(byte, int, int, int)}.
-         *
-         * @return a byte according to the encoding defined by the GenEV3 Developer Kit Documentation.
-         * @see <a href="https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">LEGO Mindstorms GenEV3 Firmware Developer Kit</a>
-         */
-        public byte toByte() {
-            switch (this) {
-                case _1:
-                    return 0;
-                case _2:
-                    return 1;
-                case _3:
-                    return 2;
-                default:
-                    return 3;
-            }
-        }
-
-        @SuppressLint("DefaultLocale")
-        @Override
-        @NonNull
-        public String toString() {
-            return String.format("In/%d", toByte());
-        }
-    }
-
-    /**
-     * This enum type represents the 4 physical output ports on the EV3 brick.
-     */
-    public enum OutputPort {
-        /**
-         * Output port A
-         */
-        A,
-        /**
-         * Output port B
-         */
-        B,
-        /**
-         * Output port C
-         */
-        C,
-        /**
-         * Output port D
-         */
-        D;
-
-        /**
-         * Encode the output port as a bit mask for certain GenEV3 direct commands that require the bitmask format as parameter.
-         *
-         * @return a byte with the bit mask.
-         * @see <a href="http://google.com</a>https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">GenEV3 Developer Kit Documentation</a>
-         */
-        public byte toBitmask() {
-            return (byte) (1 << toByte());
-        }
-
-        /**
-         * Encode the output port into a byte for use with {@link EV3.Api#getPercentValue(byte, int, int, int)} and {@link EV3.Api#getSiValue(byte, int, int, int)}.
-         * Using output ports for receive operations is possible, though a special encoding is needed according to the GenEV3 Developer Kit Documentation - this is provided by this method.
-         *
-         * @return a byte according to the encoding defined by the GenEV3 Developer Kit Documentation.
-         * @see <a href="http://google.com</a>https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">GenEV3 Developer Kit Documentation</a>
-         */
-        public byte toByteAsRead() {
-            return (byte) (toByte() | 0x10);
-        }
-
-        /**
-         * Encode the output port into a byte for use with {@link EV3.Api#getPercentValue(byte, int, int, int)} and {@link EV3.Api#getSiValue(byte, int, int, int)}.
-         *
-         * @return a byte according to the encoding defined by the GenEV3 Developer Kit Documentation.
-         * @see <a href="http://google.com</a>https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">GenEV3 Developer Kit Documentation</a>
-         */
-        public byte toByte() {
-            switch (this) {
-                case A:
-                    return 0;
-                case B:
-                    return 1;
-                case C:
-                    return 2;
-                default:
-                    return 3;
-            }
-        }
-
-        @SuppressLint("DefaultLocale")
-        @Override
-        @NonNull
-        public String toString() {
-            return String.format("Out/%s", super.toString());
-        }
-
-        // TODO: implementare il comando opOutput_Test che verifica se le output port sono occupate
     }
 
 }

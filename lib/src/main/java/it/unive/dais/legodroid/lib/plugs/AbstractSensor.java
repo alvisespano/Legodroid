@@ -6,13 +6,12 @@ import java.io.IOException;
 import java.util.concurrent.Future;
 
 import it.unive.dais.legodroid.lib.EV3;
-import it.unive.dais.legodroid.lib.GenEV3;
 import it.unive.dais.legodroid.lib.util.Function;
 
 /**
  * Abstract class for sensors collecting reusable functionalities.
  */
-public abstract class AbstractSensor extends Plug<GenEV3.InputPort> {
+public abstract class AbstractSensor extends Plug<EV3.InputPort> {
     /**
      * This field represents the type of the direct command according to the GenEV3 Development Kit Documentation, e.g. {@link it.unive.dais.legodroid.lib.comm.Const#EV3_COLOR}.
      */
@@ -26,7 +25,7 @@ public abstract class AbstractSensor extends Plug<GenEV3.InputPort> {
      * @param port input port where the sensor is attached to.
      * @param type type constant, e.g. {@link it.unive.dais.legodroid.lib.comm.Const#EV3_COLOR}.
      */
-    protected AbstractSensor(@NonNull EV3.Api api, GenEV3.InputPort port, int type) {
+    protected AbstractSensor(@NonNull EV3.Api api, EV3.InputPort port, int type) {
         super(api, port);
         this.type = type;
     }

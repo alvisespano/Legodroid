@@ -6,14 +6,13 @@ import java.io.IOException;
 import java.util.concurrent.Future;
 
 import it.unive.dais.legodroid.lib.EV3;
-import it.unive.dais.legodroid.lib.GenEV3;
 import it.unive.dais.legodroid.lib.comm.Const;
 
 /**
  * Instances of this class allow operations on the gyroscope sensor (accelerometer) connected to GenEV3 via an input port.
  */
 public class GyroSensor extends AbstractSensor {
-    public GyroSensor(EV3.Api api, GenEV3.InputPort port) {
+    public GyroSensor(EV3.Api api, EV3.InputPort port) {
         super(api, port, Const.EV3_GYRO);
     }
 

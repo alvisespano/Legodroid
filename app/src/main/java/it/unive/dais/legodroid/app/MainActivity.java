@@ -70,14 +70,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private static class CustomApi extends EV3.Api {
+    private static class MyCustomApi extends EV3.Api {
 
-        private CustomApi(@NonNull GenEV3<? extends EV3.Api> ev3) {
+        private MyCustomApi(@NonNull GenEV3<? extends EV3.Api> ev3) {
             super(ev3);
         }
 
-        public void myspecialmethod() {
-        }
+        public void mySpecialCommand() {}
     }
 
     // quick wrapper for accessing field 'motor' only when not-null; also ignores any exception thrown
@@ -96,17 +95,18 @@ public class MainActivity extends AppCompatActivity {
             BluetoothConnection.BluetoothChannel conn = new BluetoothConnection("EV3").connect(); // replace with your own brick name
 
             // connect to EV3 via bluetooth
-            GenEV3<CustomApi> gev3 = new GenEV3<>(conn);
-            EV3 ev3 = new EV3(conn);
+            GenEV3<MyCustomApi> ev3 = new GenEV3<>(conn);
+//            EV3 ev3 = new EV3(conn);  // alternatively an EV3 subclass
 
             Button stopButton = findViewById(R.id.stopButton);
             stopButton.setOnClickListener(v -> {
-                gev3.cancel();   // fire cancellation signal to the EV3 task
+                ev3.cancel();   // fire cancellation signal to the EV3 task
             });
 
             Button startButton = findViewById(R.id.startButton);
-            startButton.setOnClickListener(v -> Prelude.trap(() -> gev3.run(this::legoMainCustomApi, CustomApi::new)));
-            startButton.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::legoMain)));
+            startButton.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::legoMainCustomApi, MyCustomApi::new)));
+            // alternatively with plain EV3
+//            startButton.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::legoMain)));
 
             setupEditable(R.id.powerEdit, (x) -> applyMotor((m) -> {
                 m.setPower(x);
@@ -186,11 +186,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void legoMainCustomApi(CustomApi api) {
+    private void legoMainCustomApi(MyCustomApi api) {
         final String TAG = Prelude.ReTAG("legoMainCustomApi");
-
-        api.myspecialmethod();
-
+        // specialized methods can be safely called
+        api.mySpecialCommand();
+        // stub the other main
         legoMain(api);
     }
 
