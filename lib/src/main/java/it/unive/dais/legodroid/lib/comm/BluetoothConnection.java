@@ -28,7 +28,6 @@ public class BluetoothConnection implements Connection<BluetoothConnection.Bluet
 
     @NonNull
     private final String name;
-    @NonNull
     private final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
     @Nullable
     private BluetoothDevice device = null;
@@ -58,6 +57,8 @@ public class BluetoothConnection implements Connection<BluetoothConnection.Bluet
             Log.w(TAG, "bluetooth socket is already connected");
             return new BluetoothChannel(socket);
         }
+        if (adapter == null)
+            throw new IOException("bluetooth is not supported");
         if (!adapter.isEnabled())
             throw new IOException("bluetooth adapter is not enabled or unavailable");
         Set<BluetoothDevice> devs = adapter.getBondedDevices();
