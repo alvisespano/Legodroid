@@ -215,7 +215,7 @@ public class EV3 extends GenEV3<EV3.Api> {
          * @return an object of type LightSensor.
          */
         @NonNull
-        public LightSensor getLightSensor(InputPort port) {
+        public LightSensor getLightSensor(@NonNull InputPort port) {
             return new LightSensor(this, port);
         }
 
@@ -226,7 +226,7 @@ public class EV3 extends GenEV3<EV3.Api> {
          * @return an object of type TouchSensor.
          */
         @NonNull
-        public TouchSensor getTouchSensor(InputPort port) {
+        public TouchSensor getTouchSensor(@NonNull InputPort port) {
             return new TouchSensor(this, port);
         }
 
@@ -237,7 +237,7 @@ public class EV3 extends GenEV3<EV3.Api> {
          * @return an object of type UltrasonicSensor.
          */
         @NonNull
-        public UltrasonicSensor getUltrasonicSensor(InputPort port) {
+        public UltrasonicSensor getUltrasonicSensor(@NonNull InputPort port) {
             return new UltrasonicSensor(this, port);
         }
 
@@ -248,7 +248,7 @@ public class EV3 extends GenEV3<EV3.Api> {
          * @return an object of type GyroSensor.
          */
         @NonNull
-        public GyroSensor getGyroSensor(InputPort port) {
+        public GyroSensor getGyroSensor(@NonNull InputPort port) {
             return new GyroSensor(this, port);
         }
 
@@ -259,7 +259,7 @@ public class EV3 extends GenEV3<EV3.Api> {
          * @return an object of type TachoMotor.
          */
         @NonNull
-        public TachoMotor getTachoMotor(OutputPort port) {
+        public TachoMotor getTachoMotor(@NonNull OutputPort port) {
             return new TachoMotor(this, port);
         }
 
@@ -379,6 +379,7 @@ public class EV3 extends GenEV3<EV3.Api> {
          * @throws IOException thrown when communication errors occur.
          * @see <a href="https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">LEGO Mindstorms GenEV3 Firmware Developer Kit</a>
          */
+        @NonNull
         public Future<Reply> send(int reservation, @NonNull Bytecode bc) throws IOException {
             return ev3.channel.send(reservation, bc);
         }
@@ -390,7 +391,7 @@ public class EV3 extends GenEV3<EV3.Api> {
          * @throws IOException thrown when communication errors occur.
          * @see <a href="https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">LEGO Mindstorms GenEV3 Firmware Developer Kit</a>
          */
-        public void sendNoReply(Bytecode bc) throws IOException {
+        public void sendNoReply(@NonNull Bytecode bc) throws IOException {
             ev3.channel.sendNoReply(bc);
         }
 

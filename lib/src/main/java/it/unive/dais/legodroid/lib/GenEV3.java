@@ -35,7 +35,7 @@ public class GenEV3<A extends EV3.Api> {
     }
 
     @NonNull
-    final AsyncChannel channel;
+    protected final AsyncChannel channel;
 
     @Nullable
     private AsyncTask<Void, Void, Void> task = null;

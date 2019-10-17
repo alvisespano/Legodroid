@@ -8,6 +8,7 @@ import it.unive.dais.legodroid.lib.comm.Bytecode;
 import it.unive.dais.legodroid.lib.comm.Const;
 import it.unive.dais.legodroid.lib.comm.Reply;
 import it.unive.dais.legodroid.lib.util.Prelude;
+import it.unive.dais.legodroid.lib.util.UnexpectedException;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -236,8 +237,10 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
             switch (this) {
                 case MEDIUM:
                     return Const.M_MOTOR;
-                default:
+                case LARGE:
                     return Const.L_MOTOR;
+                default:
+                    throw new UnexpectedException("unknown motor type");
             }
         }
     }

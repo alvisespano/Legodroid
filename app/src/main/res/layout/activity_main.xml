@@ -60,7 +60,8 @@
             android:id="@+id/powerEdit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:inputType="numberSigned" />
+            android:inputType="numberSigned"
+            android:importantForAutofill="no" />
 
     </LinearLayout>
 
@@ -80,7 +81,8 @@
             android:id="@+id/speedEdit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:inputType="numberSigned" />
+            android:inputType="numberSigned"
+            android:importantForAutofill="no" />
 
     </LinearLayout>
 </LinearLayout>
