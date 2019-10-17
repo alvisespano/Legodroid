@@ -1,18 +1,17 @@
 package it.unive.dais.legodroid.lib;
 
-import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import it.unive.dais.legodroid.lib.comm.AsyncChannel;
 import it.unive.dais.legodroid.lib.comm.Channel;
 import it.unive.dais.legodroid.lib.comm.SpooledAsyncChannel;
-import it.unive.dais.legodroid.lib.util.Consumer;
-import it.unive.dais.legodroid.lib.util.Function;
 
 import static it.unive.dais.legodroid.lib.util.Prelude.ReTAG;
 
@@ -98,7 +97,7 @@ public class GenEV3<A extends EV3.Api> {
             Thread.currentThread().setName(TAG);
             Log.v(TAG, "starting EV3 task");
             try {
-                main.call(make.apply(ev3));
+                main.accept(make.apply(ev3));
                 Log.v(TAG, "exiting EV3 task");
             } catch (Throwable e) {
                 Log.e(TAG, String.format("uncaught exception: %s. Aborting EV3 task", e.getMessage()));
@@ -120,7 +119,7 @@ public class GenEV3<A extends EV3.Api> {
      */
     public synchronized void cancel() {
         if (task != null) {
-            Log.v(TAG, "cancelling task");
+            Log.v(TAG, "cancelling EV3 task");
             task.cancel(true);
         }
     }
@@ -128,7 +127,7 @@ public class GenEV3<A extends EV3.Api> {
     /**
      * Test the cancellation flag. This is meant to be called from within the GenEV3 task callback.
      *
-     * @return returns true when a call to cancel() has been performed.
+     * @return returns true when a accept to cancel() has been performed.
      * @see #cancel()
      */
     public synchronized boolean isCancelled() {

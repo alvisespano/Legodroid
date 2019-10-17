@@ -3,6 +3,7 @@ package it.unive.dais.legodroid.lib.plugs;
 import android.support.annotation.NonNull;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 import it.unive.dais.legodroid.lib.EV3;
@@ -24,7 +25,7 @@ public class LightSensor extends AbstractSensor {
      * @throws IOException thrown when communication errors occur.
      */
     @NonNull
-    public Future<Short> getReflected() throws IOException {
+    public CompletableFuture<Short> getReflected() throws IOException {
         return getPercent1(Const.COL_REFLECT);
     }
 
@@ -36,7 +37,7 @@ public class LightSensor extends AbstractSensor {
      * @throws IOException thrown when communication errors occur.
      */
     @NonNull
-    public Future<Short> getAmbient() throws IOException {
+    public CompletableFuture<Short> getAmbient() throws IOException {
         return getPercent1(Const.COL_AMBIENT);
     }
 
@@ -48,7 +49,7 @@ public class LightSensor extends AbstractSensor {
      * @throws IOException thrown when communication errors occur.
      */
     @NonNull
-    public Future<Color> getColor() throws IOException {
+    public CompletableFuture<Color> getColor() throws IOException {
         return getSi1(Const.COL_COLOR, (x) -> Color.values()[(int) (float) x]);
     }
 
@@ -62,7 +63,7 @@ public class LightSensor extends AbstractSensor {
      */
     @Deprecated
     @NonNull
-    public Future<Rgb> getRgb() throws IOException {
+    public CompletableFuture<Rgb> getRgb() throws IOException {
         return getSi(Const.COL_RGB, 3, (rgb) -> new Rgb((int) rgb[0], (int) rgb[1], (int) rgb[2]));
     }
 

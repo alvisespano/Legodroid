@@ -42,6 +42,11 @@ public class BluetoothConnection implements Connection<BluetoothConnection.Bluet
         this.name = name;
     }
 
+    @NonNull
+    public String getName() {
+        return name;
+    }
+
     /**
      * Create a channel for communication.
      * Multiple calls to this method do not produce multiple channels: only one active channel is supported.

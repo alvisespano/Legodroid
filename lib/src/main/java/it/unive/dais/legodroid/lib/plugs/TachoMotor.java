@@ -11,6 +11,7 @@ import it.unive.dais.legodroid.lib.util.Prelude;
 import it.unive.dais.legodroid.lib.util.UnexpectedException;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -43,8 +44,8 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
      * @return the current position of the motor in tacho ticks.
      * @throws IOException thrown when communication errors occur.
      */
-    public Future<Float> getPosition() throws IOException {
-        Future<float[]> r = api.getSiValue(port.toByteAsRead(), Const.L_MOTOR, Const.L_MOTOR_DEGREE, 1);
+    public CompletableFuture<Float> getPosition() throws IOException {
+        CompletableFuture<float[]> r = api.getSiValue(port.toByteAsRead(), Const.L_MOTOR, Const.L_MOTOR_DEGREE, 1);
         return api.execAsync(() -> r.get()[0]);
     }
 
@@ -56,8 +57,8 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
      * @return the current motor speed in tacho counts per second.
      * @throws IOException thrown when communication errors occur.
      */
-    public Future<Float> getSpeed() throws IOException {
-        Future<float[]> r = api.getSiValue(port.toByteAsRead(), Const.L_MOTOR, Const.L_MOTOR_SPEED, 1);
+    public CompletableFuture<Float> getSpeed() throws IOException {
+        CompletableFuture<float[]> r = api.getSiValue(port.toByteAsRead(), Const.L_MOTOR, Const.L_MOTOR_SPEED, 1);
         return api.execAsync(() -> r.get()[0]);
     }
 
@@ -82,12 +83,12 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
      *
      * @throws IOException thrown when communication errors occur.
      */
-    public Future<Boolean> isBusy() throws IOException {
+    public CompletableFuture<Boolean> isBusy() throws IOException {
         Bytecode bc = new Bytecode();
         bc.addOpCode(Const.OUTPUT_TEST);
         bc.addParameter(Const.LAYER_MASTER);
         bc.addParameter(port.toBitmask());
-        Future<Reply> r = api.send(1, bc);
+        CompletableFuture<Reply> r = api.send(1, bc);
         Log.d(TAG, "motor is busy");
         return api.execAsync(() -> r.get().getData()[0] != 0);
     }

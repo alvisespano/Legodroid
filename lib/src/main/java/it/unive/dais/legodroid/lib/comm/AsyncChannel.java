@@ -3,6 +3,7 @@ package it.unive.dais.legodroid.lib.comm;
 import android.support.annotation.NonNull;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 /**
@@ -18,7 +19,7 @@ public interface AsyncChannel extends AutoCloseable {
      * @throws IOException thrown when communication errors occur.
      */
     @NonNull
-    Future<Reply> send(@NonNull Command cmd) throws IOException;
+    CompletableFuture<Reply> send(@NonNull Command cmd) throws IOException;
 
     /**
      * Send a {@link Command} asynchronously and returns a future object hosting the {@link Reply} object.
@@ -30,7 +31,7 @@ public interface AsyncChannel extends AutoCloseable {
      * @throws IOException thrown when communication errors occur.
      */
     @NonNull
-    Future<Reply> send(int reservation, @NonNull Bytecode bc) throws IOException;
+    CompletableFuture<Reply> send(int reservation, @NonNull Bytecode bc) throws IOException;
 
     /**
      * Lower-level method for sending a custom-built Bytecode objects as commands.

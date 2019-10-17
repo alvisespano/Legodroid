@@ -3,10 +3,11 @@ package it.unive.dais.legodroid.lib.plugs;
 import android.support.annotation.NonNull;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
+import java.util.function.Function;
 
 import it.unive.dais.legodroid.lib.EV3;
-import it.unive.dais.legodroid.lib.util.Function;
 
 /**
  * Abstract class for sensors collecting reusable functionalities.
@@ -41,7 +42,7 @@ public abstract class AbstractSensor extends Plug<EV3.InputPort> {
      * @throws IOException thrown when communication errors occur.
      */
     @NonNull
-    protected <T> Future<T> getPercent(int mode, int nvalue, @NonNull Function<short[], T> f) throws IOException {
+    protected <T> CompletableFuture<T> getPercent(int mode, int nvalue, @NonNull Function<short[], T> f) throws IOException {
         Future<short[]> r = api.getPercentValue(port.toByte(), type, mode, nvalue);
         return api.execAsync(() -> f.apply(r.get()));
     }
@@ -57,7 +58,7 @@ public abstract class AbstractSensor extends Plug<EV3.InputPort> {
      * @throws IOException thrown when communication errors occur.
      */
     @NonNull
-    protected <T> Future<T> getPercent1(int mode, @NonNull Function<Short, T> f) throws IOException {
+    protected <T> CompletableFuture<T> getPercent1(int mode, @NonNull Function<Short, T> f) throws IOException {
         return getPercent(mode, 1, (a) -> f.apply(a[0]));
     }
 
@@ -69,7 +70,7 @@ public abstract class AbstractSensor extends Plug<EV3.InputPort> {
      * @throws IOException thrown when communication errors occur.
      */
     @NonNull
-    protected Future<Short> getPercent1(int mode) throws IOException {
+    protected CompletableFuture<Short> getPercent1(int mode) throws IOException {
         return getPercent1(mode, Function.identity());
     }
 
@@ -85,7 +86,7 @@ public abstract class AbstractSensor extends Plug<EV3.InputPort> {
      */
     @SuppressWarnings("SameParameterValue")
     @NonNull
-    protected <T> Future<T> getSi(int mode, int nvalue, @NonNull Function<float[], T> f) throws IOException {
+    protected <T> CompletableFuture<T> getSi(int mode, int nvalue, @NonNull Function<float[], T> f) throws IOException {
         Future<float[]> r = api.getSiValue(port.toByte(), type, mode, nvalue);
         return api.execAsync(() -> f.apply(r.get()));
     }
@@ -101,7 +102,7 @@ public abstract class AbstractSensor extends Plug<EV3.InputPort> {
      * @throws IOException thrown when communication errors occur.
      */
     @NonNull
-    protected <T> Future<T> getSi1(int mode, @NonNull Function<Float, T> f) throws IOException {
+    protected <T> CompletableFuture<T> getSi1(int mode, @NonNull Function<Float, T> f) throws IOException {
         return getSi(mode, 1, (a) -> f.apply(a[0]));
     }
 
@@ -113,7 +114,7 @@ public abstract class AbstractSensor extends Plug<EV3.InputPort> {
      * @throws IOException thrown when communication errors occur.
      */
     @NonNull
-    protected Future<Float> getSi1(int mode) throws IOException {
+    protected CompletableFuture<Float> getSi1(int mode) throws IOException {
         return getSi1(mode, Function.identity());
     }
 }

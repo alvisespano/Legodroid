@@ -2,16 +2,20 @@ package it.unive.dais.legodroid.lib;
 
 import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import it.unive.dais.legodroid.lib.comm.AsyncChannel;
 import it.unive.dais.legodroid.lib.comm.Bytecode;
@@ -23,8 +27,8 @@ import it.unive.dais.legodroid.lib.plugs.LightSensor;
 import it.unive.dais.legodroid.lib.plugs.TachoMotor;
 import it.unive.dais.legodroid.lib.plugs.TouchSensor;
 import it.unive.dais.legodroid.lib.plugs.UltrasonicSensor;
-import it.unive.dais.legodroid.lib.util.Consumer;
-import it.unive.dais.legodroid.lib.util.Function;
+
+import static it.unive.dais.legodroid.lib.util.Prelude.ReTAG;
 
 /**
  * Specialized EV3 class with default Api.
@@ -195,6 +199,8 @@ public class EV3 extends GenEV3<EV3.Api> {
      * @see #getPercentValue(byte, int, int, int)
      */
     public static class Api implements AutoCloseable {
+        private static final String TAG = ReTAG("Api");
+
         /**
          * Public field pointing to the GenEV3 object.
          */
@@ -313,7 +319,7 @@ public class EV3 extends GenEV3<EV3.Api> {
          * @see <a href="https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">LEGO Mindstorms GenEV3 Firmware Developer Kit</a>
          */
         @NonNull
-        public Future<float[]> getSiValue(byte port, int type, int mode, int nvalue) throws IOException {
+        public CompletableFuture<float[]> getSiValue(byte port, int type, int mode, int nvalue) throws IOException {
             Bytecode bc = prefaceGetValue(Const.READY_SI, port, type, mode, nvalue);
             Future<Reply> r = ev3.channel.send(4 * nvalue, bc);
             return execAsync(() -> {
@@ -340,7 +346,7 @@ public class EV3 extends GenEV3<EV3.Api> {
          * @see <a href="https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">LEGO Mindstorms GenEV3 Firmware Developer Kit</a>
          */
         @NonNull
-        public Future<short[]> getPercentValue(byte port, int type, int mode, int nvalue) throws IOException {
+        public CompletableFuture<short[]> getPercentValue(byte port, int type, int mode, int nvalue) throws IOException {
             Bytecode bc = prefaceGetValue(Const.READY_PCT, port, type, mode, nvalue);
             Future<Reply> fr = ev3.channel.send(2 * nvalue, bc);
             return execAsync(() -> {
@@ -359,15 +365,20 @@ public class EV3 extends GenEV3<EV3.Api> {
          * Low level method to execute the callback passed as argument within an Android {@link FutureTask}.
          * The {@link Executor} in charge of the executing the function the is a builtin single-threaded executor.
          *
-         * @param c   functional object of type {@link Callable}.
          * @param <T> the return type of the callback.
-         * @return a {@link FutureTask} object hosting the result of type {@code T}.
+         * @param f   functional object of type {@link Callable}.
+         * @return a {@link CompletableFuture} object hosting the result of type {@code T}.
          */
         @NonNull
-        public <T> FutureTask<T> execAsync(@NonNull Callable<T> c) {
-            FutureTask<T> t = new FutureTask<>(c);
-            executor.execute(t);
-            return t;
+        public <T> CompletableFuture<T> execAsync(@NonNull Callable<T> f) {
+            return CompletableFuture.supplyAsync(() -> {
+                try {
+                    return f.call();
+                } catch (Exception e) {
+                    Log.w(TAG, "execAsync(): exception caught when executing callback");
+                    throw new RuntimeException(e);
+                }
+            });
         }
 
         /**
@@ -380,7 +391,7 @@ public class EV3 extends GenEV3<EV3.Api> {
          * @see <a href="https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">LEGO Mindstorms GenEV3 Firmware Developer Kit</a>
          */
         @NonNull
-        public Future<Reply> send(int reservation, @NonNull Bytecode bc) throws IOException {
+        public CompletableFuture<Reply> send(int reservation, @NonNull Bytecode bc) throws IOException {
             return ev3.channel.send(reservation, bc);
         }
 

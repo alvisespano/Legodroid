@@ -1,7 +1,6 @@
 package it.unive.dais.legodroid.lib.util;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import java.util.Arrays;
 
@@ -43,24 +42,46 @@ public class Prelude {
     /**
      * Call a runnable that can throw an exception and trap the invocation surrounding it with a try-catch block.
      *
-     * @param r the object of type {@link ThrowingRunnable}.
+     * @param f the object of type {@link ThrowingRunnable}.
      */
-    public static void trap(ThrowingRunnable<? extends Throwable> r) {
-        try {
-            r.run();
-        } catch (Throwable e) {
-            Log.e(TAG, String.format("exception trapped: %s", e));
-            e.printStackTrace();
-        }
+    public static void trap(ThrowingRunnable<? extends Throwable> f) {
+        trap(() -> {
+            f.run();
+            return null;
+        });
     }
 
     /**
      * Call a ThrowingConsumer with the given argument of type T.
-     * @param c the ThrowingConsumer picking an argument of type T.
-     * @param x the argument of type T to be applied.
-     * @param <T> automatically inferred local generic.
+     *
+     * @param f   the ThrowingConsumer picking an argument of type T.
+     * @param x   the argument of type T to be applied.
+     * @param <T> then type of the argument.
      */
-    public static <T> void trap(ThrowingConsumer<T, ? extends Throwable> c, T x) {
-        trap(() -> { c.call(x); });
+    public static <T> void trap(ThrowingConsumer<T, ? extends Throwable> f, T x) {
+        trap(() -> f.accept(x));
     }
+
+    /**
+     * Call a ThrowingSupplier with the given argument of type T.
+     *
+     * @param f   the ThrowingConsumer picking an argument of type T.
+     * @param <T> the result type.
+     */
+    public static <T> T trap(ThrowingSupplier<T, ? extends Throwable> f) {
+        return f.get();
+    }
+
+    /**
+     * Call a ThrowingFunction with the given argument of type T.
+     *
+     * @param f   the ThrowingConsumer picking an argument of type T.
+     * @param x   the argument of type T to be applied.
+     * @param <T> the type of the argument.
+     * @param <R> the result type.
+     */
+    public static <T, R> R trap(ThrowingFunction<T, R, ? extends Throwable> f, T x) {
+        return f.apply(x);
+    }
+
 }

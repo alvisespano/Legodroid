@@ -3,6 +3,7 @@ package it.unive.dais.legodroid.lib.plugs;
 import android.support.annotation.NonNull;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 import it.unive.dais.legodroid.lib.EV3;
@@ -23,7 +24,7 @@ public class GyroSensor extends AbstractSensor {
      * @throws IOException thrown when communication errors occur.
      */
     @NonNull
-    public Future<Float> getAngle() throws IOException {
+    public CompletableFuture<Float> getAngle() throws IOException {
         return getSi1(Const.GYRO_ANGLE);
     }
 
@@ -34,7 +35,7 @@ public class GyroSensor extends AbstractSensor {
      * @throws IOException thrown when communication errors occur.
      */
     @NonNull
-    public Future<Float> getRate() throws IOException {
+    public CompletableFuture<Float> getRate() throws IOException {
         return getSi1(Const.GYRO_RATE);
     }
 }

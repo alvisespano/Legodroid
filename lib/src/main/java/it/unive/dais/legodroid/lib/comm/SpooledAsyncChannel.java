@@ -2,14 +2,17 @@ package it.unive.dais.legodroid.lib.comm;
 
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -78,7 +81,7 @@ public class SpooledAsyncChannel implements AsyncChannel {
                     synchronized (q) {
                         for (FutureReply t : q) {
                             if (t.id == r.getCounter()) {
-                                t.setReply(r);
+                                t.complete(r);
                                 break;
                             }
                         }
@@ -104,120 +107,21 @@ public class SpooledAsyncChannel implements AsyncChannel {
     }
 
     /**
-     * This class implements a {@link Future} over a {@link Reply} object specifically tailored for the {@link SpooledAsyncChannel} outer class.
-     * Access is thread-safe and the hosted reply is <b>stored once</b> and returned at each call of the {@link #get()} method.
-     * Calls to {@link #get()} and {@link #get(long, TimeUnit)} are <b>blocking</b> when the reply is yet to be received; subsequent calls return immediately.
-     * Cancellation is not supported.
+     * This class extends {@link CompletableFuture} over a {@link Reply} object specifically tailored for the {@link SpooledAsyncChannel} class.
      *
      * @see Future
+     * @see CompletableFuture
      */
-    public static class FutureReply implements Future<Reply> {
-        private static final long GET_MAX_TIMEOUT_MS = 30000;
+    static class FutureReply extends CompletableFuture<Reply> {
         private final int id;
-        @NonNull
-        private final Lock lock = new ReentrantLock();
-        @NonNull
-        private final Condition cond = lock.newCondition();
-        @Nullable
-        private Reply reply = null;
-        private boolean waiting;
-
         private FutureReply(int id) {
             this.id = id;
-        }
-
-        private void setReply(@Nullable Reply r) {
-            lock.lock();
-            try {
-                reply = r;
-                cond.signalAll();
-            } finally {
-                lock.unlock();
-            }
-        }
-
-        /**
-         * Attempt at cancelling the blocking wait performed by {@link #get(long, TimeUnit)} and {@link #get()}.
-         *
-         * @param b may interrupt.
-         * @return always false.
-         * @implNote Cancellation is not supported.
-         */
-        @Override
-        public boolean cancel(boolean b) {
-            return false;
-        }
-
-        /**
-         * Tests if wait has been cancelled
-         *
-         * @return always false.
-         * @implNote Cancellation is not supported.
-         */
-        @Override
-        public boolean isCancelled() {
-            return false;
-        }
-
-        /**
-         * Check whether the future hosts the internal reply.
-         *
-         * @return true when the reply has been stored.
-         */
-        @Override
-        public boolean isDone() {
-            lock.lock();
-            try {
-                return reply != null;
-            } finally {
-                lock.unlock();
-            }
-        }
-
-        /**
-         * Get the reply with the default timeout (30 seconds).
-         * This method is <b>blocking</b> when the reply is yet to be received; subsequent calls return immediately.
-         *
-         * @return the {@link Reply} object.
-         * @throws InterruptedException thrown when interrupted.
-         */
-        @Override
-        @NonNull
-        public Reply get() throws InterruptedException, ExecutionException {
-            try {
-                return get(GET_MAX_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-            } catch (TimeoutException e) {
-                throw new ExecutionException(e);
-            }
-        }
-
-        /**
-         * Get the reply with the given timeout.
-         * This method is <b>blocking</b> when the reply is yet to be received; subsequent calls return immediately.
-         *
-         * @param l        amount of time units to wait.
-         * @param timeUnit the time unit.
-         * @return the {@link Reply} object.
-         * @throws InterruptedException thrown when interrupted.
-         */
-        @NonNull
-        @Override
-        public Reply get(long l, @NonNull TimeUnit timeUnit) throws InterruptedException, TimeoutException {
-            lock.lock();
-            try {
-                if (reply == null)
-                    cond.await(l, timeUnit);
-                if (reply == null) throw new TimeoutException(String.format("FutureReply.get() timed out (%d %s)", l, timeUnit));
-                return reply;
-            } finally {
-                lock.unlock();
-            }
         }
     }
 
     @Override
     @NonNull
-    public FutureReply send(@NonNull Command cmd) throws IOException {
+    public CompletableFuture<Reply> send(@NonNull Command cmd) throws IOException {
         channel.send(cmd);
         FutureReply r = new FutureReply(cmd.getCounter());
         q.add(r);
@@ -226,7 +130,7 @@ public class SpooledAsyncChannel implements AsyncChannel {
 
     @NonNull
     @Override
-    public FutureReply send(int reservation, @NonNull Bytecode bc) throws IOException {
+    public CompletableFuture<Reply> send(int reservation, @NonNull Bytecode bc) throws IOException {
         return send(new Command(true, 0, reservation, bc.getBytes()));
     }
 

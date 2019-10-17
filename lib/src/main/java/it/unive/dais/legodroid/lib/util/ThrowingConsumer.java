@@ -1,5 +1,7 @@
 package it.unive.dais.legodroid.lib.util;
 
+import java.util.function.Consumer;
+
 /**
  * Functional interface representing {@link Consumer}'s that can throw exception.
  * @param <T>
@@ -8,13 +10,13 @@ package it.unive.dais.legodroid.lib.util;
 @FunctionalInterface
 public interface ThrowingConsumer<T, E extends Throwable> extends Consumer<T> {
     /**
-     * Invoke {@link #callThrows(Object)} and turn possible checked exceptions into an unchecked {@link RuntimeException}.
+     * Invoke {@link #acceptThrows(Object)} and turn possible checked exceptions into an unchecked {@link RuntimeException}.
      * @param elem
      */
     @Override
-    default void call(T elem) {
+    default void accept(T elem) {
         try {
-            callThrows(elem);
+            acceptThrows(elem);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -25,5 +27,5 @@ public interface ThrowingConsumer<T, E extends Throwable> extends Consumer<T> {
      * @param elem the parameter.
      * @throws E the exception.
      */
-    void callThrows(T elem) throws E;
+    void acceptThrows(T elem) throws E;
 }
