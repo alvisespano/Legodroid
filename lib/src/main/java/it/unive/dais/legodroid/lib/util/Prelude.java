@@ -1,9 +1,10 @@
 package it.unive.dais.legodroid.lib.util;
 
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.util.Arrays;
+
+import androidx.annotation.NonNull;
 
 /**
  * This class provides miscellaneous utilities.
@@ -61,6 +62,6 @@ public class Prelude {
      * @param <T> automatically inferred local generic.
      */
     public static <T> void trap(ThrowingConsumer<T, ? extends Throwable> c, T x) {
-        trap(() -> { c.call(x); });
+        trap(() -> c.call(x));
     }
 }

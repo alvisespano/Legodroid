@@ -1,15 +1,14 @@
 package it.unive.dais.legodroid.lib.plugs;
 
-import android.support.annotation.NonNull;
-
 import java.io.IOException;
 import java.util.concurrent.Future;
 
+import androidx.annotation.NonNull;
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.util.Function;
 
 /**
- * Abstract class for sensors collecting reusable functionalities.
+ * Abstract class for sensors.
  */
 public abstract class AbstractSensor extends Plug<EV3.InputPort> {
     /**

@@ -1,7 +1,6 @@
 package it.unive.dais.legodroid.lib;
 
 import android.annotation.SuppressLint;
-import android.support.annotation.NonNull;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -13,6 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
+import androidx.annotation.NonNull;
 import it.unive.dais.legodroid.lib.comm.AsyncChannel;
 import it.unive.dais.legodroid.lib.comm.Bytecode;
 import it.unive.dais.legodroid.lib.comm.Channel;
@@ -57,12 +57,6 @@ public class EV3 extends GenEV3<EV3.Api> {
      */
     public void run(@NonNull Consumer<Api> f) throws AlreadyRunningException {
         run(f, Api::new);
-
-        try (Api api = new Api(this)) {
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     /**

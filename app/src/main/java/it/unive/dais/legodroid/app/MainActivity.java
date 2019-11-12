@@ -1,10 +1,6 @@
 package it.unive.dais.legodroid.app;
 
 import android.os.Bundle;
-import android.support.annotation.IdRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -18,6 +14,10 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.GenEV3;
 import it.unive.dais.legodroid.lib.comm.BluetoothConnection;
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
             super(ev3);
         }
 
-        public void mySpecialCommand() {}
+        public void mySpecialCommand() { /* do something special */ }
     }
 
     // quick wrapper for accessing field 'motor' only when not-null; also ignores any exception thrown

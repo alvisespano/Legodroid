@@ -9,12 +9,12 @@ package it.unive.dais.legodroid.lib.util;
 public interface ThrowingConsumer<T, E extends Throwable> extends Consumer<T> {
     /**
      * Invoke {@link #callThrows(Object)} and turn possible checked exceptions into an unchecked {@link RuntimeException}.
-     * @param elem
+     * @param x the argument of type T
      */
     @Override
-    default void call(T elem) {
+    default void call(T x) {
         try {
-            callThrows(elem);
+            callThrows(x);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -22,8 +22,8 @@ public interface ThrowingConsumer<T, E extends Throwable> extends Consumer<T> {
 
     /**
      * Invoke the function.
-     * @param elem the parameter.
+     * @param x the parameter.
      * @throws E the exception.
      */
-    void callThrows(T elem) throws E;
+    void callThrows(T x) throws E;
 }

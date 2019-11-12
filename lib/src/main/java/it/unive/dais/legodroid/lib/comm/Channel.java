@@ -1,8 +1,8 @@
 package it.unive.dais.legodroid.lib.comm;
 
-import android.support.annotation.NonNull;
-
 import java.io.IOException;
+
+import androidx.annotation.NonNull;
 
 /**
  * Classes implementing this interface represent active on-going connections between two devices.

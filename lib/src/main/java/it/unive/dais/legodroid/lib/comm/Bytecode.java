@@ -1,10 +1,10 @@
 package it.unive.dais.legodroid.lib.comm;
 
-import android.support.annotation.NonNull;
-
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+
+import androidx.annotation.NonNull;
 
 /**
  * This class is a low-level buffer for creating commands to be sent to the GenEV3 device.

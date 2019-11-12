@@ -1,18 +1,18 @@
 package it.unive.dais.legodroid.lib.plugs;
 
-import android.support.annotation.NonNull;
 import android.util.Log;
 
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+import androidx.annotation.NonNull;
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.comm.Bytecode;
 import it.unive.dais.legodroid.lib.comm.Const;
 import it.unive.dais.legodroid.lib.comm.Reply;
 import it.unive.dais.legodroid.lib.util.Prelude;
 import it.unive.dais.legodroid.lib.util.UnexpectedException;
-
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 // TODO: write more details in the javadoc of these methods
 

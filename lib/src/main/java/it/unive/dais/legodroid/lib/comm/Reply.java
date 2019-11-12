@@ -1,7 +1,8 @@
 package it.unive.dais.legodroid.lib.comm;
 
-import android.support.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 /**
  * This class implements a reply for the GenEV3 device.
@@ -14,7 +15,7 @@ public class Reply extends Packet {
      * Create a reply object given the raw byte array received by the GenEV3 device.
      * This constructor acts as a deserializer.
      *
-     * @param bytes
+     * @param bytes the input byte array
      */
     public Reply(@NonNull byte[] bytes) {
         super(((bytes[1] << 8) & 0xff00) | (bytes[0] & 0xff), new byte[bytes.length - 3]);

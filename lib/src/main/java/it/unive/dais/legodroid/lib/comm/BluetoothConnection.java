@@ -3,8 +3,6 @@ package it.unive.dais.legodroid.lib.comm;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.IOException;
@@ -14,6 +12,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import it.unive.dais.legodroid.lib.util.Prelude;
 
 import static it.unive.dais.legodroid.lib.util.Prelude.ReTAG;
