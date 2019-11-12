@@ -1,8 +1,6 @@
 package it.unive.dais.legodroid.lib.plugs;
 
-
-
-import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
 
 import it.unive.dais.legodroid.lib.EV3;
 

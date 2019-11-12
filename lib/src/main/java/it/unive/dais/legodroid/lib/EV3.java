@@ -1,8 +1,7 @@
 package it.unive.dais.legodroid.lib;
 
 import android.annotation.SuppressLint;
-
-import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

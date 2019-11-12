@@ -1,7 +1,6 @@
 package it.unive.dais.legodroid.lib.util;
 
-
-import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
 
 /**
  * Unchecked exception representing an unexpected error.

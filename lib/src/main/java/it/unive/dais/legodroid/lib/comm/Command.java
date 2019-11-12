@@ -1,7 +1,6 @@
 package it.unive.dais.legodroid.lib.comm;
 
-
-import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
 
 /**
  * This class implements a command for the GenEV3 device.
