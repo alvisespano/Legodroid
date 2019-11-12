@@ -1,6 +1,7 @@
 package it.unive.dais.legodroid.lib.comm;
 
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 /**
  * Abstract class that serves as a superclass for {@link Command} and {@link Reply}.

@@ -1,7 +1,8 @@
 package it.unive.dais.legodroid.lib.comm;
 
-import android.support.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 /**
  * This class implements a reply for the GenEV3 device.
