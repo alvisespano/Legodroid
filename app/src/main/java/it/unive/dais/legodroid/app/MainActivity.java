@@ -188,6 +188,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // alternative version of the lego main with a custom API
     private void legoMainCustomApi(MyCustomApi api) {
         final String TAG = Prelude.ReTAG("legoMainCustomApi");
         // specialized methods can be safely called
