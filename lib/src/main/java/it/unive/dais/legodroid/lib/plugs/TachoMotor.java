@@ -18,6 +18,8 @@ import it.unive.dais.legodroid.lib.util.UnexpectedException;
 
 /**
  * This class offers methods for controlling the tacho motor of GenEV3 devices.
+ * The full documentation of EV3 commands, with a detailed description of their behaviour, can be found here:
+ * https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf
  */
 public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
     private static final String TAG = Prelude.ReTAG("TachoMotor");

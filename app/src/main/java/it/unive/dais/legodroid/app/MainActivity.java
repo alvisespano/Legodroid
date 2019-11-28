@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // example of custom API
     private static class MyCustomApi extends EV3.Api {
 
         private MyCustomApi(@NonNull GenEV3<? extends EV3.Api> ev3) {
@@ -78,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         public void mySpecialCommand() { /* do something special */ }
     }
 
-    // quick wrapper for accessing field 'motor' only when not-null; also ignores any exception thrown
+    // quick wrapper for accessing the private field MainActivity.motor only when not-null; also ignores any exception thrown
     private void applyMotor(@NonNull ThrowingConsumer<TachoMotor, Throwable> f) {
         if (motor != null)
             Prelude.trap(() -> f.call(motor));
@@ -91,11 +92,12 @@ public class MainActivity extends AppCompatActivity {
         textView = findViewById(R.id.textView);
 
         try {
-            BluetoothConnection.BluetoothChannel conn = new BluetoothConnection("EV3").connect(); // replace with your own brick name
-
             // connect to EV3 via bluetooth
-            GenEV3<MyCustomApi> ev3 = new GenEV3<>(conn);
-//            EV3 ev3 = new EV3(conn);  // alternatively an EV3 subclass
+            BluetoothConnection.BluetoothChannel ch = new BluetoothConnection("EV3").connect(); // replace with your own brick name
+
+            EV3 ev3 = new EV3(ch);
+            // use GenEV3 only if you need a custom API
+            //GenEV3<MyCustomApi> ev3 = new GenEV3<>(ch);
 
             Button stopButton = findViewById(R.id.stopButton);
             stopButton.setOnClickListener(v -> {
@@ -103,9 +105,10 @@ public class MainActivity extends AppCompatActivity {
             });
 
             Button startButton = findViewById(R.id.startButton);
-            startButton.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::legoMainCustomApi, MyCustomApi::new)));
-            // alternatively with plain EV3
-//            startButton.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::legoMain)));
+
+            startButton.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::legoMain)));
+            // alternatively with GenEV3
+//          startButton.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::legoMainCustomApi, MyCustomApi::new)));
 
             setupEditable(R.id.powerEdit, (x) -> applyMotor((m) -> {
                 m.setPower(x);
@@ -140,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
 
             while (!api.ev3.isCancelled()) {    // loop until cancellation signal is fired
                 try {
-                    // values returned by getters are boxed within a special Future object
+                    // values returned by getters are boxed within a Future object
                     Future<Float> gyro = gyroSensor.getAngle();
                     updateStatus(gyroSensor, "gyro angle", gyro.get()); // call get() for actually reading the value - this may block!
 
@@ -156,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
                     Future<LightSensor.Color> colf = lightSensor.getColor();
                     LightSensor.Color col = colf.get();
                     updateStatus(lightSensor, "color", col);
-                    // when you need to deal with the UI, you must do it within a lambda passed to runOnUiThread()
+                    // when you need to deal with the UI, you must do it via runOnUiThread()
                     runOnUiThread(() -> findViewById(R.id.colorView).setBackgroundColor(col.toARGB32()));
 
                     Future<Boolean> touched = touchSensor.getPressed();
