@@ -5,8 +5,8 @@ Legodroid is a tiny Java library for Android with educational purposes, aimed at
 Among its features:
  - strong-typed API for communicating with EV3 bricks: easy connection, robust access to motors and sensors;
  - bluetooth supported, wifi will come;
- - sound patterns for transparent asyncronous programming;
- - layered API allows for easy customization of commands/replies;
+ - type-driven patterns for writing correct programs in a type-disciplined way;
+ - layered API allows for easy customization of commands/replies.
 
 ## Disclaimer
 
