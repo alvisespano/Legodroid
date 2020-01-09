@@ -19,4 +19,6 @@ public interface Connection<C extends Channel> {
      */
     @NonNull
     C connect() throws IOException;
+    @NonNull
+    String getPeerName();
 }

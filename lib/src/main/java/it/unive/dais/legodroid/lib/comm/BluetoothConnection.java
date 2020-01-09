@@ -19,7 +19,7 @@ import it.unive.dais.legodroid.lib.util.Prelude;
 import static it.unive.dais.legodroid.lib.util.Prelude.ReTAG;
 
 /**
- * This class implements a {@link Connection} between the Android device and the GenEV3 via the Bluetooth protocol.
+ * This class implements a {@link Connection} between the Android device and the EV3 via the Bluetooth protocol.
  * Instances of this class do not represent an active connection but rather a factory for creating the actual connection channel.
  * The type of the channel is the inner class {@link BluetoothChannel}.
  */
@@ -35,8 +35,8 @@ public class BluetoothConnection implements Connection<BluetoothConnection.Bluet
     private BluetoothSocket socket = null;
 
     /**
-     * Create an object given the name of the GenEV3 device, as configured on the brick settings.
-     * @param name the name of the GenEV3 device. LEGO factory settings default to "GenEV3".
+     * Create an object given the name of the EV3 device, as configured on the brick settings.
+     * @param name the name of the EV3 device. LEGO factory settings default to "EV3".
      */
     public BluetoothConnection(@NonNull String name) {
         this.name = name;
@@ -46,7 +46,7 @@ public class BluetoothConnection implements Connection<BluetoothConnection.Bluet
      * Create a channel for communication.
      * Multiple calls to this method do not produce multiple channels: only one active channel is supported.
      * This method internally performs the bluetooth discovery, searching among paired devices for the device whose name has been passed as argument to the constructor.
-     * @apiNote The GenEV3 device must be first paired with the mobile Android device; refer to the device Bluetooth settings for more info.
+     * @apiNote The EV3 device must be first paired with the mobile Android device; refer to the device Bluetooth settings for more info.
      * @return an object of type {@link BluetoothChannel}.
      * @throws IOException thrown when communication errors occur.
      */
@@ -75,6 +75,19 @@ public class BluetoothConnection implements Connection<BluetoothConnection.Bluet
         Log.v(TAG, String.format("bluetooth connected successfully to device '%s'", device.getName()));
         return new BluetoothChannel(socket);
     }
+
+    @Override
+    @NonNull
+    public String getPeerName() {
+        return name;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return String.format("BluetoothConnection[%s]", getPeerName());
+    }
+
 
     /**
      * This inner non-static class represents an active bluetooth channel through which the two connected devices communicate sending commands and receiving replies.
@@ -128,6 +141,18 @@ public class BluetoothConnection implements Connection<BluetoothConnection.Bluet
                 Log.v(TAG, String.format("bluetooth disconnected from device '%s'", Objects.requireNonNull(device).getName()));
                 Prelude.trap(socket::close);
             }
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return String.format("BluetoothChannel[%s]", getPeerName());
+        }
+
+        @Override
+        @NonNull
+        public Connection getConnection() {
+            return BluetoothConnection.this;
         }
     }
 

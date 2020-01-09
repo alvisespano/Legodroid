@@ -8,7 +8,7 @@ import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.comm.Const;
 
 /**
- * Instances of this class allow operations on the ultrasonic sensor connected to GenEV3 via an input port.
+ * Instances of this class allow operations on the ultrasonic sensor connected to EV3 via an input port.
  */
 public class UltrasonicSensor extends AbstractSensor {
     public UltrasonicSensor(EV3.Api api, EV3.InputPort port) {

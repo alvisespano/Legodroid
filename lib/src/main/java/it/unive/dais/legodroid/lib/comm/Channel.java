@@ -29,6 +29,13 @@ public interface Channel extends AutoCloseable {
     Reply receive() throws IOException;
 
     /**
+     * Get the {@link Connection} object this channel refers to.
+     * @return the connection.
+     */
+    @NonNull
+    Connection getConnection();
+
+    /**
      * Disconnect from the device.
      * Calling this method explicitly invalidates the object, therefore it is recommended to trigger the {@link AutoCloseable} behaviour by losing the reference to the object instead, when you need to disconnect.
      */

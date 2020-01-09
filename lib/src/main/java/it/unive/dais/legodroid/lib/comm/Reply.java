@@ -5,14 +5,14 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 /**
- * This class implements a reply for the GenEV3 device.
+ * This class implements a reply for the EV3 device.
  */
 public class Reply extends Packet {
     private static final String TAG = "Reply";
     private final boolean error;
 
     /**
-     * Create a reply object given the raw byte array received by the GenEV3 device.
+     * Create a reply object given the raw byte array received by the EV3 device.
      * This constructor acts as a deserializer.
      *
      * @param bytes the input byte array
@@ -24,7 +24,7 @@ public class Reply extends Packet {
     }
 
     /**
-     * Get the error flag as replied by the GenEV3 device.
+     * Get the error flag as replied by the EV3 device.
      *
      * @return true if an error occurred; false otherwise.
      */

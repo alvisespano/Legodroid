@@ -4,7 +4,7 @@ package it.unive.dais.legodroid.lib.comm;
 import androidx.annotation.NonNull;
 
 /**
- * This class implements a command for the GenEV3 device.
+ * This class implements a command for the EV3 device.
  */
 public class Command extends Packet {
 

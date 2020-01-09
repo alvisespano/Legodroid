@@ -8,7 +8,7 @@ import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.comm.Const;
 
 /**
- * Instances of this class allow operations on the gyroscope sensor (accelerometer) connected to GenEV3 via an input port.
+ * Instances of this class allow operations on the gyroscope sensor (accelerometer) connected to EV3 via an input port.
  */
 public class GyroSensor extends AbstractSensor {
     public GyroSensor(EV3.Api api, EV3.InputPort port) {
@@ -18,7 +18,7 @@ public class GyroSensor extends AbstractSensor {
     /**
      * Get the angle from the sensor in degrees.
      *
-     * @return a {@link Future} object hosting the 32-bit float within the range [ -18000 - 18000 ] returned by GenEV3.
+     * @return a {@link Future} object hosting the 32-bit float within the range [ -18000 - 18000 ] returned by EV3.
      * @throws IOException thrown when communication errors occur.
      */
     @NonNull
@@ -29,7 +29,7 @@ public class GyroSensor extends AbstractSensor {
     /**
      * Get the rate (or rotational speed) from the sensor in degrees per second.
      *
-     * @return a {@link Future} object hosting the 32-bit float returned by GenEV3.
+     * @return a {@link Future} object hosting the 32-bit float returned by EV3.
      * @throws IOException thrown when communication errors occur.
      */
     @NonNull

@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.Pair;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -19,7 +20,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import it.unive.dais.legodroid.lib.EV3;
-import it.unive.dais.legodroid.lib.GenEV3;
 import it.unive.dais.legodroid.lib.comm.BluetoothConnection;
 import it.unive.dais.legodroid.lib.plugs.GyroSensor;
 import it.unive.dais.legodroid.lib.plugs.LightSensor;
@@ -70,13 +70,76 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // example of custom API
-    private static class MyCustomApi extends EV3.Api {
+    private class AnotherCustomApi extends CustomApi {
+        private AnotherCustomApi(@NonNull EV3 ev3) {
+            super(ev3);
+        }
+    }
 
-        private MyCustomApi(@NonNull GenEV3<? extends EV3.Api> ev3) {
+    private class CustomApiExt extends CustomApi {
+        private CustomApiExt(@NonNull EV3 ev3) {
+            super(ev3);
+        }
+    }
+
+    // example of custom API
+    private class CustomApi extends EV3.Api {
+
+        private CustomApi(@NonNull EV3 ev3) {
             super(ev3);
         }
 
-        public void mySpecialCommand() { /* do something special */ }
+        @Override
+        @NonNull
+        public AveragingLightSensor getLightSensor(@NonNull EV3.InputPort port) {
+            return new AveragingLightSensor(this, port);
+        }
+    }
+
+    static class AveragingLightSensor extends LightSensor {
+        @NonNull
+        private final float[] avgHSV = new float[]{0.5f, 0.5f, 0.5f};
+        @NonNull
+        private final Map<Color, Integer> map = new HashMap<>();
+
+        AveragingLightSensor(@NonNull CustomApi api, @NonNull EV3.InputPort port) {
+            super(api, port);
+            for (Color c : Color.values()) {    // populate map
+                map.put(c, c.toARGB32());
+            }
+        }
+
+        @NonNull
+        private Color nearest(int rgb) {
+            Pair<Integer, Map.Entry<Color, Integer>> min =
+                    new Pair<>(0x100 * 3, map.entrySet().iterator().next());
+            for (Map.Entry<Color, Integer> e : map.entrySet()) {
+                final int v = e.getValue(), d = distance(v, rgb);
+                if (min.first < d)
+                    min = new Pair<>(d, e);
+            }
+            return min.second.getKey();
+        }
+
+        private static int distance(int value, int rgb) {
+            int r = Math.abs(value & 0xff0000 >> 16 - rgb & 0xff0000 >> 16),
+                    g = Math.abs(value & 0x00ff00 >> 8 - rgb & 0x00ff00 >> 8),
+                    b = Math.abs(value & 0x0000ff - rgb & 0x0000ff);
+            return r + g + b;
+        }
+
+        @Override
+        @NonNull
+        public Future<Color> getColor() {
+            return api.execAsync(() -> {
+                Future<Color> c = super.getColor();
+                float[] hsv = new float[3];
+                android.graphics.Color.colorToHSV(c.get().toARGB32(), hsv);
+                for (int i = 0; i < 3; ++i)
+                    avgHSV[i] = (avgHSV[i] + hsv[i]) / 2.f;
+                return nearest(android.graphics.Color.HSVToColor(avgHSV));
+            });
+        }
     }
 
     // quick wrapper for accessing the private field MainActivity.motor only when not-null; also ignores any exception thrown
@@ -94,10 +157,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             // connect to EV3 via bluetooth
             BluetoothConnection.BluetoothChannel ch = new BluetoothConnection("EV3").connect(); // replace with your own brick name
-
             EV3 ev3 = new EV3(ch);
-            // use GenEV3 only if you need a custom API
-            //GenEV3<MyCustomApi> ev3 = new GenEV3<>(ch);
 
             Button stopButton = findViewById(R.id.stopButton);
             stopButton.setOnClickListener(v -> {
@@ -106,9 +166,18 @@ public class MainActivity extends AppCompatActivity {
 
             Button startButton = findViewById(R.id.startButton);
 
-            startButton.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::legoMain)));
-            // alternatively with GenEV3
-//          startButton.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::legoMainCustomApi, MyCustomApi::new)));
+            ev3.run(this::legoMain, CustomApi::new);
+            ev3.run(this::customLegoMain, CustomApi::new);
+            ev3.run(this::anotherCustomLegoMain, AnotherCustomApi::new);
+            ev3.run(this::legoMain, AnotherCustomApi::new);
+            ev3.run(this::customLegoMain, AnotherCustomApi::new);
+            ev3.run(this::legoMain, CustomApiExt::new);
+            ev3.run(this::customLegoMain, CustomApiExt::new);
+            ev3.run(this::customLegoMainExt, CustomApiExt::new);
+
+            startButton.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::customLegoMain, CustomApi::new)));
+            // alternatively with EV3
+            startButton.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::legoMain, AnotherCustomApi::new)));
 
             setupEditable(R.id.powerEdit, (x) -> applyMotor((m) -> {
                 m.setPower(x);
@@ -120,6 +189,8 @@ public class MainActivity extends AppCompatActivity {
             }));
         } catch (IOException e) {
             Log.e(TAG, "fatal error: cannot connect to EV3");
+            e.printStackTrace();
+        } catch (EV3.AlreadyRunningException e) {
             e.printStackTrace();
         }
     }
@@ -189,14 +260,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // alternative version of the lego main with a custom API
-    private void legoMainCustomApi(MyCustomApi api) {
+    private void customLegoMain(CustomApi api) {
         final String TAG = Prelude.ReTAG("legoMainCustomApi");
-        // specialized methods can be safely called
-        api.mySpecialCommand();
         // stub the other main
         legoMain(api);
     }
 
+    private void customLegoMainExt(CustomApiExt api) {
+        final String TAG = Prelude.ReTAG("legoMainCustomApi");
+        // stub the other main
+        legoMain(api);
+    }
+
+    private void anotherCustomLegoMain(AnotherCustomApi api) {
+        final String TAG = Prelude.ReTAG("anotherCustomLegoMain");
+        // stub the other main
+        legoMain(api);
+    }
 
 }
 

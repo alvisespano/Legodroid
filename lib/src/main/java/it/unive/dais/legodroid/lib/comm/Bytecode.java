@@ -7,10 +7,10 @@ import java.io.IOException;
 import androidx.annotation.NonNull;
 
 /**
- * This class is a low-level buffer for creating commands to be sent to the GenEV3 device.
+ * This class is a low-level buffer for creating commands to be sent to the EV3 device.
  * Parts can be appended using this class methods according to which data type and command segment is needed.
  *
- * @see <a href="http://google.com</a>https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">GenEV3 Developer Kit Documentation</a>
+ * @see <a href="http://google.com</a>https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">EV3 Developer Kit Documentation</a>
  */
 public class Bytecode {
     private static final byte BYTE_SIZE = (byte) 0b10000001;
@@ -35,7 +35,7 @@ public class Bytecode {
      *
      * @param opcode the op-code as a byte.
      * @throws IOException thrown when communication errors occur.
-     * @see <a href="https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">LEGO Mindstorms GenEV3 Firmware Developer Kit</a>
+     * @see <a href="https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">LEGO Mindstorms EV3 Firmware Developer Kit</a>
      */
     public void addOpCode(byte opcode) throws IOException {
         out.writeByte(opcode);
@@ -46,7 +46,7 @@ public class Bytecode {
      *
      * @param param the parameter as a 8-bit byte.
      * @throws IOException thrown when communication errors occur.
-     * @see <a href="https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">LEGO Mindstorms GenEV3 Firmware Developer Kit</a>
+     * @see <a href="https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">LEGO Mindstorms EV3 Firmware Developer Kit</a>
      */
     public void addParameter(byte param) throws IOException {
         out.writeByte(BYTE_SIZE);
@@ -58,7 +58,7 @@ public class Bytecode {
      *
      * @param param the parameter as a 16-bit short integer.
      * @throws IOException thrown when communication errors occur.
-     * @see <a href="https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">LEGO Mindstorms GenEV3 Firmware Developer Kit</a>
+     * @see <a href="https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">LEGO Mindstorms EV3 Firmware Developer Kit</a>
      */
     public void addParameter(short param) throws IOException {
         out.writeByte(SHORT_SIZE);
@@ -71,7 +71,7 @@ public class Bytecode {
      *
      * @param param the parameter as a 32-bit integer.
      * @throws IOException thrown when communication errors occur.
-     * @see <a href="https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">LEGO Mindstorms GenEV3 Firmware Developer Kit</a>
+     * @see <a href="https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">LEGO Mindstorms EV3 Firmware Developer Kit</a>
      */
     public void addParameter(int param) throws IOException {
         out.writeByte(INT_SIZE);
@@ -86,7 +86,7 @@ public class Bytecode {
      *
      * @param index the index as a 8-bit byte.
      * @throws IOException thrown when communication errors occur.
-     * @see <a href="https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">LEGO Mindstorms GenEV3 Firmware Developer Kit</a>
+     * @see <a href="https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf?la=en-us">LEGO Mindstorms EV3 Firmware Developer Kit</a>
      */
     public void addGlobalIndex(byte index) throws IOException {
         out.writeByte(index + 0x60);

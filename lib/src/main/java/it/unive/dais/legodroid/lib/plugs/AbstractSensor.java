@@ -12,7 +12,7 @@ import it.unive.dais.legodroid.lib.util.Function;
  */
 public abstract class AbstractSensor extends Plug<EV3.InputPort> {
     /**
-     * This field represents the type of the direct command according to the GenEV3 Development Kit Documentation, e.g. {@link it.unive.dais.legodroid.lib.comm.Const#EV3_COLOR}.
+     * This field represents the type of the direct command according to the EV3 Development Kit Documentation, e.g. {@link it.unive.dais.legodroid.lib.comm.Const#EV3_COLOR}.
      */
     protected final int type;
 
