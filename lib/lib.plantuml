@@ -1,0 +1,260 @@
+@startuml
+
+title __LIB's Class Diagram__\n
+
+  namespace it.unive.dais.legodroid {
+    class it.unive.dais.legodroid.BuildConfig {
+    }
+  }
+  
+
+  namespace it.unive.dais.legodroid {
+    namespace lib {
+      class it.unive.dais.legodroid.lib.EV3 {
+      }
+    }
+  }
+  
+
+  namespace it.unive.dais.legodroid {
+    namespace lib {
+      namespace comm {
+        interface it.unive.dais.legodroid.lib.comm.AsyncChannel {
+        }
+      }
+    }
+  }
+  
+
+  namespace it.unive.dais.legodroid {
+    namespace lib {
+      namespace comm {
+        class it.unive.dais.legodroid.lib.comm.BluetoothConnection {
+        }
+      }
+    }
+  }
+  
+
+  namespace it.unive.dais.legodroid {
+    namespace lib {
+      namespace comm {
+        class it.unive.dais.legodroid.lib.comm.Bytecode {
+        }
+      }
+    }
+  }
+  
+
+  namespace it.unive.dais.legodroid {
+    namespace lib {
+      namespace comm {
+        interface it.unive.dais.legodroid.lib.comm.Channel {
+        }
+      }
+    }
+  }
+  
+
+  namespace it.unive.dais.legodroid {
+    namespace lib {
+      namespace comm {
+        class it.unive.dais.legodroid.lib.comm.Command {
+        }
+      }
+    }
+  }
+  
+
+  namespace it.unive.dais.legodroid {
+    namespace lib {
+      namespace comm {
+        interface it.unive.dais.legodroid.lib.comm.Connection {
+        }
+      }
+    }
+  }
+  
+
+  namespace it.unive.dais.legodroid {
+    namespace lib {
+      namespace comm {
+        class it.unive.dais.legodroid.lib.comm.Const {
+        }
+      }
+    }
+  }
+  
+
+  namespace it.unive.dais.legodroid {
+    namespace lib {
+      namespace comm {
+        abstract class it.unive.dais.legodroid.lib.comm.Packet {
+        }
+      }
+    }
+  }
+  
+
+  namespace it.unive.dais.legodroid {
+    namespace lib {
+      namespace comm {
+        class it.unive.dais.legodroid.lib.comm.Reply {
+        }
+      }
+    }
+  }
+  
+
+  namespace it.unive.dais.legodroid {
+    namespace lib {
+      namespace plugs {
+        abstract class it.unive.dais.legodroid.lib.plugs.AbstractSensor {
+        }
+      }
+    }
+  }
+  
+
+  namespace it.unive.dais.legodroid {
+    namespace lib {
+      namespace plugs {
+        class it.unive.dais.legodroid.lib.plugs.GyroSensor {
+        }
+      }
+    }
+  }
+  
+
+  namespace it.unive.dais.legodroid {
+    namespace lib {
+      namespace plugs {
+        class it.unive.dais.legodroid.lib.plugs.LightSensor {
+        }
+      }
+    }
+  }
+  
+
+  namespace it.unive.dais.legodroid {
+    namespace lib {
+      namespace plugs {
+        abstract class it.unive.dais.legodroid.lib.plugs.Plug {
+        }
+      }
+    }
+  }
+  
+
+  namespace it.unive.dais.legodroid {
+    namespace lib {
+      namespace plugs {
+        class it.unive.dais.legodroid.lib.plugs.TachoMotor {
+        }
+      }
+    }
+  }
+  
+
+  namespace it.unive.dais.legodroid {
+    namespace lib {
+      namespace plugs {
+        class it.unive.dais.legodroid.lib.plugs.TouchSensor {
+        }
+      }
+    }
+  }
+  
+
+  namespace it.unive.dais.legodroid {
+    namespace lib {
+      namespace plugs {
+        class it.unive.dais.legodroid.lib.plugs.UltrasonicSensor {
+        }
+      }
+    }
+  }
+  
+
+  namespace it.unive.dais.legodroid {
+    namespace lib {
+      namespace util {
+        interface it.unive.dais.legodroid.lib.util.Consumer {
+        }
+      }
+    }
+  }
+  
+
+  namespace it.unive.dais.legodroid {
+    namespace lib {
+      namespace util {
+        interface it.unive.dais.legodroid.lib.util.Function {
+        }
+      }
+    }
+  }
+  
+
+  namespace it.unive.dais.legodroid {
+    namespace lib {
+      namespace util {
+        class it.unive.dais.legodroid.lib.util.Prelude {
+        }
+      }
+    }
+  }
+  
+
+  namespace it.unive.dais.legodroid {
+    namespace lib {
+      namespace util {
+        interface it.unive.dais.legodroid.lib.util.ThrowingConsumer {
+        }
+      }
+    }
+  }
+  
+
+  namespace it.unive.dais.legodroid {
+    namespace lib {
+      namespace util {
+        interface it.unive.dais.legodroid.lib.util.ThrowingRunnable {
+        }
+      }
+    }
+  }
+  
+
+  namespace it.unive.dais.legodroid {
+    namespace lib {
+      namespace util {
+        class it.unive.dais.legodroid.lib.util.UnexpectedException {
+        }
+      }
+    }
+  }
+  
+
+  it.unive.dais.legodroid.lib.comm.BluetoothConnection .up.|> it.unive.dais.legodroid.lib.comm.Connection
+  it.unive.dais.legodroid.lib.comm.Command -up-|> it.unive.dais.legodroid.lib.comm.Packet
+  it.unive.dais.legodroid.lib.comm.Reply -up-|> it.unive.dais.legodroid.lib.comm.Packet
+  it.unive.dais.legodroid.lib.plugs.AbstractSensor -up-|> it.unive.dais.legodroid.lib.plugs.Plug
+  it.unive.dais.legodroid.lib.plugs.GyroSensor -up-|> it.unive.dais.legodroid.lib.plugs.AbstractSensor
+  it.unive.dais.legodroid.lib.plugs.LightSensor -up-|> it.unive.dais.legodroid.lib.plugs.AbstractSensor
+  it.unive.dais.legodroid.lib.plugs.Plug o-- it.unive.dais.legodroid.lib.EV3.Api : api
+  it.unive.dais.legodroid.lib.plugs.Plug o-- Port : port
+  it.unive.dais.legodroid.lib.plugs.TachoMotor .up.|> java.lang.AutoCloseable
+  it.unive.dais.legodroid.lib.plugs.TachoMotor -up-|> it.unive.dais.legodroid.lib.plugs.Plug
+  it.unive.dais.legodroid.lib.plugs.TouchSensor -up-|> it.unive.dais.legodroid.lib.plugs.AbstractSensor
+  it.unive.dais.legodroid.lib.plugs.UltrasonicSensor -up-|> it.unive.dais.legodroid.lib.plugs.AbstractSensor
+
+
+right footer
+
+
+PlantUML diagram generated by SketchIt! (https://bitbucket.org/pmesmeur/sketch.it)
+For more information about this tool, please contact philippe.mesmeur@gmail.com
+endfooter
+
+@enduml

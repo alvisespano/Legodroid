@@ -23,7 +23,7 @@ import static it.unive.dais.legodroid.lib.util.Prelude.ReTAG;
  * Instances of this class do not represent an active connection but rather a factory for creating the actual connection channel.
  * The type of the channel is the inner class {@link BluetoothChannel}.
  */
-public class BluetoothConnection implements Connection<BluetoothConnection.BluetoothChannel> {
+public class BluetoothConnection implements Connection<String, BluetoothConnection.BluetoothChannel> {
     private static final String TAG = ReTAG("BluetoothConnection");
 
     @NonNull
@@ -52,7 +52,7 @@ public class BluetoothConnection implements Connection<BluetoothConnection.Bluet
      */
     @NonNull
     @Override
-    public BluetoothChannel connect() throws IOException {
+    public BluetoothChannel call() throws IOException {
         if (socket != null && socket.isConnected()) {
             Log.w(TAG, "bluetooth socket is already connected");
             return new BluetoothChannel(socket);
@@ -78,14 +78,14 @@ public class BluetoothConnection implements Connection<BluetoothConnection.Bluet
 
     @Override
     @NonNull
-    public String getPeerName() {
+    public String getPeer() {
         return name;
     }
 
     @NonNull
     @Override
     public String toString() {
-        return String.format("BluetoothConnection[%s]", getPeerName());
+        return String.format("BluetoothConnection[%s]", getPeer());
     }
 
 
@@ -93,7 +93,7 @@ public class BluetoothConnection implements Connection<BluetoothConnection.Bluet
      * This inner non-static class represents an active bluetooth channel through which the two connected devices communicate sending commands and receiving replies.
      * @see Channel
      */
-    public class BluetoothChannel implements Channel {
+    public class BluetoothChannel implements Channel<String> {
         private final String TAG = ReTAG(BluetoothConnection.TAG, ".BluetoothChannel");
         @NonNull
         private final InputStream in;
@@ -146,13 +146,13 @@ public class BluetoothConnection implements Connection<BluetoothConnection.Bluet
         @NonNull
         @Override
         public String toString() {
-            return String.format("BluetoothChannel[%s]", getPeerName());
+            return String.format("BluetoothChannel[%s]", getPeer());
         }
 
         @Override
         @NonNull
-        public Connection getConnection() {
-            return BluetoothConnection.this;
+        public String getPeer() {
+            return BluetoothConnection.this.getPeer();
         }
     }
 

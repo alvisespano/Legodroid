@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
  * Classes implementing this interface represent active on-going connections between two devices, in a similar fashion to {@link Channel}.
  * Communication is <b>asynchronous</b> though: no receive method exists, as calling {@link #send(Command)} returns a future reply.
  */
-public interface AsyncChannel extends AutoCloseable {
+public interface AsyncChannel<P> extends AutoCloseable {
     /**
      * Send a {@link Command} asynchronously and returns a future object hosting the {@link Reply} object.
      *
@@ -46,4 +46,7 @@ public interface AsyncChannel extends AutoCloseable {
      */
     @Override
     void close();
+
+    @NonNull
+    P getPeer();
 }

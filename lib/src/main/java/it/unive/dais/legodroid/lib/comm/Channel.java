@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
  * Communication is synchronous and users must be aware of the communication dynamics by calling {@link #send(Command)} and {@link #receive()} accordingly.
  * Channels are also {@link AutoCloseable}, therefore losing the reference to the channel object triggers automatic disconnection.
  */
-public interface Channel extends AutoCloseable {
+public interface Channel<P> extends AutoCloseable {
     /**
      * Send a {@link Command} synchronously.
      *
@@ -33,7 +33,7 @@ public interface Channel extends AutoCloseable {
      * @return the connection.
      */
     @NonNull
-    Connection getConnection();
+    P getPeer();
 
     /**
      * Disconnect from the device.

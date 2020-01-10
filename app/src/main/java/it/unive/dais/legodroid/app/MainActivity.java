@@ -1,5 +1,6 @@
 package it.unive.dais.legodroid.app;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,6 +19,7 @@ import java.util.concurrent.Future;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.comm.BluetoothConnection;
@@ -148,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
             Prelude.trap(() -> f.call(motor));
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -155,8 +158,8 @@ public class MainActivity extends AppCompatActivity {
         textView = findViewById(R.id.textView);
 
         try {
-            // connect to EV3 via bluetooth
-            BluetoothConnection.BluetoothChannel ch = new BluetoothConnection("EV3").connect(); // replace with your own brick name
+            // call to EV3 via bluetooth
+            BluetoothConnection.BluetoothChannel ch = new BluetoothConnection("EV3").call(); // replace with your own brick name
             EV3 ev3 = new EV3(ch);
 
             Button stopButton = findViewById(R.id.stopButton);
@@ -166,18 +169,19 @@ public class MainActivity extends AppCompatActivity {
 
             Button startButton = findViewById(R.id.startButton);
 
-            ev3.run(this::legoMain, CustomApi::new);
-            ev3.run(this::customLegoMain, CustomApi::new);
-            ev3.run(this::anotherCustomLegoMain, AnotherCustomApi::new);
-            ev3.run(this::legoMain, AnotherCustomApi::new);
-            ev3.run(this::customLegoMain, AnotherCustomApi::new);
-            ev3.run(this::legoMain, CustomApiExt::new);
-            ev3.run(this::customLegoMain, CustomApiExt::new);
-            ev3.run(this::customLegoMainExt, CustomApiExt::new);
+//            ev3.run(this::legoMain, CustomApi::new);
+//            ev3.run(this::customLegoMain, CustomApi::new);
+//            ev3.run(this::anotherCustomLegoMain, AnotherCustomApi::new);
+//            ev3.run(this::legoMain, AnotherCustomApi::new);
+//            ev3.run(this::customLegoMain, AnotherCustomApi::new);
+//            ev3.run(this::legoMain, CustomApiExt::new);
+//            ev3.run(this::customLegoMain, CustomApiExt::new);
+//            ev3.run(this::customLegoMainExt, CustomApiExt::new);
+
+//            String[] peers = new String[] { "MyBrickName1", "MyBrickName2", "MyBrickName3" };
+//            Stream<? extends Channel<?>> r = Arrays.stream(peers).map(BluetoothConnection::new).map(BluetoothConnection::call);
 
             startButton.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::customLegoMain, CustomApi::new)));
-            // alternatively with EV3
-            startButton.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::legoMain, AnotherCustomApi::new)));
 
             setupEditable(R.id.powerEdit, (x) -> applyMotor((m) -> {
                 m.setPower(x);
@@ -188,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
                 m.start();
             }));
         } catch (IOException e) {
-            Log.e(TAG, "fatal error: cannot connect to EV3");
+            Log.e(TAG, "fatal error: cannot call to EV3");
             e.printStackTrace();
         } catch (EV3.AlreadyRunningException e) {
             e.printStackTrace();

@@ -182,7 +182,7 @@ public class EV3 {
     @NonNull
     protected final static Set<AsyncChannel> channels = new HashSet<>();
     @NonNull
-    protected final AsyncChannel channel;
+    protected final AsyncChannel<?> channel;
     @Nullable
     protected AsyncTask<Void, Void, Void> task = null;
 
@@ -191,7 +191,7 @@ public class EV3 {
      *
      * @param channel an asynchronous channel object of type AsyncChannel.
      */
-    public EV3(@NonNull AsyncChannel channel) throws AlreadyRunningException {
+    public EV3(@NonNull AsyncChannel<?> channel) throws AlreadyRunningException {
         this.channel = channel;
         if (channels.contains(channel))
             throw new AlreadyRunningException(String.format("channel '%s' is already busy", channel.toString()));
@@ -203,8 +203,8 @@ public class EV3 {
      *
      * @param channel a synchrounous channel object.
      */
-    public EV3(@NonNull Channel channel) throws AlreadyRunningException {
-        this(new SpooledAsyncChannel(channel));
+    public <P> EV3(@NonNull Channel<P> channel) throws AlreadyRunningException {
+        this(new SpooledAsyncChannel<>(channel));
     }
 
     /**
@@ -231,7 +231,7 @@ public class EV3 {
      * @param f the function object representing the main code for the EV3 brick.
      * @throws AlreadyRunningException thrown when a program is already running on the EV3 brick.
      */
-    public  void run(@NonNull Consumer<Api> f) throws AlreadyRunningException {
+    public void run(@NonNull Consumer<Api> f) throws AlreadyRunningException {
         run(f, Api::new);
     }
 
@@ -310,10 +310,10 @@ public class EV3 {
      *
      * @see AsyncChannel
      */
-    private static class SpooledAsyncChannel implements AsyncChannel {
+    private static class SpooledAsyncChannel<P> implements AsyncChannel<P> {
 
         @NonNull
-        private final Channel channel;
+        private final Channel<P> channel;
         @NonNull
         private final List<FutureReply> q = Collections.synchronizedList(new ArrayList<>());
         @NonNull
@@ -324,7 +324,7 @@ public class EV3 {
          *
          * @param channel a synchrounous channel.
          */
-        public SpooledAsyncChannel(@NonNull Channel channel) {
+        public SpooledAsyncChannel(@NonNull Channel<P> channel) {
             this.channel = channel;
             this.task = new SpoolerTask(channel, q);
             task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -333,6 +333,12 @@ public class EV3 {
         @Override
         public void close() {
             task.cancel(true);
+        }
+
+        @NonNull
+        @Override
+        public P getPeer() {
+            return channel.getPeer();
         }
 
         @Override
@@ -351,11 +357,11 @@ public class EV3 {
             private static final int MAX_RETRIES = 5;
 
             @NonNull
-            private final Channel channel;
+            private final Channel<?> channel;
             @NonNull
             private final List<FutureReply> q;
 
-            private SpoolerTask(@NonNull Channel ch, @NonNull List<FutureReply> q) {
+            private SpoolerTask(@NonNull Channel<?> ch, @NonNull List<FutureReply> q) {
                 this.channel = ch;
                 this.q = q;
             }
