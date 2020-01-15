@@ -10,10 +10,8 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -180,8 +178,6 @@ public class EV3 {
     }
 
     @NonNull
-    protected final static Set<AsyncChannel> channels = new HashSet<>();
-    @NonNull
     protected final AsyncChannel<?> channel;
     @Nullable
     protected AsyncTask<Void, Void, Void> task = null;
@@ -191,11 +187,8 @@ public class EV3 {
      *
      * @param channel an asynchronous channel object of type AsyncChannel.
      */
-    public EV3(@NonNull AsyncChannel<?> channel) throws AlreadyRunningException {
+    public EV3(@NonNull AsyncChannel<?> channel) {
         this.channel = channel;
-        if (channels.contains(channel))
-            throw new AlreadyRunningException(String.format("channel '%s' is already in use", channel.toString()));
-        channels.add(channel);
     }
 
     /**
@@ -203,7 +196,7 @@ public class EV3 {
      *
      * @param channel a synchrounous channel object.
      */
-    public <P> EV3(@NonNull Channel<P> channel) throws AlreadyRunningException {
+    public <P> EV3(@NonNull Channel<P> channel) {
         this(new SpooledAsyncChannel<>(channel));
     }
 
@@ -266,10 +259,10 @@ public class EV3 {
         @Override
         protected Void doInBackground(Void... voids) {
             Thread.currentThread().setName(TAG);
-            Log.v(TAG, "starting EV3 task");
+            Log.v(TAG, "starting EV3 spooler task");
             try {
                 main.call(make.apply(ev3));
-                Log.v(TAG, "exiting EV3 task");
+                Log.v(TAG, "exiting EV3 spooler task");
             } catch (Throwable e) {
                 Log.e(TAG, String.format("uncaught exception: %s. Aborting EV3 task", e.getMessage()));
                 e.printStackTrace();
