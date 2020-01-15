@@ -706,7 +706,7 @@ public class EV3 {
                     byte[] bData = Arrays.copyOfRange(reply, 2 * i, 2 * i + 2);
                     result[i] = ByteBuffer.wrap(bData).order(ByteOrder.LITTLE_ENDIAN).getShort();
                 }
-                return result;
+                return result; 
             });
         }
 
