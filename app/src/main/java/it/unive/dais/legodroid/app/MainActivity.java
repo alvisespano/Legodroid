@@ -116,17 +116,17 @@ public class MainActivity extends AppCompatActivity {
             Pair<Integer, Map.Entry<Color, Integer>> min =
                     new Pair<>(0x100 * 3, map.entrySet().iterator().next());
             for (Map.Entry<Color, Integer> e : map.entrySet()) {
-                final int v = e.getValue(), d = distance(v, rgb);
+                final int v = e.getValue(), d = rgbDistance(v, rgb);
                 if (min.first < d)
                     min = new Pair<>(d, e);
             }
             return min.second.getKey();
         }
 
-        private static int distance(int value, int rgb) {
-            int r = Math.abs(value & 0xff0000 >> 16 - rgb & 0xff0000 >> 16),
-                    g = Math.abs(value & 0x00ff00 >> 8 - rgb & 0x00ff00 >> 8),
-                    b = Math.abs(value & 0x0000ff - rgb & 0x0000ff);
+        private static int rgbDistance(int x, int y) {
+            int r = Math.abs(x & 0xff0000 >> 16 - y & 0xff0000 >> 16),
+                    g = Math.abs(x & 0x00ff00 >> 8 - y & 0x00ff00 >> 8),
+                    b = Math.abs(x & 0x0000ff - y & 0x0000ff);
             return r + g + b;
         }
 

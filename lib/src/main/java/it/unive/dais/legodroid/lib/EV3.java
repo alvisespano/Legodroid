@@ -194,7 +194,7 @@ public class EV3 {
     public EV3(@NonNull AsyncChannel<?> channel) throws AlreadyRunningException {
         this.channel = channel;
         if (channels.contains(channel))
-            throw new AlreadyRunningException(String.format("channel '%s' is already busy", channel.toString()));
+            throw new AlreadyRunningException(String.format("channel '%s' is already in use", channel.toString()));
         channels.add(channel);
     }
 
