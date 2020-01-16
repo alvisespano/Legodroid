@@ -78,8 +78,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class CustomApiExt extends CustomApi {
-        private CustomApiExt(@NonNull EV3 ev3) {
+    private class ExtCustomApi extends CustomApi {
+        private ExtCustomApi(@NonNull EV3 ev3) {
             super(ev3);
         }
     }
@@ -169,14 +169,16 @@ public class MainActivity extends AppCompatActivity {
 
             Button startButton = findViewById(R.id.startButton);
 
-//            ev3.run(this::legoMain, CustomApi::new);
-//            ev3.run(this::customLegoMain, CustomApi::new);
-//            ev3.run(this::anotherCustomLegoMain, AnotherCustomApi::new);
-//            ev3.run(this::legoMain, AnotherCustomApi::new);
-//            ev3.run(this::customLegoMain, AnotherCustomApi::new);
-//            ev3.run(this::legoMain, CustomApiExt::new);
-//            ev3.run(this::customLegoMain, CustomApiExt::new);
-//            ev3.run(this::customLegoMainExt, CustomApiExt::new);
+            ev3.run(this::legoMain, CustomApi::new);
+            ev3.run(this::legoMain, AnotherCustomApi::new);
+            ev3.run(this::extCustomLegoMain, ExtCustomApi::new);
+            ev3.run(this::extCustomLegoMain, CustomApi::new);
+            ev3.run(this::anotherCustomLegoMain, ExtCustomApi::new);
+
+            ev3.run(this::legoMain, AnotherCustomApi::new);
+            ev3.run(this::customLegoMain, AnotherCustomApi::new);
+            ev3.run(this::legoMain, ExtCustomApi::new);
+            ev3.run(this::extCustomLegoMain, ExtCustomApi::new);
 
 //            String[] peers = new String[] { "MyBrickName1", "MyBrickName2", "MyBrickName3" };
 //            Stream<? extends Channel<?>> r = Arrays.stream(peers).map(BluetoothConnection::new).map(BluetoothConnection::call);
@@ -270,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
         legoMain(api);
     }
 
-    private void customLegoMainExt(CustomApiExt api) {
+    private void extCustomLegoMain(ExtCustomApi api) {
         final String TAG = Prelude.ReTAG("legoMainCustomApi");
         // stub the other main
         legoMain(api);
