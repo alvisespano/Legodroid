@@ -22,7 +22,10 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import it.unive.dais.legodroid.lib.EV3;
+import it.unive.dais.legodroid.lib.comm.AsyncChannel;
 import it.unive.dais.legodroid.lib.comm.BluetoothConnection;
+import it.unive.dais.legodroid.lib.comm.Channel;
+import it.unive.dais.legodroid.lib.comm.Connection;
 import it.unive.dais.legodroid.lib.plugs.GyroSensor;
 import it.unive.dais.legodroid.lib.plugs.LightSensor;
 import it.unive.dais.legodroid.lib.plugs.Plug;
@@ -169,16 +172,11 @@ public class MainActivity extends AppCompatActivity {
 
             Button startButton = findViewById(R.id.startButton);
 
-            ev3.run(this::legoMain, CustomApi::new);
-            ev3.run(this::legoMain, AnotherCustomApi::new);
-            ev3.run(this::extCustomLegoMain, ExtCustomApi::new);
-            ev3.run(this::extCustomLegoMain, CustomApi::new);
-            ev3.run(this::anotherCustomLegoMain, ExtCustomApi::new);
-
-            ev3.run(this::legoMain, AnotherCustomApi::new);
-            ev3.run(this::customLegoMain, AnotherCustomApi::new);
-            ev3.run(this::legoMain, ExtCustomApi::new);
-            ev3.run(this::extCustomLegoMain, ExtCustomApi::new);
+//            ev3.run(this::legoMain, CustomApi::new);
+//            ev3.run(this::legoMain, AnotherCustomApi::new);
+//            ev3.run(this::extCustomLegoMain, ExtCustomApi::new);
+//            ev3.run(this::extCustomLegoMain, CustomApi::new);
+//            ev3.run(this::anotherCustomLegoMain, ExtCustomApi::new);
 
 //            String[] peers = new String[] { "MyBrickName1", "MyBrickName2", "MyBrickName3" };
 //            Stream<? extends Channel<?>> r = Arrays.stream(peers).map(BluetoothConnection::new).map(BluetoothConnection::call);
@@ -195,8 +193,6 @@ public class MainActivity extends AppCompatActivity {
             }));
         } catch (IOException e) {
             Log.e(TAG, "fatal error: cannot call to EV3");
-            e.printStackTrace();
-        } catch (EV3.AlreadyRunningException e) {
             e.printStackTrace();
         }
     }
