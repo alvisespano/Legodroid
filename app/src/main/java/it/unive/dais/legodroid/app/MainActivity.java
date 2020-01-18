@@ -22,7 +22,10 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import it.unive.dais.legodroid.lib.EV3;
+import it.unive.dais.legodroid.lib.comm.AsyncChannel;
 import it.unive.dais.legodroid.lib.comm.BluetoothConnection;
+import it.unive.dais.legodroid.lib.comm.Channel;
+import it.unive.dais.legodroid.lib.comm.Connection;
 import it.unive.dais.legodroid.lib.plugs.GyroSensor;
 import it.unive.dais.legodroid.lib.plugs.LightSensor;
 import it.unive.dais.legodroid.lib.plugs.Plug;
@@ -78,8 +81,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class CustomApiExt extends CustomApi {
-        private CustomApiExt(@NonNull EV3 ev3) {
+    private class ExtCustomApi extends CustomApi {
+        private ExtCustomApi(@NonNull EV3 ev3) {
             super(ev3);
         }
     }
@@ -116,17 +119,17 @@ public class MainActivity extends AppCompatActivity {
             Pair<Integer, Map.Entry<Color, Integer>> min =
                     new Pair<>(0x100 * 3, map.entrySet().iterator().next());
             for (Map.Entry<Color, Integer> e : map.entrySet()) {
-                final int v = e.getValue(), d = distance(v, rgb);
+                final int v = e.getValue(), d = rgbDistance(v, rgb);
                 if (min.first < d)
                     min = new Pair<>(d, e);
             }
             return min.second.getKey();
         }
 
-        private static int distance(int value, int rgb) {
-            int r = Math.abs(value & 0xff0000 >> 16 - rgb & 0xff0000 >> 16),
-                    g = Math.abs(value & 0x00ff00 >> 8 - rgb & 0x00ff00 >> 8),
-                    b = Math.abs(value & 0x0000ff - rgb & 0x0000ff);
+        private static int rgbDistance(int x, int y) {
+            int r = Math.abs(x & 0xff0000 >> 16 - y & 0xff0000 >> 16),
+                    g = Math.abs(x & 0x00ff00 >> 8 - y & 0x00ff00 >> 8),
+                    b = Math.abs(x & 0x0000ff - y & 0x0000ff);
             return r + g + b;
         }
 
@@ -170,13 +173,10 @@ public class MainActivity extends AppCompatActivity {
             Button startButton = findViewById(R.id.startButton);
 
 //            ev3.run(this::legoMain, CustomApi::new);
-//            ev3.run(this::customLegoMain, CustomApi::new);
-//            ev3.run(this::anotherCustomLegoMain, AnotherCustomApi::new);
 //            ev3.run(this::legoMain, AnotherCustomApi::new);
-//            ev3.run(this::customLegoMain, AnotherCustomApi::new);
-//            ev3.run(this::legoMain, CustomApiExt::new);
-//            ev3.run(this::customLegoMain, CustomApiExt::new);
-//            ev3.run(this::customLegoMainExt, CustomApiExt::new);
+//            ev3.run(this::extCustomLegoMain, ExtCustomApi::new);
+//            ev3.run(this::extCustomLegoMain, CustomApi::new);
+//            ev3.run(this::anotherCustomLegoMain, ExtCustomApi::new);
 
 //            String[] peers = new String[] { "MyBrickName1", "MyBrickName2", "MyBrickName3" };
 //            Stream<? extends Channel<?>> r = Arrays.stream(peers).map(BluetoothConnection::new).map(BluetoothConnection::call);
@@ -193,8 +193,6 @@ public class MainActivity extends AppCompatActivity {
             }));
         } catch (IOException e) {
             Log.e(TAG, "fatal error: cannot call to EV3");
-            e.printStackTrace();
-        } catch (EV3.AlreadyRunningException e) {
             e.printStackTrace();
         }
     }
@@ -270,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
         legoMain(api);
     }
 
-    private void customLegoMainExt(CustomApiExt api) {
+    private void extCustomLegoMain(ExtCustomApi api) {
         final String TAG = Prelude.ReTAG("legoMainCustomApi");
         // stub the other main
         legoMain(api);

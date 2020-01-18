@@ -121,121 +121,121 @@ title __COMM's Class Diagram__\n
   }
   
 
-  namespace it.unive.dais.legodroid {
-    namespace lib {
-      namespace comm {
-        class it.unive.dais.legodroid.lib.comm.Const {
-            {static} + ALL_MOTORS : byte
-            {static} + BRAKE : byte
-            {static} + CAL_DEFAULT : byte
-            {static} + CAL_MAX : byte
-            {static} + CAL_MIN : byte
-            {static} + CAL_MINMAX : byte
-            {static} + CLR_ALL : byte
-            {static} + CLR_CHANGES : byte
-            {static} + COAST : byte
-            {static} + COL_AMBIENT : byte
-            {static} + COL_COLOR : byte
-            {static} + COL_REFLECT : byte
-            {static} + COL_RGB : byte
-            {static} + DIRECT_COMMAND_FAIL : byte
-            {static} + DIRECT_COMMAND_NOREPLY : byte
-            {static} + DIRECT_COMMAND_REPLY : byte
-            {static} + DIRECT_COMMAND_SUCCESS : byte
-            {static} + EV3_COLOR : byte
-            {static} + EV3_GYRO : byte
-            {static} + EV3_IR : byte
-            {static} + EV3_TOUCH : byte
-            {static} + EV3_ULTRASONIC : byte
-            {static} + GET_BUMPS : byte
-            {static} + GET_CHANGES : byte
-            {static} + GET_CONNECTION : byte
-            {static} + GET_FIGURES : byte
-            {static} + GET_FORMAT : byte
-            {static} + GET_MINMAX : byte
-            {static} + GET_MODENAME : byte
-            {static} + GET_NAME : byte
-            {static} + GET_RAW : byte
-            {static} + GET_SYMBOL : byte
-            {static} + GET_TYPEMODE : byte
-            {static} + GYRO_ANGLE : byte
-            {static} + GYRO_RATE : byte
-            {static} + INPUT_DEVICE : byte
-            {static} + INPUT_DEVICE_LIST : byte
-            {static} + INPUT_READ : byte
-            {static} + INPUT_READEXT : byte
-            {static} + INPUT_READSI : byte
-            {static} + INPUT_READY : byte
-            {static} + INPUT_SAMPLE : byte
-            {static} + INPUT_TEST : byte
-            {static} + INPUT_WRITE : byte
-            {static} + IR_PROX : byte
-            {static} + IR_REMOTE : byte
-            {static} + IR_SEEK : byte
-            {static} + LAYER_MASTER : byte
-            {static} + LAYER_SLAVE : byte
-            {static} + LIGHT_AMBIENT : byte
-            {static} + LIGHT_REFLECT : byte
-            {static} + L_MOTOR : byte
-            {static} + L_MOTOR_DEGREE : byte
-            {static} + L_MOTOR_ROTATE : byte
-            {static} + L_MOTOR_SPEED : byte
-            {static} + MODE_DEFAULT : byte
-            {static} + M_MOTOR : byte
-            {static} + M_MOTOR_DEGREE : byte
-            {static} + M_MOTOR_ROTATE : byte
-            {static} + M_MOTOR_SPEED : byte
-            {static} + NOT_INITIALIZED : byte
-            {static} + NXT_COLOR : byte
-            {static} + NXT_LIGHT : byte
-            {static} + NXT_SOUND : byte
-            {static} + NXT_TOUCH : byte
-            {static} + NXT_ULTRASONIC : byte
-            {static} + OUTPUT_CLR_COUNT : byte
-            {static} + OUTPUT_GET_COUNT : byte
-            {static} + OUTPUT_GET_TYPE : byte
-            {static} + OUTPUT_POLARITY : byte
-            {static} + OUTPUT_POSITION : byte
-            {static} + OUTPUT_POWER : byte
-            {static} + OUTPUT_PRG_ST : byte
-            {static} + OUTPUT_READ : byte
-            {static} + OUTPUT_READY : byte
-            {static} + OUTPUT_RESET : byte
-            {static} + OUTPUT_SET_TYPE : byte
-            {static} + OUTPUT_SPEED : byte
-            {static} + OUTPUT_START : byte
-            {static} + OUTPUT_STEP_POWER : byte
-            {static} + OUTPUT_STEP_SPEED : byte
-            {static} + OUTPUT_STEP_SYNC : byte
-            {static} + OUTPUT_STOP : byte
-            {static} + OUTPUT_TEST : byte
-            {static} + OUTPUT_TIME_POWER : byte
-            {static} + OUTPUT_TIME_SPEED : byte
-            {static} + OUTPUT_TIME_SYNC : byte
-            {static} + READY_PCT : byte
-            {static} + READY_RAW : byte
-            {static} + READY_SI : byte
-            {static} + SETUP : byte
-            {static} + SET_RAW : byte
-            {static} + SOUND_BREAK : byte
-            {static} + SOUND_CONTROL : byte
-            {static} + SOUND_DB : byte
-            {static} + SOUND_DBA : byte
-            {static} + SOUND_PLAY : byte
-            {static} + SOUND_REPEAT : byte
-            {static} + SOUND_SERVICE : byte
-            {static} + SOUND_TONE : byte
-            {static} + STOP_ALL : byte
-            {static} + TOUCH_BUMPS : byte
-            {static} + TOUCH_TOUCH : byte
-            {static} + TYPE_DEFAULT : byte
-            {static} + US_CM : byte
-            {static} + US_INCH : byte
-            {static} + US_LISTEN : byte
-        }
-      }
-    }
-  }
+'  namespace it.unive.dais.legodroid {
+'    namespace lib {
+'      namespace comm {
+'        class it.unive.dais.legodroid.lib.comm.Const {
+'            {static} + ALL_MOTORS : byte
+'            {static} + BRAKE : byte
+'            {static} + CAL_DEFAULT : byte
+'            {static} + CAL_MAX : byte
+'            {static} + CAL_MIN : byte
+'            {static} + CAL_MINMAX : byte
+'            {static} + CLR_ALL : byte
+'            {static} + CLR_CHANGES : byte
+'            {static} + COAST : byte
+'            {static} + COL_AMBIENT : byte
+'            {static} + COL_COLOR : byte
+'            {static} + COL_REFLECT : byte
+'            {static} + COL_RGB : byte
+'            {static} + DIRECT_COMMAND_FAIL : byte
+'            {static} + DIRECT_COMMAND_NOREPLY : byte
+'            {static} + DIRECT_COMMAND_REPLY : byte
+'            {static} + DIRECT_COMMAND_SUCCESS : byte
+'            {static} + EV3_COLOR : byte
+'            {static} + EV3_GYRO : byte
+'            {static} + EV3_IR : byte
+'            {static} + EV3_TOUCH : byte
+'            {static} + EV3_ULTRASONIC : byte
+'            {static} + GET_BUMPS : byte
+'            {static} + GET_CHANGES : byte
+'            {static} + GET_CONNECTION : byte
+'            {static} + GET_FIGURES : byte
+'            {static} + GET_FORMAT : byte
+'            {static} + GET_MINMAX : byte
+'            {static} + GET_MODENAME : byte
+'            {static} + GET_NAME : byte
+'            {static} + GET_RAW : byte
+'            {static} + GET_SYMBOL : byte
+'            {static} + GET_TYPEMODE : byte
+'            {static} + GYRO_ANGLE : byte
+'            {static} + GYRO_RATE : byte
+'            {static} + INPUT_DEVICE : byte
+'            {static} + INPUT_DEVICE_LIST : byte
+'            {static} + INPUT_READ : byte
+'            {static} + INPUT_READEXT : byte
+'            {static} + INPUT_READSI : byte
+'            {static} + INPUT_READY : byte
+'            {static} + INPUT_SAMPLE : byte
+'            {static} + INPUT_TEST : byte
+'            {static} + INPUT_WRITE : byte
+'            {static} + IR_PROX : byte
+'            {static} + IR_REMOTE : byte
+'            {static} + IR_SEEK : byte
+'            {static} + LAYER_MASTER : byte
+'            {static} + LAYER_SLAVE : byte
+'            {static} + LIGHT_AMBIENT : byte
+'            {static} + LIGHT_REFLECT : byte
+'            {static} + L_MOTOR : byte
+'            {static} + L_MOTOR_DEGREE : byte
+'            {static} + L_MOTOR_ROTATE : byte
+'            {static} + L_MOTOR_SPEED : byte
+'            {static} + MODE_DEFAULT : byte
+'            {static} + M_MOTOR : byte
+'            {static} + M_MOTOR_DEGREE : byte
+'            {static} + M_MOTOR_ROTATE : byte
+'            {static} + M_MOTOR_SPEED : byte
+'            {static} + NOT_INITIALIZED : byte
+'            {static} + NXT_COLOR : byte
+'            {static} + NXT_LIGHT : byte
+'            {static} + NXT_SOUND : byte
+'            {static} + NXT_TOUCH : byte
+'            {static} + NXT_ULTRASONIC : byte
+'            {static} + OUTPUT_CLR_COUNT : byte
+'            {static} + OUTPUT_GET_COUNT : byte
+'            {static} + OUTPUT_GET_TYPE : byte
+'            {static} + OUTPUT_POLARITY : byte
+'            {static} + OUTPUT_POSITION : byte
+'            {static} + OUTPUT_POWER : byte
+'            {static} + OUTPUT_PRG_ST : byte
+'            {static} + OUTPUT_READ : byte
+'            {static} + OUTPUT_READY : byte
+'            {static} + OUTPUT_RESET : byte
+'            {static} + OUTPUT_SET_TYPE : byte
+'            {static} + OUTPUT_SPEED : byte
+'            {static} + OUTPUT_START : byte
+'            {static} + OUTPUT_STEP_POWER : byte
+'            {static} + OUTPUT_STEP_SPEED : byte
+'            {static} + OUTPUT_STEP_SYNC : byte
+'            {static} + OUTPUT_STOP : byte
+'            {static} + OUTPUT_TEST : byte
+'            {static} + OUTPUT_TIME_POWER : byte
+'            {static} + OUTPUT_TIME_SPEED : byte
+'            {static} + OUTPUT_TIME_SYNC : byte
+'            {static} + READY_PCT : byte
+'            {static} + READY_RAW : byte
+'            {static} + READY_SI : byte
+'            {static} + SETUP : byte
+'            {static} + SET_RAW : byte
+'            {static} + SOUND_BREAK : byte
+'            {static} + SOUND_CONTROL : byte
+'            {static} + SOUND_DB : byte
+'            {static} + SOUND_DBA : byte
+'            {static} + SOUND_PLAY : byte
+'            {static} + SOUND_REPEAT : byte
+'            {static} + SOUND_SERVICE : byte
+'            {static} + SOUND_TONE : byte
+'            {static} + STOP_ALL : byte
+'            {static} + TOUCH_BUMPS : byte
+'            {static} + TOUCH_TOUCH : byte
+'            {static} + TYPE_DEFAULT : byte
+'            {static} + US_CM : byte
+'            {static} + US_INCH : byte
+'            {static} + US_LISTEN : byte
+'        }
+'      }
+'    }
+'  }
   
 
   namespace it.unive.dais.legodroid {
@@ -266,7 +266,7 @@ title __COMM's Class Diagram__\n
       }
     }
   }
-  
+
 
   it.unive.dais.legodroid.lib.comm.BluetoothConnection .up.|> it.unive.dais.legodroid.lib.comm.Connection
   it.unive.dais.legodroid.lib.comm.BluetoothConnection +-down- it.unive.dais.legodroid.lib.comm.BluetoothConnection.BluetoothChannel
@@ -275,11 +275,5 @@ title __COMM's Class Diagram__\n
   it.unive.dais.legodroid.lib.comm.Reply -up-|> it.unive.dais.legodroid.lib.comm.Packet
 
 
-right footer
-
-
-PlantUML diagram generated by SketchIt! (https://bitbucket.org/pmesmeur/sketch.it)
-For more information about this tool, please contact philippe.mesmeur@gmail.com
-endfooter
 
 @enduml
