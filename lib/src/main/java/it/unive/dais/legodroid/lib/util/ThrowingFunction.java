@@ -6,15 +6,15 @@ package it.unive.dais.legodroid.lib.util;
  * @param <E>
  */
 @FunctionalInterface
-public interface ThrowingConsumer<T, E extends Throwable> extends Consumer<T> {
+public interface ThrowingFunction<A, B, E extends Throwable> extends Function<A, B> {
     /**
-     * Invoke {@link #callThrows} and turn possible checked exceptions into an unchecked {@link RuntimeException}.
+     * Invoke {@link #applyThrows} and turn possible checked exceptions into an unchecked {@link RuntimeException}.
      * @param x the argument of type T
      */
     @Override
-    default void call(T x) {
+    default B apply(A x) {
         try {
-            callThrows(x);
+            return applyThrows(x);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -25,5 +25,5 @@ public interface ThrowingConsumer<T, E extends Throwable> extends Consumer<T> {
      * @param x the parameter.
      * @throws E the exception.
      */
-    void callThrows(T x) throws E;
+    B applyThrows(A x) throws E;
 }

@@ -7,7 +7,7 @@ package it.unive.dais.legodroid.lib.util;
 @FunctionalInterface
 public interface ThrowingRunnable<E extends Throwable> extends Runnable {
     /**
-     * Invoke {@link #runThrows()} and turn possible checked exceptions into an unchecked {@link RuntimeException}.
+     * Invoke {@link #runThrows} and turn possible checked exceptions into an unchecked {@link RuntimeException}.
      */
     @Override
     default void run() {

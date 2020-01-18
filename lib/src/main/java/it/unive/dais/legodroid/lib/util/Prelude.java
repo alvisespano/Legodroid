@@ -5,6 +5,7 @@ import android.util.Log;
 import java.util.Arrays;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * This class provides miscellaneous utilities.
@@ -48,7 +49,7 @@ public class Prelude {
      */
     public static void trap(ThrowingRunnable<? extends Throwable> r) {
         try {
-            r.run();
+            r.runThrows();
         } catch (Throwable e) {
             Log.e(TAG, String.format("exception trapped: %s", e));
             e.printStackTrace();
@@ -59,9 +60,27 @@ public class Prelude {
      * Call a ThrowingConsumer with the given argument of type T.
      * @param c the ThrowingConsumer picking an argument of type T.
      * @param x the argument of type T to be applied.
-     * @param <T> automatically inferred local generic.
+     * @param <T> the type argument of the {@link ThrowingConsumer}.
      */
     public static <T> void trap(ThrowingConsumer<T, ? extends Throwable> c, T x) {
-        trap(() -> c.call(x));
+        trap(() -> c.callThrows(x));
     }
+
+    /**
+     * Call a ThrowingFunction with the given argument of type A.
+     * @param f the ThrowingFunction picking an argument of type A and returning a value of type B.
+     * @param x the argument of type T to be applied.
+     * @param <A> the type of the argument of the {@link ThrowingFunction}.
+     * @param <B> the return type of the {@link ThrowingFunction}.
+     */
+    public static <A, B> B trap(ThrowingFunction<A, B, ? extends Throwable> f, A x) {
+        try {
+            return f.applyThrows(x);
+        } catch (Throwable e) {
+            Log.e(TAG, String.format("exception trapped: %s", e));
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
 }
