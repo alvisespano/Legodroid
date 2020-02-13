@@ -1,20 +1,21 @@
 package it.unive.dais.legodroid.lib.comm;
 
-import android.support.annotation.NonNull;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 /**
- * This class implements a reply for the EV3 device.
+ * This class implements a reply for the GenEV3 device.
  */
 public class Reply extends Packet {
     private static final String TAG = "Reply";
     private final boolean error;
 
     /**
-     * Create a reply object given the raw byte array received by the EV3 device.
+     * Create a reply object given the raw byte array received by the GenEV3 device.
      * This constructor acts as a deserializer.
      *
-     * @param bytes
+     * @param bytes the input byte array
      */
     public Reply(@NonNull byte[] bytes) {
         super(((bytes[1] << 8) & 0xff00) | (bytes[0] & 0xff), new byte[bytes.length - 3]);
@@ -23,7 +24,7 @@ public class Reply extends Packet {
     }
 
     /**
-     * Get the error flag as replied by the EV3 device.
+     * Get the error flag as replied by the GenEV3 device.
      *
      * @return true if an error occurred; false otherwise.
      */

@@ -3,8 +3,6 @@ package it.unive.dais.legodroid.lib.comm;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.IOException;
@@ -14,22 +12,22 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import it.unive.dais.legodroid.lib.util.Prelude;
 
 import static it.unive.dais.legodroid.lib.util.Prelude.ReTAG;
 
 /**
- * This class implements a {@link Connection} between the Android device and the EV3 via the Bluetooth protocol.
+ * This class implements a {@link Connection} between the Android device and the GenEV3 via the Bluetooth protocol.
  * Instances of this class do not represent an active connection but rather a factory for creating the actual connection channel.
  * The type of the channel is the inner class {@link BluetoothChannel}.
  */
 public class BluetoothConnection implements Connection<BluetoothConnection.BluetoothChannel> {
     private static final String TAG = ReTAG("BluetoothConnection");
-    private static final long READ_TIMEOUT_MS = 10000;
 
     @NonNull
     private final String name;
-    @NonNull
     private final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
     @Nullable
     private BluetoothDevice device = null;
@@ -37,8 +35,8 @@ public class BluetoothConnection implements Connection<BluetoothConnection.Bluet
     private BluetoothSocket socket = null;
 
     /**
-     * Create an object given the name of the EV3 device, as configured on the brick settings.
-     * @param name the name of the EV3 device. LEGO factory settings default to "EV3".
+     * Create an object given the name of the GenEV3 device, as configured on the brick settings.
+     * @param name the name of the GenEV3 device. LEGO factory settings default to "GenEV3".
      */
     public BluetoothConnection(@NonNull String name) {
         this.name = name;
@@ -48,7 +46,7 @@ public class BluetoothConnection implements Connection<BluetoothConnection.Bluet
      * Create a channel for communication.
      * Multiple calls to this method do not produce multiple channels: only one active channel is supported.
      * This method internally performs the bluetooth discovery, searching among paired devices for the device whose name has been passed as argument to the constructor.
-     * @apiNote The EV3 device must be first paired with the mobile Android device; refer to the device Bluetooth settings for more info.
+     * @apiNote The GenEV3 device must be first paired with the mobile Android device; refer to the device Bluetooth settings for more info.
      * @return an object of type {@link BluetoothChannel}.
      * @throws IOException thrown when communication errors occur.
      */
@@ -59,6 +57,8 @@ public class BluetoothConnection implements Connection<BluetoothConnection.Bluet
             Log.w(TAG, "bluetooth socket is already connected");
             return new BluetoothChannel(socket);
         }
+        if (adapter == null)
+            throw new IOException("bluetooth is not supported");
         if (!adapter.isEnabled())
             throw new IOException("bluetooth adapter is not enabled or unavailable");
         Set<BluetoothDevice> devs = adapter.getBondedDevices();

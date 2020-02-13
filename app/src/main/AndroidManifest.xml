@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="it.unive.dais.appu">
+    package="it.unive.dais.legodroid.app">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <application

@@ -1,10 +1,6 @@
 package it.unive.dais.legodroid.app;
 
 import android.os.Bundle;
-import android.support.annotation.IdRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -18,8 +14,12 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import it.unive.dais.appu.R;
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import it.unive.dais.legodroid.lib.EV3;
+import it.unive.dais.legodroid.lib.GenEV3;
 import it.unive.dais.legodroid.lib.comm.BluetoothConnection;
 import it.unive.dais.legodroid.lib.plugs.GyroSensor;
 import it.unive.dais.legodroid.lib.plugs.LightSensor;
@@ -69,7 +69,17 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // quick wrapper for accessing field 'motor' only when not-null; also ignores any exception thrown
+    // example of custom API
+    private static class MyCustomApi extends EV3.Api {
+
+        private MyCustomApi(@NonNull GenEV3<? extends EV3.Api> ev3) {
+            super(ev3);
+        }
+
+        public void mySpecialCommand() { /* do something special */ }
+    }
+
+    // quick wrapper for accessing the private field MainActivity.motor only when not-null; also ignores any exception thrown
     private void applyMotor(@NonNull ThrowingConsumer<TachoMotor, Throwable> f) {
         if (motor != null)
             Prelude.trap(() -> f.call(motor));
@@ -92,7 +102,10 @@ public class MainActivity extends AppCompatActivity {
             });
 
             Button startButton = findViewById(R.id.startButton);
-            startButton.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::legomain)));
+
+            startButton.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::legoMain)));
+            // alternatively with GenEV3
+//          startButton.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::legoMainCustomApi, MyCustomApi::new)));
 
             setupEditable(R.id.powerEdit, (x) -> applyMotor((m) -> {
                 m.setPower(x);
@@ -110,8 +123,8 @@ public class MainActivity extends AppCompatActivity {
 
     // main program executed by EV3
 
-    private void legomain(EV3.Api api) {
-        final String TAG = Prelude.ReTAG("legomain");
+    private void legoMain(EV3.Api api) {
+        final String TAG = Prelude.ReTAG("legoMain");
 
         // get sensors
         final LightSensor lightSensor = api.getLightSensor(EV3.InputPort._3);
@@ -127,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
 
             while (!api.ev3.isCancelled()) {    // loop until cancellation signal is fired
                 try {
-                    // values returned by getters are boxed within a special Future object
+                    // values returned by getters are boxed within a Future object
                     Future<Float> gyro = gyroSensor.getAngle();
                     updateStatus(gyroSensor, "gyro angle", gyro.get()); // call get() for actually reading the value - this may block!
 
@@ -143,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                     Future<LightSensor.Color> colf = lightSensor.getColor();
                     LightSensor.Color col = colf.get();
                     updateStatus(lightSensor, "color", col);
-                    // when you need to deal with the UI, you must do it within a lambda passed to runOnUiThread()
+                    // when you need to deal with the UI, you must do it via runOnUiThread()
                     runOnUiThread(() -> findViewById(R.id.colorView).setBackgroundColor(col.toARGB32()));
 
                     Future<Boolean> touched = touchSensor.getPressed();
@@ -170,7 +183,15 @@ public class MainActivity extends AppCompatActivity {
         } finally {
             applyMotor(TachoMotor::stop);
         }
+    }
 
+    // alternative version of the lego main with a custom API
+    private void legoMainCustomApi(MyCustomApi api) {
+        final String TAG = Prelude.ReTAG("legoMainCustomApi");
+        // specialized methods can be safely called
+        api.mySpecialCommand();
+        // stub the other main
+        legoMain(api);
     }
 
 

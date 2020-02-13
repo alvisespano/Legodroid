@@ -1,16 +1,14 @@
 package it.unive.dais.legodroid.lib.plugs;
 
-import android.support.annotation.NonNull;
-
 import java.io.IOException;
 import java.util.concurrent.Future;
 
+import androidx.annotation.NonNull;
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.comm.Const;
-import it.unive.dais.legodroid.lib.comm.Reply;
 
 /**
- * Instances of this class allow operations on the light sensor connected to EV3 via an input port.
+ * Instances of this class allow operations on the light sensor connected to GenEV3 via an input port.
  */
 public class LightSensor extends AbstractSensor {
     public LightSensor(EV3.Api api, EV3.InputPort port) {
@@ -18,10 +16,10 @@ public class LightSensor extends AbstractSensor {
     }
 
     /**
-     * Get the reflected light from the sensor (device mode EV3-Color-Reflected).
+     * Get the reflected light from the sensor (device mode GenEV3-Color-Reflected).
      * Sets the sensor LED color to red.
      *
-     * @return a {@link Future} object hosting the 16-bit integer within the range [ 0 - 100 ] returned by EV3.
+     * @return a {@link Future} object hosting the 16-bit integer within the range [ 0 - 100 ] returned by GenEV3.
      * @throws IOException thrown when communication errors occur.
      */
     @NonNull
@@ -30,10 +28,10 @@ public class LightSensor extends AbstractSensor {
     }
 
     /**
-     * Get the ambient light from the sensor (device mode EV3-Color-Ambient).
+     * Get the ambient light from the sensor (device mode GenEV3-Color-Ambient).
      * Sets the sensor LED color to blue (dimly lit).
      *
-     * @return a {@link Future} object hosting the 16-bit integer within the range [ 0 - 100 ] returned by EV3.
+     * @return a {@link Future} object hosting the 16-bit integer within the range [ 0 - 100 ] returned by GenEV3.
      * @throws IOException thrown when communication errors occur.
      */
     @NonNull
@@ -42,10 +40,10 @@ public class LightSensor extends AbstractSensor {
     }
 
     /**
-     * Get the color value from the sensor (device mode EV3-Color-Color).
+     * Get the color value from the sensor (device mode GenEV3-Color-Color).
      * Sets the sensor LED color to white (all LEDs rapidly cycling).
      *
-     * @return a {@link Future} object hosting the value of type {@link Color} returned by EV3.
+     * @return a {@link Future} object hosting the value of type {@link Color} returned by GenEV3.
      * @throws IOException thrown when communication errors occur.
      */
     @NonNull
@@ -54,12 +52,12 @@ public class LightSensor extends AbstractSensor {
     }
 
     /**
-     * Get the raw RGB values from the sensor (device mode EV3-Color-RGB-Raw).
+     * Get the raw RGB values from the sensor (device mode GenEV3-Color-RGB-Raw).
      * Sets the sensor LED color to white (all LEDs rapidly cycling).
      *
-     * @return a {@link Future} object hosting the object of type {@link Rgb} returned by EV3.
+     * @return a {@link Future} object hosting the object of type {@link Rgb} returned by GenEV3.
      * @throws IOException thrown when communication errors occur.
-     * @deprecated On current EV3 firmwares this command seems to return wrong or imprecise values. Use at own risk.
+     * @deprecated On current GenEV3 firmwares this command seems to return wrong or imprecise values. Use at own risk.
      */
     @Deprecated
     @NonNull
@@ -108,7 +106,7 @@ public class LightSensor extends AbstractSensor {
     }
 
     /**
-     * This enum type represents the possible colors returned by the sensor in device mode EV3-Color-RGB-Raw.
+     * This enum type represents the possible colors returned by the sensor in device mode GenEV3-Color-RGB-Raw.
      */
     public enum Color {
         TRANSPARENT,

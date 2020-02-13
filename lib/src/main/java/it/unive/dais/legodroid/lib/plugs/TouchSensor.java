@@ -1,15 +1,14 @@
 package it.unive.dais.legodroid.lib.plugs;
 
-import android.support.annotation.NonNull;
-
-import it.unive.dais.legodroid.lib.EV3;
-import it.unive.dais.legodroid.lib.comm.Const;
-
 import java.io.IOException;
 import java.util.concurrent.Future;
 
+import androidx.annotation.NonNull;
+import it.unive.dais.legodroid.lib.EV3;
+import it.unive.dais.legodroid.lib.comm.Const;
+
 /**
- * Instances of this class allow operations on the touch (or pressure) sensor connected to EV3 via an input port.
+ * Instances of this class allow operations on the touch (or pressure) sensor connected to GenEV3 via an input port.
  */
 public class TouchSensor extends AbstractSensor {
     public TouchSensor(EV3.Api api, EV3.InputPort port) {

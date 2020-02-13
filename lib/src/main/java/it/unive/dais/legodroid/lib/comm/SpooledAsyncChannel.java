@@ -2,8 +2,6 @@ package it.unive.dais.legodroid.lib.comm;
 
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.IOException;
@@ -17,6 +15,9 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import static it.unive.dais.legodroid.lib.util.Prelude.ReTAG;
 

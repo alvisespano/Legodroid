@@ -1,22 +1,25 @@
 package it.unive.dais.legodroid.lib.plugs;
 
-import android.support.annotation.NonNull;
 import android.util.Log;
-
-import it.unive.dais.legodroid.lib.EV3;
-import it.unive.dais.legodroid.lib.comm.Bytecode;
-import it.unive.dais.legodroid.lib.comm.Const;
-import it.unive.dais.legodroid.lib.comm.Reply;
-import it.unive.dais.legodroid.lib.util.Prelude;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import androidx.annotation.NonNull;
+import it.unive.dais.legodroid.lib.EV3;
+import it.unive.dais.legodroid.lib.comm.Bytecode;
+import it.unive.dais.legodroid.lib.comm.Const;
+import it.unive.dais.legodroid.lib.comm.Reply;
+import it.unive.dais.legodroid.lib.util.Prelude;
+import it.unive.dais.legodroid.lib.util.UnexpectedException;
+
 // TODO: write more details in the javadoc of these methods
 
 /**
- * This class offers methods for controlling the tacho motor of EV3 devices.
+ * This class offers methods for controlling the tacho motor of GenEV3 devices.
+ * The full documentation of EV3 commands, with a detailed description of their behaviour, can be found here:
+ * https://le-www-live-s.legocdn.com/sc/media/files/ev3-developer-kit/lego%20mindstorms%20ev3%20firmware%20developer%20kit-7be073548547d99f7df59ddfd57c0088.pdf
  */
 public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
     private static final String TAG = Prelude.ReTAG("TachoMotor");
@@ -24,7 +27,7 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
     /**
      * Constructor.
      *
-     * @param api  the object of type {@link it.unive.dais.legodroid.lib.EV3.Api}.
+     * @param api  the object of type {@link EV3.Api}.
      * @param port the output port.
      */
     public TachoMotor(@NonNull EV3.Api api, EV3.OutputPort port) {
@@ -109,7 +112,7 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
     }
 
     /**
-     * Make the EV3 wait until the current command has been completed.
+     * Make the GenEV3 wait until the current command has been completed.
      * This method is NOT blocking the caller thread.
      *
      * @throws IOException thrown when communication errors occur.
@@ -219,11 +222,11 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
      */
     public enum Type {
         /**
-         * Medium motor: the small ones, e.g. EV3 Medium Servo motor
+         * Medium motor: the small ones, e.g. GenEV3 Medium Servo motor
          */
         MEDIUM,
         /**
-         * Large motor: the standard ones, e.g. EV3 Large Servo Motor.
+         * Large motor: the standard ones, e.g. GenEV3 Large Servo Motor.
          */
         LARGE;
 
@@ -236,8 +239,10 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
             switch (this) {
                 case MEDIUM:
                     return Const.M_MOTOR;
-                default:
+                case LARGE:
                     return Const.L_MOTOR;
+                default:
+                    throw new UnexpectedException("unknown motor type");
             }
         }
     }
