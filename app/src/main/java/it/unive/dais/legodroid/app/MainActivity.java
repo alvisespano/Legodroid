@@ -83,7 +83,8 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             // connect to EV3 via bluetooth
-            EV3 ev3 = new EV3(new BluetoothConnection("EV3").connect());    // replace with your own brick name
+            Connection c = new BluetoothConnection("EV3");
+            EV3 ev3 = new EV3(c.connect());    // replace with your own brick name
 
             Button stopButton = findViewById(R.id.stopButton);
             stopButton.setOnClickListener(v -> {
