@@ -22,6 +22,7 @@ android {
 
     productFlavors {
     }
+    namespace 'it.unive.dais.legodroid.app'
 }
 
 dependencies {
